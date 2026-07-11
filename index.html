@@ -823,16 +823,28 @@
         // --- СКЕНЕР (Симулация) ---
         let stream = null, scanTotal = 0;
         
-        async function startCamera() {
+async function startCamera() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                // 1. Опитваме първо задна камера (за телефон). 
+                // Ако гръмне (напр. сме на лаптоп), хващаме грешката и пускаме каквато и да е камера (video: true).
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                } catch (e) {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                }
+
                 const video = document.getElementById('cameraFeed');
                 video.srcObject = stream;
+                
+                // 2. ИЗРИЧНО караме видеото да тръгне (спасява черен екран на iPhone/Mac)
+                await video.play();
+
                 video.classList.remove('hidden');
                 document.getElementById('cameraPlaceholder').classList.add('hidden');
                 document.getElementById('scanLine').classList.remove('hidden');
             } catch (err) {
-                showToast("Няма достъп до камерата.", "error");
+                console.error("Грешка с камерата:", err);
+                showToast("Няма достъп или камерата е блокирана.", "error");
             }
         }
 
