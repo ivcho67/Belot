@@ -10,6 +10,7 @@
             theme: {
                 extend: {
                     colors: {
+                        bgApp: '#050806',
                         bgDark: '#0a0d0b',
                         bgBase: '#121714',
                         panel: '#1b2921',
@@ -21,7 +22,7 @@
                     },
                     boxShadow: {
                         'glow': '0 0 15px rgba(227, 190, 82, 0.4)',
-                        'glow-lg': '0 0 25px rgba(227, 190, 82, 0.6)'
+                        'glow-lg': '0 0 40px rgba(227, 190, 82, 0.2)'
                     }
                 }
             }
@@ -31,19 +32,20 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
         
         body {
-            background-color: #0a0d0b;
+            background-color: #050806;
+            background-image: radial-gradient(circle at 50% 0%, #1b2921 0%, #050806 70%);
             color: #ffffff;
             -webkit-tap-highlight-color: transparent;
             font-family: 'Inter', sans-serif;
-            overscroll-behavior-y: none; /* Предотвратява pull-to-refresh на мобилни */
+            overscroll-behavior-y: none;
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #263b2f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #263b2f; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e3be52; }
         
-        /* Скриване на стрелките на number input-а */
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -51,7 +53,6 @@
         }
         input[type="number"] { -moz-appearance: textfield; }
 
-        /* Анимации за табове */
         .tab-content {
             display: none;
             opacity: 0;
@@ -64,7 +65,6 @@
             transform: translateY(0);
         }
 
-        /* Checkbox Styling - Modern */
         .custom-checkbox input:checked + div {
             background-color: #e3be52;
             border-color: #e3be52;
@@ -73,311 +73,332 @@
             display: block;
         }
 
-        /* Toast Animation */
         @keyframes slideUp {
             from { transform: translate(-50%, 100%); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
         }
         .toast-enter { animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes scan { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden selection:bg-accentGold selection:text-bgDark">
+<body class="h-screen w-full overflow-hidden flex justify-center items-center lg:p-6 selection:bg-accentGold selection:text-bgDark">
 
-    <!-- Топ Хедър с Glassmorphism -->
-    <header class="fixed top-0 w-full z-40 bg-bgDark/80 backdrop-blur-md border-b border-panelLight pb-3 pt-safe-top">
-        <div class="max-w-md mx-auto px-4 pt-4 flex justify-between items-end">
-            <!-- Отбор Ние -->
-            <div class="text-center w-[40%]">
-                <input type="text" id="team1Name" value="Ние" class="bg-transparent text-gray-400 font-semibold text-sm w-full text-center focus:outline-none focus:text-accentGold transition-colors" onchange="saveState()">
-                <div class="text-4xl font-black mt-1 tracking-tight text-white drop-shadow-md" id="score1">0</div>
+    <!-- Главен Контейнер на Приложението (Адаптивен) -->
+    <div id="app-wrapper" class="w-full h-full lg:max-w-6xl lg:max-h-[900px] lg:rounded-3xl bg-bgDark flex flex-col lg:flex-row overflow-hidden lg:shadow-glow-lg lg:border border-panelLight relative">
+        
+        <!-- Навигация (Долу на телефон, Отляво на десктоп) -->
+        <nav class="order-2 lg:order-1 flex-none w-full lg:w-28 h-[calc(5rem+env(safe-area-inset-bottom))] lg:h-full border-t lg:border-t-0 lg:border-r border-panelLight bg-bgDark/95 backdrop-blur-xl flex lg:flex-col justify-around items-center pb-[env(safe-area-inset-bottom)] lg:pb-8 lg:pt-8 z-50 transition-all">
+            <!-- Лого само за десктоп -->
+            <div class="hidden lg:flex flex-col items-center mb-8 opacity-80">
+                <span class="text-3xl">♠️</span>
+                <span class="text-[10px] font-black text-accentGold tracking-widest mt-1">BELOT</span>
             </div>
-            
-            <div class="text-2xl font-black text-panelLight w-[10%] text-center pb-1">VS</div>
-            
-            <!-- Отбор Вие -->
-            <div class="text-center w-[40%]">
-                <input type="text" id="team2Name" value="Вие" class="bg-transparent text-gray-400 font-semibold text-sm w-full text-center focus:outline-none focus:text-accentGold transition-colors" onchange="saveState()">
-                <div class="text-4xl font-black mt-1 tracking-tight text-white drop-shadow-md" id="score2">0</div>
-            </div>
-        </div>
 
-        <!-- Прогрес Бар -->
-        <div class="max-w-md mx-auto px-4 mt-3">
-            <div class="flex justify-between text-[10px] uppercase font-bold text-gray-500 mb-1.5 tracking-wider">
-                <span>Прогрес</span>
-                <span id="targetScoreLabel" class="text-accentGold">Цел: 151</span>
-            </div>
-            <div class="w-full bg-bgBase rounded-full h-1.5 flex overflow-hidden shadow-inner">
-                <div id="progress1" class="bg-accentGold h-full transition-all duration-500 ease-out" style="width: 0%"></div>
-                <div class="flex-grow bg-bgBase"></div>
-                <div id="progress2" class="bg-accentGold h-full transition-all duration-500 ease-out" style="width: 0%"></div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Основен Контейнер -->
-    <main class="flex-grow overflow-y-auto w-full relative pt-[110px] pb-[calc(80px+env(safe-area-inset-bottom))]">
-        <div class="max-w-md mx-auto px-4 w-full">
-
-            <!-- ТАБ 1: КАЛКУЛАТОР -->
-            <section id="tab-score" class="tab-content active space-y-5">
-                
-                <!-- Контролен Панел за Договор -->
-                <div class="bg-bgBase p-4 rounded-2xl border border-panelLight/50 shadow-lg">
-                    <div class="grid grid-cols-3 gap-2 bg-panel p-1 rounded-xl">
-                        <button class="contract-btn py-3 rounded-lg font-bold text-sm transition-all duration-200 active:scale-95" data-contract="all" onclick="selectContract('all')">Вс. Коз</button>
-                        <button class="contract-btn py-3 rounded-lg font-bold text-sm transition-all duration-200 active:scale-95" data-contract="none" onclick="selectContract('none')">Без Коз</button>
-                        <button class="contract-btn py-3 rounded-lg font-bold text-sm transition-all duration-200 active:scale-95" data-contract="suit" onclick="selectContract('suit')">Боя</button>
-                    </div>
-                    
-                    <!-- Избор на боя -->
-                    <div id="suitSelector" class="hidden grid-cols-4 gap-2 mt-3">
-                        <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl active:scale-90 transition-all hover:border-accentGold" onclick="setSuit('♠', this)">♠</button>
-                        <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl text-red-500 active:scale-90 transition-all hover:border-accentGold" onclick="setSuit('♥', this)">♥</button>
-                        <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl text-red-500 active:scale-90 transition-all hover:border-accentGold" onclick="setSuit('♦', this)">♦</button>
-                        <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl active:scale-90 transition-all hover:border-accentGold" onclick="setSuit('♣', this)">♣</button>
-                    </div>
-                    
-                    <div class="mt-4 grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Обявил играта</label>
-                            <select id="callerSelect" class="w-full bg-panelLight text-white rounded-xl p-3 outline-none focus:ring-2 ring-accentGold mt-1 font-semibold appearance-none" onchange="updateCalc()">
-                                <option value="1">Отбор: Ние</option>
-                                <option value="2">Отбор: Вие</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Множител</label>
-                            <select id="multiplierSelect" class="w-full bg-panelLight text-white rounded-xl p-3 outline-none focus:ring-2 ring-accentGold mt-1 font-semibold appearance-none text-center">
-                                <option value="1">Нормално x1</option>
-                                <option value="2" class="text-accentGold">Контра x2</option>
-                                <option value="4" class="text-danger">Реконтра x4</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Бързо въвеждане на точки -->
-                <div class="bg-bgBase p-4 rounded-2xl border border-panelLight/50 shadow-lg relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accentGold/20 to-transparent"></div>
-                    
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xs uppercase font-bold text-gray-500 tracking-wider">Точки от карти</h2>
-                        <span id="basePointsLabel" class="text-xs font-bold bg-accentGold/10 text-accentGold px-3 py-1 rounded-full border border-accentGold/20">Макс: 162</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between gap-3 bg-bgDark p-3 rounded-2xl border border-panelLight">
-                        <!-- Основен инпут -->
-                        <div class="flex flex-col items-center w-1/2 relative">
-                            <label id="lblPoints1" class="text-[10px] uppercase font-bold text-gray-500 mb-1">Ние</label>
-                            <div class="flex items-center w-full gap-1">
-                                <button onclick="adjPts(-10)" class="bg-panel w-10 h-12 rounded-lg text-gray-400 active:scale-90 active:bg-panelLight font-bold">-</button>
-                                <input type="number" id="inputPoints" inputmode="numeric" pattern="[0-9]*" class="flex-grow bg-transparent text-center text-4xl font-black text-white outline-none w-full h-12 focus:text-accentGold transition-colors" placeholder="0" oninput="updateCalc()" onclick="this.select()">
-                                <button onclick="adjPts(10)" class="bg-panel w-10 h-12 rounded-lg text-gray-400 active:scale-90 active:bg-panelLight font-bold">+</button>
-                            </div>
-                        </div>
-                        
-                        <div class="text-2xl text-panelLight font-black">/</div>
-                        
-                        <!-- Автоматично изчислено -->
-                        <div class="flex flex-col items-center w-1/3 opacity-50">
-                            <label id="lblPoints2" class="text-[10px] uppercase font-bold text-gray-500 mb-1">Вие</label>
-                            <div id="autoPoints" class="text-4xl font-black text-gray-400 h-12 flex items-center justify-center">0</div>
-                        </div>
-                    </div>
-
-                    <!-- Валат Checkboxes -->
-                    <div class="mt-4 grid grid-cols-2 gap-3">
-                        <label class="custom-checkbox flex items-center justify-center space-x-2 bg-panelLight/30 p-2 rounded-xl cursor-pointer active:scale-95 transition-transform">
-                            <input type="checkbox" id="valat1" class="hidden">
-                            <div class="w-5 h-5 rounded border-2 border-gray-500 flex items-center justify-center transition-colors">
-                                <svg class="hidden w-3 h-3 text-bgDark font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <span class="text-sm font-semibold text-gray-300">Ние - Валат</span>
-                        </label>
-                        <label class="custom-checkbox flex items-center justify-center space-x-2 bg-panelLight/30 p-2 rounded-xl cursor-pointer active:scale-95 transition-transform">
-                            <input type="checkbox" id="valat2" class="hidden">
-                            <div class="w-5 h-5 rounded border-2 border-gray-500 flex items-center justify-center transition-colors">
-                                <svg class="hidden w-3 h-3 text-bgDark font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <span class="text-sm font-semibold text-gray-300">Вие - Валат</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Анонси -->
-                <div id="announcementsSection" class="bg-bgBase p-4 rounded-2xl border border-panelLight/50">
-                    <h2 class="text-xs uppercase font-bold text-gray-500 tracking-wider mb-3">Анонси (Сумират се)</h2>
-                    <div class="flex gap-4">
-                        <div class="w-1/2 space-y-2" id="ann1"></div>
-                        <div class="w-1/2 space-y-2" id="ann2"></div>
-                    </div>
-                </div>
-                
-                <div id="noTrumpsWarning" class="hidden bg-danger/10 border border-danger/30 p-4 rounded-2xl text-center">
-                    <span class="text-danger font-black text-sm uppercase tracking-wide">⚠️ На Без Коз няма анонси</span>
-                </div>
-
-                <!-- Главен Бутон -->
-                <button onclick="saveRound()" class="w-full bg-accentGold text-bgDark font-black text-lg p-5 rounded-2xl shadow-glow hover:bg-accentHover active:scale-95 transition-all flex justify-center items-center gap-2 relative overflow-hidden group">
-                    <span class="relative z-10">ЗАПИШИ РУНДА</span>
-                    <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-                </button>
-
-                <!-- История -->
-                <div class="mt-8 mb-4">
-                    <div class="flex justify-between items-center mb-4 px-1">
-                        <h3 class="font-black text-lg text-white">История на играта</h3>
-                        <button onclick="confirmAction('Искате ли да изтриете последното раздаване?', undoLast)" class="text-xs font-bold text-danger/80 hover:text-danger bg-danger/10 px-3 py-1.5 rounded-full transition-colors">Върни ход</button>
-                    </div>
-                    <div class="bg-bgBase rounded-2xl border border-panelLight/50 overflow-hidden shadow-lg">
-                        <table class="w-full text-sm text-left">
-                            <thead class="text-[10px] uppercase font-bold text-gray-500 bg-panelLight/30">
-                                <tr>
-                                    <th class="p-3 pl-4">Игра</th>
-                                    <th class="p-3 text-center">Ние</th>
-                                    <th class="p-3 text-center pr-4">Вие</th>
-                                </tr>
-                            </thead>
-                            <tbody id="historyBody" class="divide-y divide-panelLight/30 font-medium">
-                                <!-- History Rows -->
-                            </tbody>
-                        </table>
-                        <div id="emptyHistory" class="text-center p-6 text-gray-500 text-sm hidden">
-                            Няма записани раздавания.
-                        </div>
-                    </div>
-                    <button onclick="confirmAction('Сигурни ли сте, че искате да започнете изцяло нова игра?', resetGame)" class="w-full mt-4 bg-transparent border-2 border-panelLight text-gray-400 font-bold p-4 rounded-2xl active:bg-panelLight/50 transition-colors">
-                        Нова игра (Reset)
-                    </button>
-                </div>
-            </section>
-
-            <!-- ТАБ 2: AI СКАНИРАНЕ (Sim) -->
-            <section id="tab-scan" class="tab-content flex flex-col h-full space-y-4">
-                <div class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-2xl text-sm text-blue-200">
-                    <strong class="text-blue-400 block mb-1">AI Асистент (Симулация)</strong> 
-                    Използвайте камерата и бързата решетка, за да маркирате видените карти. Точките се смятат автоматично спрямо текущия договор.
-                </div>
-
-                <div class="relative w-full aspect-video bg-bgDark rounded-2xl overflow-hidden border border-panelLight flex items-center justify-center shadow-inner">
-                    <video id="cameraFeed" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-60"></video>
-                    <div id="cameraPlaceholder" class="text-center p-4">
-                        <div class="text-4xl mb-2 opacity-50">📷</div>
-                        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Камерата е спряна</p>
-                    </div>
-                    <div id="scanLine" class="hidden absolute left-0 w-full h-0.5 bg-success shadow-[0_0_15px_#4ade80] animate-[scan_2s_ease-in-out_infinite]"></div>
-                </div>
-                
-                <div class="flex gap-3">
-                    <button onclick="startCamera()" class="flex-1 bg-panelLight border border-success/50 text-success p-3 rounded-xl font-bold active:scale-95 transition-transform flex justify-center items-center gap-2">
-                        <span>▶</span> Пусни 
-                    </button>
-                    <button onclick="stopCamera()" class="flex-1 bg-bgDark border border-danger/30 text-danger/70 p-3 rounded-xl font-bold active:scale-95 transition-transform">
-                        Спри
-                    </button>
-                </div>
-
-                <div class="bg-bgBase p-4 rounded-2xl border border-panelLight/50 mt-2">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="font-bold text-sm text-white uppercase tracking-wide">Решетка на картите</h3>
-                        <span class="text-[10px] font-bold bg-accentGold/10 px-2 py-1 rounded text-accentGold border border-accentGold/20" id="scanContractInfo">Според договора</span>
-                    </div>
-                    
-                    <div class="grid grid-cols-4 gap-1.5" id="cardGrid"></div>
-
-                    <div class="mt-5 flex justify-between items-center bg-bgDark p-3 rounded-xl border border-panelLight">
-                        <div class="text-[10px] uppercase font-bold text-gray-500 leading-tight">Общо<br><span id="scanTotal" class="text-3xl font-black text-white">0</span></div>
-                        <button onclick="sendToCalculator()" class="bg-accentGold text-bgDark px-6 py-3 rounded-xl font-black active:scale-95 transition-transform shadow-glow">
-                            ВЪВЕДИ →
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ТАБ 3: ПРАВИЛА (Сляти за по-лесно четене) -->
-            <section id="tab-rules" class="tab-content space-y-4">
-                <div class="bg-panel rounded-2xl p-5 border border-panelLight">
-                    <h3 class="font-black text-accentGold text-xl mb-2">Анонси</h3>
-                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">На Без Коз няма анонси. По-дълга поредица бие по-къса. При равна дължина - по-висока карта. При пълно равенство - Козът печели.</p>
-                    
-                    <div class="space-y-2 text-sm font-medium">
-                        <div class="flex justify-between border-b border-panelLight/50 pb-2"><span class="text-white">Белот (K+Q коз)</span><span class="text-accentGold font-bold">20 т.</span></div>
-                        <div class="flex justify-between border-b border-panelLight/50 pb-2"><span class="text-white">Терца (3 поредни)</span><span class="text-accentGold font-bold">20 т.</span></div>
-                        <div class="flex justify-between border-b border-panelLight/50 pb-2"><span class="text-white">Кварта (4 поредни)</span><span class="text-accentGold font-bold">50 т.</span></div>
-                        <div class="flex justify-between border-b border-panelLight/50 pb-2"><span class="text-white">Квинта (5+ поредни)</span><span class="text-accentGold font-bold">100 т.</span></div>
-                        <div class="flex justify-between border-b border-panelLight/50 pb-2"><span class="text-white">Каре Валета</span><span class="text-accentGold font-bold">200 т.</span></div>
-                        <div class="flex justify-between border-b border-panelLight/50 pb-2"><span class="text-white">Каре Деветки</span><span class="text-accentGold font-bold">150 т.</span></div>
-                        <div class="flex justify-between"><span class="text-white">Каре (A/K/Q/10)</span><span class="text-accentGold font-bold">100 т.</span></div>
-                    </div>
-                </div>
-
-                <div class="bg-bgBase rounded-2xl p-5 border border-panelLight/50">
-                    <h3 class="font-black text-white text-lg mb-3">Основни Правила</h3>
-                    <ul class="space-y-3 text-sm text-gray-300">
-                        <li class="flex gap-3"><span class="text-accentGold font-bold">1.</span> Раздават се общо 32 карти. Цел: 151 т. (или 251 на Без Коз).</li>
-                        <li class="flex gap-3"><span class="text-accentGold font-bold">2.</span> <strong>Закръгляне:</strong> Крайният резултат се дели на 10. (напр. 145 т. стават 15, 144 т. стават 14).</li>
-                        <li class="flex gap-3"><span class="text-accentGold font-bold">3.</span> <strong>Вътре:</strong> Обявилият трябва да изкара повече от половината точки (над 81 на Коз/Боя, над 65 на Без Коз). При равенство (81-81), обявилият е вътре. Противникът взима всичко.</li>
-                        <li class="flex gap-3"><span class="text-accentGold font-bold">4.</span> <strong>Валат:</strong> +25 т. бонус за отбора, спечелил всички ръце в раздаването.</li>
-                    </ul>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- Долна Навигация (Glassmorphism) -->
-    <nav class="fixed bottom-0 w-full bg-bgDark/85 backdrop-blur-xl border-t border-panelLight/50 pb-safe-bottom z-40">
-        <div class="flex justify-around items-center h-20 max-w-md mx-auto px-2">
-            <button onclick="switchTab('score')" class="nav-btn active w-1/3 flex flex-col items-center justify-center text-accentGold transition-all transform active:scale-90" data-target="score">
-                <svg class="w-6 h-6 mb-1 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                <span class="text-[10px] font-black uppercase tracking-wider">Калкулатор</span>
+            <button onclick="switchTab('score')" class="nav-btn active w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-accentGold transition-all transform active:scale-90 hover:bg-panelLight/20 lg:rounded-2xl" data-target="score">
+                <svg class="w-7 h-7 mb-1.5 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                <span class="text-[10px] font-black uppercase tracking-wider">Игра</span>
             </button>
-            <button onclick="switchTab('scan')" class="nav-btn w-1/3 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90" data-target="scan">
-                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <button onclick="switchTab('scan')" class="nav-btn w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-panelLight/20 lg:rounded-2xl" data-target="scan">
+                <svg class="w-7 h-7 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 <span class="text-[10px] font-black uppercase tracking-wider">Скенер</span>
             </button>
-            <button onclick="switchTab('rules')" class="nav-btn w-1/3 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90" data-target="rules">
-                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            <button onclick="switchTab('rules')" class="nav-btn w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-panelLight/20 lg:rounded-2xl" data-target="rules">
+                <svg class="w-7 h-7 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                 <span class="text-[10px] font-black uppercase tracking-wider">Правила</span>
             </button>
-        </div>
-    </nav>
+            <div class="hidden lg:block flex-grow"></div>
+        </nav>
 
-    <!-- Custom Modal -->
-    <div id="modalOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center px-4 opacity-0 transition-opacity duration-200">
-        <div class="bg-bgBase border border-panelLight p-6 rounded-3xl max-w-sm w-full transform scale-95 transition-transform duration-200" id="modalBox">
+        <!-- Работна Зона -->
+        <div class="order-1 lg:order-2 flex-1 flex flex-col relative overflow-hidden bg-bgDark">
+            
+            <!-- Хедър (Резултат) -->
+            <header class="flex-none bg-bgDark/90 backdrop-blur-md border-b border-panelLight pt-[max(env(safe-area-inset-top),1rem)] pb-4 px-4 lg:px-8 z-40">
+                <div class="max-w-3xl mx-auto flex justify-between items-end">
+                    <div class="text-center w-[40%]">
+                        <input type="text" id="team1Name" value="Ние" class="bg-transparent text-gray-400 font-semibold text-sm w-full text-center focus:outline-none focus:text-accentGold transition-colors" onchange="saveState()">
+                        <div class="text-4xl lg:text-5xl font-black mt-1 tracking-tight text-white drop-shadow-md" id="score1">0</div>
+                    </div>
+                    <div class="text-2xl lg:text-3xl font-black text-panelLight w-[10%] text-center pb-1 lg:pb-2">VS</div>
+                    <div class="text-center w-[40%]">
+                        <input type="text" id="team2Name" value="Вие" class="bg-transparent text-gray-400 font-semibold text-sm w-full text-center focus:outline-none focus:text-accentGold transition-colors" onchange="saveState()">
+                        <div class="text-4xl lg:text-5xl font-black mt-1 tracking-tight text-white drop-shadow-md" id="score2">0</div>
+                    </div>
+                </div>
+                <div class="max-w-3xl mx-auto mt-4">
+                    <div class="flex justify-between text-[10px] uppercase font-bold text-gray-500 mb-1.5 tracking-wider">
+                        <span>Прогрес</span>
+                        <span id="targetScoreLabel" class="text-accentGold">Цел: 151</span>
+                    </div>
+                    <div class="w-full bg-bgBase rounded-full h-2 flex overflow-hidden shadow-inner border border-gray-800">
+                        <div id="progress1" class="bg-accentGold h-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                        <div class="flex-grow bg-bgBase"></div>
+                        <div id="progress2" class="bg-accentGold h-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Основно Скролиращо Съдържание -->
+            <main class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth w-full" id="mainContainer">
+                
+                <!-- ТАБ 1: КАЛКУЛАТОР -->
+                <section id="tab-score" class="tab-content active h-full max-w-5xl mx-auto">
+                    <!-- Грид за Десктоп (2 колони), Flex за Мобилно (1 колона) -->
+                    <div class="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 lg:h-full lg:items-start">
+                        
+                        <!-- ЛЯВА КОЛОНА: Въвеждане -->
+                        <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-0">
+                            <!-- Договор -->
+                            <div class="bg-bgBase p-4 lg:p-5 rounded-2xl border border-panelLight shadow-lg">
+                                <div class="grid grid-cols-3 gap-2 bg-panel p-1.5 rounded-xl">
+                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm lg:text-base transition-all duration-200 active:scale-95" data-contract="all" onclick="selectContract('all')">Вс. Коз</button>
+                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm lg:text-base transition-all duration-200 active:scale-95" data-contract="none" onclick="selectContract('none')">Без Коз</button>
+                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm lg:text-base transition-all duration-200 active:scale-95" data-contract="suit" onclick="selectContract('suit')">Боя</button>
+                                </div>
+                                <div id="suitSelector" class="hidden grid-cols-4 gap-2 mt-3">
+                                    <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl hover:border-accentGold transition-all" onclick="setSuit('♠', this)">♠</button>
+                                    <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl text-red-500 hover:border-accentGold transition-all" onclick="setSuit('♥', this)">♥</button>
+                                    <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl text-red-500 hover:border-accentGold transition-all" onclick="setSuit('♦', this)">♦</button>
+                                    <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl hover:border-accentGold transition-all" onclick="setSuit('♣', this)">♣</button>
+                                </div>
+                                <div class="mt-4 grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Обявил</label>
+                                        <select id="callerSelect" class="w-full bg-panelLight text-white rounded-xl p-3 outline-none focus:ring-2 ring-accentGold mt-1 font-semibold cursor-pointer appearance-none" onchange="updateCalc()">
+                                            <option value="1">Ние</option>
+                                            <option value="2">Вие</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Множител</label>
+                                        <select id="multiplierSelect" class="w-full bg-panelLight text-white rounded-xl p-3 outline-none focus:ring-2 ring-accentGold mt-1 font-semibold cursor-pointer appearance-none text-center">
+                                            <option value="1">Нормално x1</option>
+                                            <option value="2" class="text-accentGold">Контра x2</option>
+                                            <option value="4" class="text-danger">Реконтра x4</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Точки -->
+                            <div class="bg-bgBase p-4 lg:p-5 rounded-2xl border border-panelLight shadow-lg relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accentGold/20 to-transparent"></div>
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xs uppercase font-bold text-gray-500 tracking-wider">Точки от карти</h2>
+                                    <span id="basePointsLabel" class="text-xs font-bold bg-accentGold/10 text-accentGold px-3 py-1 rounded-full border border-accentGold/20">Макс: 162</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between gap-3 bg-bgDark p-3 rounded-2xl border border-panelLight">
+                                    <div class="flex flex-col items-center w-1/2 relative">
+                                        <label id="lblPoints1" class="text-[10px] uppercase font-bold text-gray-500 mb-1">Ние</label>
+                                        <div class="flex items-center w-full gap-1">
+                                            <button onclick="adjPts(-10)" class="bg-panel w-10 h-12 lg:h-14 rounded-lg text-gray-400 active:scale-90 hover:bg-panelLight font-bold transition-all">-</button>
+                                            <input type="number" id="inputPoints" inputmode="numeric" pattern="[0-9]*" class="flex-grow bg-transparent text-center text-4xl lg:text-5xl font-black text-white outline-none w-full h-12 lg:h-14 focus:text-accentGold transition-colors" placeholder="0" oninput="updateCalc()" onclick="this.select()">
+                                            <button onclick="adjPts(10)" class="bg-panel w-10 h-12 lg:h-14 rounded-lg text-gray-400 active:scale-90 hover:bg-panelLight font-bold transition-all">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="text-2xl text-panelLight font-black">/</div>
+                                    <div class="flex flex-col items-center w-1/3 opacity-50">
+                                        <label id="lblPoints2" class="text-[10px] uppercase font-bold text-gray-500 mb-1">Вие</label>
+                                        <div id="autoPoints" class="text-4xl lg:text-5xl font-black text-gray-400 h-12 lg:h-14 flex items-center justify-center">0</div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 grid grid-cols-2 gap-3">
+                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-panelLight/30 p-3 rounded-xl cursor-pointer hover:bg-panelLight/50 transition-colors">
+                                        <input type="checkbox" id="valat1" class="hidden">
+                                        <div class="w-5 h-5 rounded border-2 border-gray-500 flex items-center justify-center transition-colors">
+                                            <svg class="hidden w-3 h-3 text-bgDark font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        </div>
+                                        <span class="text-sm font-semibold text-gray-300">Валат (Ние)</span>
+                                    </label>
+                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-panelLight/30 p-3 rounded-xl cursor-pointer hover:bg-panelLight/50 transition-colors">
+                                        <input type="checkbox" id="valat2" class="hidden">
+                                        <div class="w-5 h-5 rounded border-2 border-gray-500 flex items-center justify-center transition-colors">
+                                            <svg class="hidden w-3 h-3 text-bgDark font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        </div>
+                                        <span class="text-sm font-semibold text-gray-300">Валат (Вие)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button onclick="saveRound()" class="w-full bg-accentGold text-bgDark font-black text-lg p-5 rounded-2xl shadow-glow hover:bg-accentHover active:scale-95 transition-all flex justify-center items-center gap-2 relative overflow-hidden group">
+                                <span class="relative z-10">ЗАПИШИ РУНДА</span>
+                                <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                            </button>
+                        </div>
+
+                        <!-- ДЯСНА КОЛОНА: Анонси и История -->
+                        <div class="lg:col-span-7 space-y-5 flex flex-col h-full lg:pb-0 pb-10">
+                            <!-- Анонси -->
+                            <div id="announcementsSection" class="bg-bgBase p-4 lg:p-5 rounded-2xl border border-panelLight shadow-lg flex-none">
+                                <h2 class="text-xs uppercase font-bold text-gray-500 tracking-wider mb-3">Добави Анонси</h2>
+                                <div class="flex gap-4">
+                                    <div class="w-1/2 space-y-2" id="ann1"></div>
+                                    <div class="w-1/2 space-y-2" id="ann2"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="noTrumpsWarning" class="hidden bg-danger/10 border border-danger/30 p-4 rounded-2xl text-center flex-none">
+                                <span class="text-danger font-black text-sm uppercase tracking-wide">⚠️ На Без Коз няма анонси</span>
+                            </div>
+
+                            <!-- История -->
+                            <div class="flex-grow flex flex-col min-h-[250px] lg:min-h-0">
+                                <div class="flex justify-between items-center mb-3 px-1 flex-none">
+                                    <h3 class="font-black text-lg text-white">История</h3>
+                                    <button onclick="confirmAction('Искате ли да изтриете последното раздаване?', undoLast)" class="text-xs font-bold text-danger/80 hover:text-danger bg-danger/10 px-3 py-1.5 rounded-full transition-colors cursor-pointer">Върни ход</button>
+                                </div>
+                                <div class="bg-bgBase rounded-2xl border border-panelLight overflow-hidden shadow-lg flex-grow flex flex-col">
+                                    <div class="overflow-y-auto flex-grow relative">
+                                        <table class="w-full text-sm text-left relative">
+                                            <thead class="text-[10px] uppercase font-bold text-gray-500 bg-panelLight/50 sticky top-0 backdrop-blur-md z-10">
+                                                <tr>
+                                                    <th class="p-3 pl-4">Договор</th>
+                                                    <th class="p-3 text-center">Ние</th>
+                                                    <th class="p-3 text-center pr-4">Вие</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="historyBody" class="divide-y divide-panelLight/30 font-medium"></tbody>
+                                        </table>
+                                        <div id="emptyHistory" class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm hidden flex-col gap-2 bg-bgBase">
+                                            <span class="text-3xl opacity-50">📝</span>
+                                            <span>Няма записани раздавания.</span>
+                                        </div>
+                                    </div>
+                                    <button onclick="confirmAction('Сигурни ли сте, че искате да започнете нова игра?', resetGame)" class="w-full bg-panelLight/20 hover:bg-panelLight/40 text-gray-400 font-bold p-3 text-xs transition-colors flex-none border-t border-panelLight">
+                                        Изтрий всичко и започни нова игра
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ТАБ 2: СКЕНЕР -->
+                <section id="tab-scan" class="tab-content h-full max-w-3xl mx-auto space-y-4 lg:space-y-6 lg:pt-4">
+                    <div class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-2xl text-sm text-blue-200 shadow-md">
+                        <strong class="text-blue-400 block mb-1 text-base">Камера Асистент</strong> 
+                        Симулация: Отворете камерата, вижте картите и ги маркирайте в решетката. Точките се изчисляват спрямо избрания договор.
+                    </div>
+
+                    <div class="relative w-full aspect-video lg:max-h-[400px] bg-black rounded-2xl overflow-hidden border-2 border-panelLight flex items-center justify-center shadow-inner">
+                        <video id="cameraFeed" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-80"></video>
+                        <div id="cameraPlaceholder" class="text-center p-4">
+                            <div class="text-5xl mb-3 opacity-30">📷</div>
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Камерата е спряна</p>
+                        </div>
+                        <div id="scanLine" class="hidden absolute left-0 w-full h-0.5 bg-success shadow-[0_0_20px_#4ade80] animate-[scan_2s_ease-in-out_infinite]"></div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button onclick="startCamera()" class="flex-1 bg-panelLight hover:bg-panelLight/80 border border-success/50 text-success p-4 rounded-xl font-bold active:scale-95 transition-all flex justify-center items-center gap-2 text-lg shadow-md cursor-pointer">
+                            <span>▶</span> Включи
+                        </button>
+                        <button onclick="stopCamera()" class="flex-1 bg-bgDark hover:bg-panel border border-danger/30 text-danger p-4 rounded-xl font-bold active:scale-95 transition-all cursor-pointer">
+                            Изключи
+                        </button>
+                    </div>
+
+                    <div class="bg-bgBase p-5 rounded-2xl border border-panelLight shadow-lg mt-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-sm text-white uppercase tracking-wide">Ръчна Решетка</h3>
+                            <span class="text-xs font-bold bg-accentGold/10 px-3 py-1.5 rounded-full text-accentGold border border-accentGold/20" id="scanContractInfo">Според договора</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-4 gap-2 lg:gap-3" id="cardGrid"></div>
+
+                        <div class="mt-6 flex justify-between items-center bg-bgDark p-4 rounded-xl border border-panelLight">
+                            <div class="text-xs uppercase font-bold text-gray-500 leading-tight">Открити точки<br><span id="scanTotal" class="text-4xl font-black text-white">0</span></div>
+                            <button onclick="sendToCalculator()" class="bg-accentGold text-bgDark px-8 py-4 rounded-xl font-black active:scale-95 hover:bg-accentHover transition-all shadow-glow cursor-pointer text-lg">
+                                ВЪВЕДИ →
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ТАБ 3: ПРАВИЛА -->
+                <section id="tab-rules" class="tab-content h-full max-w-5xl mx-auto pb-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full items-start">
+                        <!-- Ляво: Анонси -->
+                        <div class="bg-panel rounded-2xl p-6 border border-panelLight shadow-lg">
+                            <h3 class="font-black text-accentGold text-2xl mb-2 flex items-center gap-2"><span>📣</span> Таблица с Анонси</h3>
+                            <p class="text-sm text-gray-300 mb-6 leading-relaxed bg-bgDark/50 p-3 rounded-lg border border-panelLight/50"><strong>Важно:</strong> На Без Коз няма анонси. По-дълга поредица бие по-къса. При равна дължина - по-висока карта. При пълно равенство - Козът печели.</p>
+                            
+                            <div class="space-y-3 text-sm font-medium">
+                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Белот (K+Q коз)</span><span class="text-accentGold font-black text-base">20</span></div>
+                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Терца (3 поредни)</span><span class="text-accentGold font-black text-base">20</span></div>
+                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Кварта (4 поредни)</span><span class="text-accentGold font-black text-base">50</span></div>
+                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Квинта (5+ поредни)</span><span class="text-accentGold font-black text-base">100</span></div>
+                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Каре Валета</span><span class="text-accentGold font-black text-base">200</span></div>
+                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Каре Деветки</span><span class="text-accentGold font-black text-base">150</span></div>
+                                <div class="flex justify-between hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Каре (A/K/Q/10)</span><span class="text-accentGold font-black text-base">100</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Дясно: Правила -->
+                        <div class="bg-bgBase rounded-2xl p-6 border border-panelLight shadow-lg space-y-6">
+                            <h3 class="font-black text-white text-2xl mb-4 flex items-center gap-2"><span>📖</span> Основни Правила</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-panel/30 p-4 rounded-xl border border-panelLight/30">
+                                    <h4 class="font-bold text-accentGold mb-1 text-sm uppercase tracking-wider">Основи</h4>
+                                    <p class="text-sm text-gray-300">Раздават се общо 32 карти. Играе се до 151 т. (или 251 на чист Без Коз). След раздаване на 5 карти се обявява договор.</p>
+                                </div>
+                                
+                                <div class="bg-panel/30 p-4 rounded-xl border border-panelLight/30">
+                                    <h4 class="font-bold text-accentGold mb-1 text-sm uppercase tracking-wider">Закръгляне</h4>
+                                    <p class="text-sm text-gray-300">Резултатът от ръцете се дели на 10 и се закръгля. Пример: 145 т. се пишат 15. 144 т. се пишат 14.</p>
+                                </div>
+
+                                <div class="bg-panel/30 p-4 rounded-xl border border-danger/20">
+                                    <h4 class="font-bold text-danger mb-1 text-sm uppercase tracking-wider">Вътре си (Капут)</h4>
+                                    <p class="text-sm text-gray-300">Отборът обявил играта трябва да изкара повече от половината точки (над 81 на Коз, над 65 на Без Коз). При равенство (81-81), обявилият е вътре и противникът записва всичко (вкл. анонсите).</p>
+                                </div>
+
+                                <div class="bg-panel/30 p-4 rounded-xl border border-success/20">
+                                    <h4 class="font-bold text-success mb-1 text-sm uppercase tracking-wider">Валат / Капо</h4>
+                                    <p class="text-sm text-gray-300">Ако един отбор спечели всички взятки в раздаването, той получава бонус от +25 точки.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Модален Прозорец -->
+    <div id="modalOverlay" class="fixed inset-0 bg-bgApp/90 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-200">
+        <div class="bg-bgBase border border-panelLight p-6 rounded-3xl max-w-sm w-full transform scale-95 transition-transform duration-200 shadow-2xl" id="modalBox">
             <h3 class="text-xl font-black text-white mb-2">Потвърждение</h3>
-            <p id="modalMsg" class="text-sm text-gray-400 mb-6"></p>
+            <p id="modalMsg" class="text-sm text-gray-400 mb-8"></p>
             <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 bg-panelLight text-white p-3 rounded-xl font-bold active:scale-95 transition-transform">Отказ</button>
-                <button id="modalConfirmBtn" class="flex-1 bg-danger text-white p-3 rounded-xl font-bold shadow-[0_0_15px_rgba(255,76,76,0.4)] active:scale-95 transition-transform">Потвърди</button>
+                <button onclick="closeModal()" class="flex-1 bg-panel hover:bg-panelLight text-white p-3.5 rounded-xl font-bold active:scale-95 transition-all">Отказ</button>
+                <button id="modalConfirmBtn" class="flex-1 bg-danger hover:bg-red-500 text-white p-3.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,76,76,0.3)] active:scale-95 transition-all">Потвърди</button>
             </div>
         </div>
     </div>
 
     <!-- Toast Container -->
-    <div id="toastContainer" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-max max-w-[90%] pointer-events-none"></div>
-
-    <style>
-        @keyframes scan { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
-        @keyframes shimmer { 100% { transform: translateX(100%); } }
-    </style>
+    <div id="toastContainer" class="fixed top-6 lg:top-10 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-max max-w-[90%] pointer-events-none"></div>
 
     <script>
-        // --- DATA & STATE ---
+        // --- ДАННИ ---
         let state = {
             t1Name: "Ние", t2Name: "Вие", total1: 0, total2: 0, rounds: [],
             currentContract: 'all', currentSuit: '', targetScore: 151
         };
 
         const annTypes = [
-            { id: 'belot', label: 'Белот', val: 20 }, { id: 'tierce', label: 'Терца', val: 20 },
-            { id: 'quarte', label: 'Кварта', val: 50 }, { id: 'quinte', label: 'Квинта', val: 100 },
-            { id: 'carre100', label: 'Каре (100)', val: 100 }, { id: 'carre150', label: 'Каре (9-ки)', val: 150 },
-            { id: 'carre200', label: 'Каре (J-та)', val: 200 }
+            { id: 'belot', label: 'Белот (20)', val: 20 }, { id: 'tierce', label: 'Терца (20)', val: 20 },
+            { id: 'quarte', label: 'Кварта (50)', val: 50 }, { id: 'quinte', label: 'Квинта (100)', val: 100 },
+            { id: 'carre100', label: 'Каре (100)', val: 100 }, { id: 'carre150', label: 'Каре (150)', val: 150 },
+            { id: 'carre200', label: 'Каре (200)', val: 200 }
         ];
 
-        // --- INIT ---
+        // --- ИНИЦИАЛИЗАЦИЯ ---
         window.onload = () => {
             const saved = localStorage.getItem('beloteStatePro');
             if (saved) {
@@ -403,18 +424,18 @@
 
         function updateCallerSelect() {
             const sel = document.getElementById('callerSelect');
-            sel.options[0].text = "Отбор: " + state.t1Name;
-            sel.options[1].text = "Отбор: " + state.t2Name;
+            sel.options[0].text = state.t1Name;
+            sel.options[1].text = state.t2Name;
         }
 
-        // --- UI UTILS ---
+        // --- UI ФУНКЦИИ ---
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             const color = type === 'error' ? 'bg-danger' : 'bg-accentGold';
             const textColor = type === 'error' ? 'text-white' : 'text-bgDark';
             
-            toast.className = `toast-enter ${color} ${textColor} px-5 py-3 rounded-full font-bold text-sm shadow-lg flex items-center gap-2`;
+            toast.className = `toast-enter ${color} ${textColor} px-6 py-3 rounded-full font-black text-sm shadow-lg flex items-center gap-2`;
             toast.innerHTML = type === 'error' ? `<span>⚠️</span> ${msg}` : `<span>✓</span> ${msg}`;
             
             container.appendChild(toast);
@@ -460,26 +481,27 @@
                 if (btn.dataset.target === tabId) {
                     btn.classList.add('text-accentGold');
                     btn.classList.remove('text-gray-500');
-                    btn.querySelector('svg').classList.add('drop-shadow-md');
+                    if(btn.querySelector('svg')) btn.querySelector('svg').classList.add('drop-shadow-md');
                 } else {
                     btn.classList.remove('text-accentGold');
                     btn.classList.add('text-gray-500');
-                    btn.querySelector('svg').classList.remove('drop-shadow-md');
+                    if(btn.querySelector('svg')) btn.querySelector('svg').classList.remove('drop-shadow-md');
                 }
             });
+            document.getElementById('mainContainer').scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // --- CALCULATOR LOGIC ---
+        // --- ЛОГИКА КАЛКУЛАТОР ---
         function selectContract(cType) {
             state.currentContract = cType;
             
             document.querySelectorAll('.contract-btn').forEach(btn => {
                 if (btn.dataset.contract === cType) {
                     btn.classList.add('bg-accentGold', 'text-bgDark', 'shadow-glow');
-                    btn.classList.remove('bg-panelLight', 'text-white');
+                    btn.classList.remove('bg-panelLight', 'text-white', 'hover:bg-panelLight/80');
                 } else {
                     btn.classList.remove('bg-accentGold', 'text-bgDark', 'shadow-glow');
-                    btn.classList.add('bg-panelLight', 'text-white');
+                    btn.classList.add('bg-panelLight', 'text-white', 'hover:bg-panelLight/80');
                 }
             });
 
@@ -525,12 +547,12 @@
 
             annTypes.forEach(t => {
                 const makeRow = (team) => `
-                    <label class="custom-checkbox flex items-center space-x-2 bg-panelLight/40 p-2 rounded-xl cursor-pointer active:scale-95 transition-transform">
+                    <label class="custom-checkbox flex items-center space-x-2 bg-panelLight/40 hover:bg-panelLight/70 p-2 lg:p-2.5 rounded-xl cursor-pointer transition-colors">
                         <input type="checkbox" class="hidden ann-chk t${team}-ann" data-val="${t.val}">
-                        <div class="w-5 h-5 rounded border border-gray-500 flex items-center justify-center transition-colors">
+                        <div class="w-5 h-5 flex-none rounded border border-gray-400 flex items-center justify-center transition-colors">
                             <svg class="hidden w-3 h-3 text-bgDark font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
-                        <span class="text-xs font-semibold text-gray-300">${t.label}</span>
+                        <span class="text-[11px] lg:text-xs font-semibold text-gray-200 leading-tight">${t.label}</span>
                     </label>
                 `;
                 container1.innerHTML += makeRow(1);
@@ -573,10 +595,10 @@
             const multiplier = parseInt(document.getElementById('multiplierSelect').value);
             
             let inputPts = parseInt(document.getElementById('inputPoints').value);
-            if (isNaN(inputPts)) return showToast("Въведете точки първо!", "error");
+            if (isNaN(inputPts)) return showToast("Моля, въведете точки!", "error");
 
             if (state.currentContract === 'suit' && !state.currentSuit) {
-                return showToast("Изберете боя!", "error");
+                return showToast("Изберете боя първо!", "error");
             }
 
             let raw1 = caller === '1' ? inputPts : (base - inputPts);
@@ -611,9 +633,9 @@
 
             state.rounds.push({ contract: cStr, p1: final1, p2: final2, caller: caller, inside: isInside });
             
-            showToast("Раздаването е записано!");
+            showToast("Записано!");
             
-            // Reset
+            // Зануляване UI
             document.getElementById('inputPoints').value = '';
             document.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
             document.getElementById('multiplierSelect').value = "1";
@@ -622,10 +644,13 @@
             renderHistory();
             saveState();
             
-            // Scroll history to bottom smoothly
+            // Auto scroll history down
             setTimeout(() => {
-                const main = document.querySelector('main');
-                main.scrollTo({ top: main.scrollHeight, behavior: 'smooth' });
+                const tBody = document.getElementById('historyBody');
+                if(tBody && tBody.parentElement && tBody.parentElement.parentElement) {
+                    const scrollArea = tBody.parentElement.parentElement;
+                    scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+                }
             }, 100);
         }
 
@@ -644,8 +669,8 @@
             const s1 = document.getElementById('score1');
             const s2 = document.getElementById('score2');
             
-            s1.className = `text-4xl font-black mt-1 tracking-tight drop-shadow-md ${state.total1 >= state.targetScore ? 'text-success' : 'text-white'}`;
-            s2.className = `text-4xl font-black mt-1 tracking-tight drop-shadow-md ${state.total2 >= state.targetScore ? 'text-success' : 'text-white'}`;
+            s1.className = `text-4xl lg:text-5xl font-black mt-1 tracking-tight drop-shadow-md transition-colors ${state.total1 >= state.targetScore ? 'text-success' : 'text-white'}`;
+            s2.className = `text-4xl lg:text-5xl font-black mt-1 tracking-tight drop-shadow-md transition-colors ${state.total2 >= state.targetScore ? 'text-success' : 'text-white'}`;
         }
 
         function renderHistory() {
@@ -654,12 +679,12 @@
             tbody.innerHTML = '';
             
             if(state.rounds.length === 0) {
-                tbody.parentElement.classList.add('hidden');
+                tbody.parentElement.classList.add('invisible');
                 empty.classList.remove('hidden');
                 return;
             }
             
-            tbody.parentElement.classList.remove('hidden');
+            tbody.parentElement.classList.remove('invisible');
             empty.classList.add('hidden');
 
             state.rounds.forEach((r) => {
@@ -667,23 +692,23 @@
                 tr.className = "hover:bg-panelLight/20 transition-colors";
                 tr.innerHTML = `
                     <td class="p-3 pl-4 border-b border-panelLight/30">
-                        <span class="font-bold text-accentGold block">${r.contract}</span>
-                        ${r.inside ? `<span class="text-[9px] uppercase bg-danger/20 text-danger px-1.5 py-0.5 rounded border border-danger/30">Вътре (${r.caller==='1'?state.t1Name:state.t2Name})</span>` : ''}
+                        <span class="font-bold text-accentGold block text-base">${r.contract}</span>
+                        ${r.inside ? `<span class="text-[9px] uppercase font-black bg-danger text-white px-1.5 py-0.5 rounded shadow-sm">Вътре (${r.caller==='1'?state.t1Name:state.t2Name})</span>` : ''}
                     </td>
-                    <td class="p-3 text-center border-b border-panelLight/30 text-lg ${r.caller === '1' ? 'bg-panel/50 font-black' : 'text-gray-300'}">${r.p1}</td>
-                    <td class="p-3 text-center pr-4 border-b border-panelLight/30 text-lg ${r.caller === '2' ? 'bg-panel/50 font-black' : 'text-gray-300'}">${r.p2}</td>
+                    <td class="p-3 text-center border-b border-panelLight/30 text-xl ${r.caller === '1' ? 'bg-panel/50 font-black text-white' : 'text-gray-400 font-medium'}">${r.p1}</td>
+                    <td class="p-3 text-center pr-4 border-b border-panelLight/30 text-xl ${r.caller === '2' ? 'bg-panel/50 font-black text-white' : 'text-gray-400 font-medium'}">${r.p2}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
         function undoLast() {
-            if (state.rounds.length === 0) return showToast("Няма какво да се върне.", "error");
+            if (state.rounds.length === 0) return showToast("Няма ходове за връщане.", "error");
             state.rounds.pop();
             updateOverallScore();
             renderHistory();
             saveState();
-            showToast("Последното раздаване е изтрито.");
+            showToast("Последното раздаване е изтрито!");
         }
 
         function resetGame() {
@@ -691,11 +716,10 @@
             updateOverallScore();
             renderHistory();
             saveState();
-            showToast("Нова игра започната!");
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            showToast("Нова игра е започната!");
         }
 
-        // --- SCANNER SIMULATION ---
+        // --- СКЕНЕР (Симулация) ---
         let stream = null, scanTotal = 0;
         
         async function startCamera() {
@@ -707,7 +731,7 @@
                 document.getElementById('cameraPlaceholder').classList.add('hidden');
                 document.getElementById('scanLine').classList.remove('hidden');
             } catch (err) {
-                showToast("Няма достъп до камерата.", "error");
+                showToast("Достъпът до камерата е отказан.", "error");
             }
         }
 
@@ -741,17 +765,19 @@
             suitsDef.forEach(suit => {
                 cardsDef.forEach(rank => {
                     const btn = document.createElement('button');
-                    btn.className = `bg-panelLight text-white text-xs py-2.5 rounded-lg border border-transparent transition-all transform active:scale-90 font-bold shadow-sm ${['♥','♦'].includes(suit) ? 'text-red-400' : ''}`;
+                    btn.className = `bg-panelLight hover:bg-panelLight/80 text-white text-xs lg:text-sm py-3 lg:py-4 rounded-xl border border-transparent transition-all transform active:scale-90 font-bold shadow-sm ${['♥','♦'].includes(suit) ? 'text-red-400' : ''}`;
                     btn.innerHTML = `${rank}${suit}`;
                     btn.dataset.rank = rank; btn.dataset.suit = suit; btn.dataset.active = "0";
                     btn.onclick = () => {
                         btn.dataset.active = btn.dataset.active === "1" ? "0" : "1";
                         if (btn.dataset.active === "1") {
                             btn.classList.add('bg-accentGold', 'text-bgDark', 'shadow-glow', 'scale-105');
-                            btn.classList.remove('bg-panelLight');
+                            btn.classList.remove('bg-panelLight', 'hover:bg-panelLight/80', 'text-red-400', 'text-white');
                         } else {
                             btn.classList.remove('bg-accentGold', 'text-bgDark', 'shadow-glow', 'scale-105');
-                            btn.classList.add('bg-panelLight');
+                            btn.classList.add('bg-panelLight', 'hover:bg-panelLight/80');
+                            if(['♥','♦'].includes(suit)) btn.classList.add('text-red-400');
+                            else btn.classList.add('text-white');
                         }
                         recalcScan();
                     };
@@ -776,7 +802,9 @@
             document.querySelectorAll('#cardGrid button').forEach(b => {
                 b.dataset.active = "0";
                 b.classList.remove('bg-accentGold', 'text-bgDark', 'shadow-glow', 'scale-105');
-                b.classList.add('bg-panelLight');
+                b.classList.add('bg-panelLight', 'hover:bg-panelLight/80');
+                if(['♥','♦'].includes(b.dataset.suit)) b.classList.add('text-red-400');
+                else b.classList.add('text-white');
             });
             scanTotal = 0;
             document.getElementById('scanTotal').innerText = "0";
