@@ -2,14 +2,14 @@
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#050806">
     <title>Белот Асистент Pro</title>
-    
-    <!-- Google Fonts -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Unbounded:wght@400;700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -18,6 +18,7 @@
                     fontFamily: {
                         sans: ['Manrope', 'sans-serif'],
                         display: ['Unbounded', 'sans-serif'],
+                        mono: ['"Space Mono"', 'monospace'],
                     },
                     colors: {
                         bgApp: '#050806',
@@ -44,21 +45,24 @@
             color: #ffffff;
             -webkit-tap-highlight-color: transparent;
             overscroll-behavior-y: none;
-            /* Предотвратява маркирането на текст при случайно дълго натискане */
-            -webkit-user-select: none;
-            user-select: none;
         }
-        /* Разрешаваме селектирането само в инпут полетата */
-        input {
-            -webkit-user-select: auto;
-            user-select: auto;
+        /* Селекция на текст е позволена само в четими/въвеждащи зони, не върху бутони/контроли */
+        button, nav, .no-select { -webkit-user-select: none; user-select: none; }
+        input { -webkit-user-select: auto; user-select: auto; }
+
+        /* Фина "филцова" текстура зад всичко — визуален подпис на приложението (маса за карти) */
+        #app-wrapper::before {
+            content: '';
+            position: absolute; inset: 0; z-index: 0; pointer-events: none;
+            opacity: 0.05; mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
 
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1f422e; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #e3be52; }
-        
+
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
@@ -72,30 +76,50 @@
         @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         .toast-enter { animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .pop-in { animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+        /* Достъпност: винаги видим focus пръстен при навигация с клавиатура */
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+            outline: 2px solid #e3be52; outline-offset: 2px; border-radius: 4px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+        }
+
+        /* Accordion (детайли) стилове за таб "Правила" */
+        details > summary { cursor: pointer; list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details .chev { transition: transform 0.25s ease; }
+        details[open] .chev { transform: rotate(180deg); }
+        details[open] summary { color: #e3be52; }
     </style>
 </head>
-<!-- h-[100dvh] е ключово за мобилни браузъри, за да не се реже долната част -->
 <body class="h-[100dvh] w-full overflow-hidden flex justify-center items-center lg:p-6 selection:bg-gold selection:text-anthracite">
 
-    <!-- ГЛАВНА ОБВИВКА: Без бордери и заобляне на телефон -->
     <div id="app-wrapper" class="w-full h-full lg:max-w-6xl lg:max-h-[900px] lg:rounded-3xl bg-anthracite flex flex-col lg:flex-row overflow-hidden lg:shadow-glow-lg border-0 lg:border border-emeraldLight relative">
-        
-        <!-- НАВИГАЦИЯ (TAB BAR НА ТЕЛЕФОН) -->
-        <nav class="order-2 lg:order-1 flex-none w-full lg:w-28 h-[calc(4.5rem+env(safe-area-inset-bottom))] lg:h-full border-t border-emeraldLight/40 lg:border-t-0 lg:border-r lg:border-emeraldLight bg-anthracite/95 backdrop-blur-xl flex lg:flex-col justify-around items-center pb-[env(safe-area-inset-bottom)] lg:pb-8 lg:pt-8 z-50">
-            <div class="hidden lg:flex flex-col items-center mb-8 opacity-80">
+
+        <!-- НАВИГАЦИЯ -->
+        <nav class="order-2 lg:order-1 flex-none w-full lg:w-28 h-[calc(4.5rem+env(safe-area-inset-bottom))] lg:h-full border-t border-emeraldLight/40 lg:border-t-0 lg:border-r lg:border-emeraldLight bg-anthracite/95 backdrop-blur-xl flex lg:flex-col justify-around items-center pb-[env(safe-area-inset-bottom)] lg:pb-8 lg:pt-8 z-50 relative">
+            <div class="hidden lg:flex flex-col items-center mb-6 opacity-80">
                 <span class="text-3xl">🃏</span>
                 <span class="font-display text-[9px] font-black text-gold tracking-widest mt-1">BELOT</span>
             </div>
 
-            <button onclick="switchTab('score')" class="nav-btn active w-1/3 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gold transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="score">
-                <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Игра</span>
+            <button onclick="switchTab('score')" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="score" aria-label="Резултат">
+                <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Резултат</span>
             </button>
-            <button onclick="switchTab('scan')" class="nav-btn w-1/3 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="scan">
+            <button onclick="switchTab('scan')" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="scan" aria-label="AI Скан">
                 <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Скенер</span>
+                <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">AI Скан</span>
             </button>
-            <button onclick="switchTab('rules')" class="nav-btn w-1/3 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="rules">
+            <button onclick="switchTab('announce')" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="announce" aria-label="Анонси">
+                <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592L5.436 13.683M11 5.882a3 3 0 10-5.657 1.985M11 5.882l6.632-2.947a1 1 0 011.368.928v14.274a1 1 0 01-1.368.928L11 16.118M5.436 13.683A4 4 0 017 6h1.832c.531 0 1.057-.1 1.554-.297"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.436 13.683A4 4 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a4 4 0 01-1.564-.317z"></path></svg>
+                <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Анонси</span>
+            </button>
+            <button onclick="switchTab('rules')" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="rules" aria-label="Правила">
                 <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                 <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Правила</span>
             </button>
@@ -103,23 +127,21 @@
         </nav>
 
         <!-- РАБОТНА ЗОНА -->
-        <div class="order-1 lg:order-2 flex-1 flex flex-col relative overflow-hidden bg-transparent">
-            
-            <!-- ХЕДЪР -->
-            <header class="flex-none bg-anthracite/85 backdrop-blur-md border-b border-emeraldLight/50 pt-[max(env(safe-area-inset-top),1rem)] pb-3 px-3 lg:px-8 z-40">
+        <div class="order-1 lg:order-2 flex-1 flex flex-col relative overflow-hidden bg-transparent z-10">
+
+            <header class="flex-none bg-anthracite/85 backdrop-blur-md border-b border-emeraldLight/50 pt-[max(env(safe-area-inset-top),1rem)] pb-3 px-3 lg:px-8 z-40 relative">
                 <div class="max-w-4xl mx-auto flex justify-between items-end">
                     <div class="text-center w-[40%]">
-                        <input type="text" id="team1Name" value="Ние" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors" onchange="saveState()">
-                        <!-- Намален шрифт text-4xl за телефон, за да не се чупи при 3 цифри -->
-                        <div class="font-display text-4xl sm:text-5xl lg:text-6xl font-black mt-1 tracking-tighter text-white drop-shadow-md" id="score1">0</div>
+                        <input type="text" id="team1Name" value="Ние" maxlength="14" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors rounded" oninput="onNameInput()" onchange="saveState()">
+                        <div class="font-mono text-4xl sm:text-5xl lg:text-6xl font-bold mt-1 tracking-tighter text-white drop-shadow-md transition-colors" id="score1">0</div>
                     </div>
                     <div class="text-xl sm:text-2xl lg:text-3xl font-display font-black text-emeraldLight w-[10%] text-center pb-1 lg:pb-2 opacity-50">VS</div>
                     <div class="text-center w-[40%]">
-                        <input type="text" id="team2Name" value="Вие" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors" onchange="saveState()">
-                        <div class="font-display text-4xl sm:text-5xl lg:text-6xl font-black mt-1 tracking-tighter text-white drop-shadow-md" id="score2">0</div>
+                        <input type="text" id="team2Name" value="Вие" maxlength="14" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors rounded" oninput="onNameInput()" onchange="saveState()">
+                        <div class="font-mono text-4xl sm:text-5xl lg:text-6xl font-bold mt-1 tracking-tighter text-white drop-shadow-md transition-colors" id="score2">0</div>
                     </div>
                 </div>
-                
+
                 <div id="hangingBadge" class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-danger/20 border border-danger/50 text-white font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full hidden shadow-[0_0_10px_rgba(255,76,76,0.3)]">
                     Висящи: <span id="hangingPointsDisplay">0</span>
                 </div>
@@ -138,41 +160,48 @@
             </header>
 
             <main class="flex-1 overflow-y-auto p-3 lg:p-8 w-full scroll-smooth" id="mainContainer">
-                
-                <!-- ТАБ 1: КАЛКУЛАТОР -->
+
+                <!-- ТАБ 1: РЕЗУЛТАТ / КАЛКУЛАТОР -->
                 <section id="tab-score" class="tab-content active h-full max-w-5xl mx-auto">
+
+                    <div id="gameOverBanner" class="hidden mb-4 pop-in bg-gradient-to-br from-gold/20 to-forest/30 border-2 border-gold rounded-2xl p-4 lg:p-6 text-center shadow-glow">
+                        <div class="text-3xl mb-1">🏆</div>
+                        <div class="font-display font-black text-lg lg:text-2xl text-gold uppercase tracking-wide" id="gameOverText">Играта приключи!</div>
+                        <button onclick="confirmAction('Да започнем ли нова игра?', resetGame)" class="mt-3 bg-gold text-anthracite font-black px-5 py-2.5 rounded-xl uppercase text-xs tracking-wider active:scale-95 transition-all">Нова игра</button>
+                    </div>
+
                     <div class="flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-8 lg:h-full lg:items-start">
-                        
+
                         <!-- ЛЯВА КОЛОНА: Въвеждане -->
-                        <div class="lg:col-span-5 space-y-4 lg:space-y-5 lg:sticky lg:top-0">
+                        <div id="scoreInputColumn" class="lg:col-span-5 space-y-4 lg:space-y-5 lg:sticky lg:top-0">
                             <!-- Договор -->
                             <div class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight/50 lg:border-emeraldLight shadow-lg">
                                 <div class="grid grid-cols-3 gap-1.5 lg:gap-2 bg-anthracite p-1 lg:p-1.5 rounded-xl border border-emeraldLight/30">
-                                    <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95 bg-gold text-anthracite shadow-glow" data-contract="all" onclick="selectContract('all')">Вс. Коз</button>
-                                    <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95 bg-transparent text-white hover:bg-emeraldLight/50" data-contract="none" onclick="selectContract('none')">Без Коз</button>
-                                    <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95 bg-transparent text-white hover:bg-emeraldLight/50" data-contract="suit" onclick="selectContract('suit')">Боя</button>
+                                    <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95" data-contract="all" onclick="selectContract('all')">Вс. Коз</button>
+                                    <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95" data-contract="none" onclick="selectContract('none')">Без Коз</button>
+                                    <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95" data-contract="suit" onclick="selectContract('suit')">Боя</button>
                                 </div>
                                 <div id="suitSelector" class="hidden grid-cols-4 gap-2 mt-2 lg:mt-3">
-                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl hover:border-gold transition-all" onclick="setSuit('♠', this)">♠</button>
-                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl text-red-500 hover:border-gold transition-all" onclick="setSuit('♥', this)">♥</button>
-                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl text-red-500 hover:border-gold transition-all" onclick="setSuit('♦', this)">♦</button>
-                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl hover:border-gold transition-all" onclick="setSuit('♣', this)">♣</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl hover:border-gold transition-all" data-suit="♠" onclick="setSuit('♠')">♠</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl text-red-500 hover:border-gold transition-all" data-suit="♥" onclick="setSuit('♥')">♥</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl text-red-500 hover:border-gold transition-all" data-suit="♦" onclick="setSuit('♦')">♦</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl hover:border-gold transition-all" data-suit="♣" onclick="setSuit('♣')">♣</button>
                                 </div>
-                                <div class="mt-3 lg:mt-4 grid grid-cols-2 gap-2 lg:gap-3">
-                                    <div>
-                                        <label class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Обявил играта</label>
-                                        <select id="callerSelect" class="w-full bg-emeraldLight/40 border border-emeraldLight text-white rounded-xl p-2.5 lg:p-3 text-sm outline-none focus:border-gold focus:ring-1 ring-gold mt-1 font-semibold appearance-none cursor-pointer">
-                                            <option value="1">Ние</option>
-                                            <option value="2">Вие</option>
-                                        </select>
+
+                                <div class="mt-3 lg:mt-4">
+                                    <label class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Кой обяви играта?</label>
+                                    <div class="grid grid-cols-2 gap-1.5 lg:gap-2 mt-1 bg-anthracite p-1 lg:p-1.5 rounded-xl border border-emeraldLight/30">
+                                        <button id="callerBtn1" class="caller-btn py-2.5 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all active:scale-95 truncate px-1" data-caller="1" onclick="setCaller('1')">Ние</button>
+                                        <button id="callerBtn2" class="caller-btn py-2.5 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all active:scale-95 truncate px-1" data-caller="2" onclick="setCaller('2')">Вие</button>
                                     </div>
-                                    <div>
-                                        <label class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Наддаване</label>
-                                        <select id="multiplierSelect" class="w-full bg-emeraldLight/40 border border-emeraldLight text-white rounded-xl p-2.5 lg:p-3 text-sm outline-none focus:border-gold focus:ring-1 ring-gold mt-1 font-semibold appearance-none text-center cursor-pointer">
-                                            <option value="1">Нормално x1</option>
-                                            <option value="2" class="text-gold">Контра x2</option>
-                                            <option value="4" class="text-danger">Реконтра x4</option>
-                                        </select>
+                                </div>
+
+                                <div class="mt-3 lg:mt-4">
+                                    <label class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Наддаване</label>
+                                    <div class="grid grid-cols-3 gap-1.5 lg:gap-2 mt-1 bg-anthracite p-1 lg:p-1.5 rounded-xl border border-emeraldLight/30">
+                                        <button class="contra-btn py-2.5 lg:py-3 rounded-lg font-bold text-[10px] lg:text-xs transition-all active:scale-95" data-mult="1" onclick="setContra(1)">Нормално</button>
+                                        <button class="contra-btn py-2.5 lg:py-3 rounded-lg font-bold text-[10px] lg:text-xs transition-all active:scale-95" data-mult="2" onclick="setContra(2)">Контра ×2</button>
+                                        <button class="contra-btn py-2.5 lg:py-3 rounded-lg font-bold text-[10px] lg:text-xs transition-all active:scale-95" data-mult="4" onclick="setContra(4)">Реконтра ×4</button>
                                     </div>
                                 </div>
                             </div>
@@ -184,42 +213,32 @@
                                     <h2 class="text-[10px] lg:text-xs uppercase font-bold text-gray-400 tracking-wider">Точки от карти</h2>
                                     <span id="basePointsLabel" class="text-[9px] lg:text-[10px] font-black bg-gold/10 text-gold px-2.5 py-1 rounded-full border border-gold/30 uppercase tracking-wider">Общо: 258</span>
                                 </div>
-                                
+
                                 <div class="flex items-center justify-between gap-2 lg:gap-3 bg-anthracite p-2 lg:p-3 rounded-2xl border border-emeraldLight/50">
                                     <div class="flex flex-col items-center w-1/2 relative">
-                                        <label id="lblPoints1" class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 mb-1 tracking-wider">Ние</label>
+                                        <label id="lblPoints1" class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 mb-1 tracking-wider truncate max-w-full">Обявил</label>
                                         <div class="flex items-center w-full gap-1">
-                                            <button onclick="adjPts(-10)" class="bg-emeraldLight w-8 h-10 sm:w-10 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">-</button>
-                                            <input type="number" id="inputPoints" inputmode="numeric" pattern="[0-9]*" class="font-display flex-grow bg-transparent text-center text-3xl sm:text-4xl lg:text-5xl font-black text-white outline-none w-full h-10 sm:h-12 lg:h-14 focus:text-gold transition-colors" placeholder="0" oninput="updateCalc()" onclick="this.select()">
-                                            <button onclick="adjPts(10)" class="bg-emeraldLight w-8 h-10 sm:w-10 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">+</button>
+                                            <button onclick="adjPts(-10)" aria-label="Минус 10" class="bg-emeraldLight w-8 h-10 sm:w-10 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">−</button>
+                                            <input type="number" id="inputPoints" inputmode="numeric" pattern="[0-9]*" class="font-mono flex-grow bg-transparent text-center text-3xl sm:text-4xl lg:text-5xl font-bold text-white outline-none w-full h-10 sm:h-12 lg:h-14 focus:text-gold transition-colors rounded-lg" placeholder="0" oninput="updateCalc()" onclick="this.select()">
+                                            <button onclick="adjPts(10)" aria-label="Плюс 10" class="bg-emeraldLight w-8 h-10 sm:w-10 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">+</button>
                                         </div>
                                     </div>
                                     <div class="text-xl lg:text-2xl text-emeraldLight font-black">/</div>
                                     <div class="flex flex-col items-center w-1/3 opacity-50">
-                                        <label id="lblPoints2" class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 mb-1 tracking-wider">Вие</label>
-                                        <div id="autoPoints" class="font-display text-3xl sm:text-4xl lg:text-5xl font-black text-gray-500 h-10 sm:h-12 lg:h-14 flex items-center justify-center">0</div>
+                                        <label id="lblPoints2" class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 mb-1 tracking-wider truncate max-w-full">Другият</label>
+                                        <div id="autoPoints" class="font-mono text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-500 h-10 sm:h-12 lg:h-14 flex items-center justify-center">0</div>
                                     </div>
                                 </div>
 
-                                <div class="mt-3 lg:mt-4 grid grid-cols-2 gap-2 lg:gap-3">
-                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-emeraldLight/30 border border-emeraldLight/50 p-2.5 lg:p-3 rounded-xl cursor-pointer hover:bg-emeraldLight/60 transition-colors">
-                                        <input type="checkbox" id="valat1" class="hidden">
-                                        <div class="w-4 h-4 lg:w-5 lg:h-5 rounded border-2 border-gray-400 flex items-center justify-center transition-colors">
-                                            <svg class="hidden w-2.5 h-2.5 lg:w-3 lg:h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                        </div>
-                                        <span class="text-xs lg:text-sm font-bold text-gray-200">Капо (Ние)</span>
-                                    </label>
-                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-emeraldLight/30 border border-emeraldLight/50 p-2.5 lg:p-3 rounded-xl cursor-pointer hover:bg-emeraldLight/60 transition-colors">
-                                        <input type="checkbox" id="valat2" class="hidden">
-                                        <div class="w-4 h-4 lg:w-5 lg:h-5 rounded border-2 border-gray-400 flex items-center justify-center transition-colors">
-                                            <svg class="hidden w-2.5 h-2.5 lg:w-3 lg:h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                        </div>
-                                        <span class="text-xs lg:text-sm font-bold text-gray-200">Капо (Вие)</span>
-                                    </label>
+                                <div id="capoIndicator" class="hidden mt-3 text-center pop-in">
+                                    <span class="inline-flex items-center gap-1.5 bg-gold/15 border border-gold/40 text-gold text-[10px] lg:text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
+                                        🏆 Капо за <span id="capoTeamName">—</span> · автоматично +90
+                                    </span>
                                 </div>
+                                <p class="text-[9px] lg:text-[10px] text-gray-500 mt-2 text-center leading-relaxed">Капо (всички взятки) се засича автоматично при 0 или максимума — не е нужно да го отбелязваш.</p>
                             </div>
 
-                            <button onclick="saveRound()" class="font-sans w-full bg-gold text-anthracite font-black text-base lg:text-lg p-4 lg:p-5 rounded-2xl shadow-glow hover:bg-goldHover active:scale-95 transition-all flex justify-center items-center gap-2 relative overflow-hidden group">
+                            <button id="saveRoundBtn" onclick="saveRound()" class="font-sans w-full bg-gold text-anthracite font-black text-base lg:text-lg p-4 lg:p-5 rounded-2xl shadow-glow hover:bg-goldHover active:scale-95 transition-all flex justify-center items-center gap-2 relative overflow-hidden group">
                                 <span class="relative z-10 uppercase tracking-widest">Запиши Рунда</span>
                                 <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                             </button>
@@ -227,15 +246,21 @@
 
                         <!-- ДЯСНА КОЛОНА: Анонси и История -->
                         <div class="lg:col-span-7 space-y-4 lg:space-y-5 flex flex-col h-full lg:pb-0 pb-10">
-                            <!-- Анонси -->
-                            <div id="announcementsSection" class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight/50 lg:border-emeraldLight shadow-lg flex-none transition-opacity duration-300">
-                                <h2 class="text-[10px] lg:text-xs uppercase font-bold text-gray-400 tracking-wider mb-2 lg:mb-3">Обявени Анонси</h2>
+                            <div id="announcementsSection" class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight/50 lg:border-emeraldLight shadow-lg flex-none">
+                                <div class="flex justify-between items-center mb-2 lg:mb-3">
+                                    <h2 class="text-[10px] lg:text-xs uppercase font-bold text-gray-400 tracking-wider">Обявени Анонси</h2>
+                                    <span class="text-[9px] text-gray-600 font-semibold">по-високата поредица/каре печели</span>
+                                </div>
                                 <div class="flex gap-2 lg:gap-4">
                                     <div class="w-1/2 space-y-1.5 lg:space-y-2" id="ann1"></div>
                                     <div class="w-1/2 space-y-1.5 lg:space-y-2" id="ann2"></div>
                                 </div>
+                                <div id="annConflictBox" class="hidden mt-3 bg-danger/10 border border-danger/40 rounded-xl p-2.5 lg:p-3 pop-in">
+                                    <p class="text-[10px] lg:text-xs text-white font-bold mb-2" id="annConflictMsg">Равенство в анонсите — коя е по-висока?</p>
+                                    <div class="grid grid-cols-3 gap-1.5" id="annConflictButtons"></div>
+                                </div>
                             </div>
-                            
+
                             <div id="noTrumpsWarning" class="hidden bg-danger/10 border border-danger/30 p-3 lg:p-4 rounded-2xl text-center flex-none">
                                 <span class="text-danger font-black text-[10px] lg:text-xs uppercase tracking-widest">⚠️ На Без Коз няма анонси</span>
                             </div>
@@ -251,12 +276,13 @@
                                         <table class="w-full text-xs lg:text-sm text-left">
                                             <thead class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 bg-emeraldLight/30 sticky top-0 backdrop-blur-md z-10 border-b border-emeraldLight">
                                                 <tr>
+                                                    <th class="p-3 lg:p-4 w-8">#</th>
                                                     <th class="p-3 lg:p-4">Договор</th>
-                                                    <th class="p-3 lg:p-4 text-center">Ние</th>
-                                                    <th class="p-3 lg:p-4 text-center">Вие</th>
+                                                    <th class="p-3 lg:p-4 text-center" id="historyHeadUs">Ние</th>
+                                                    <th class="p-3 lg:p-4 text-center" id="historyHeadThem">Вие</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="historyBody" class="divide-y divide-emeraldLight/30 font-semibold font-display"></tbody>
+                                            <tbody id="historyBody" class="divide-y divide-emeraldLight/30 font-semibold font-mono"></tbody>
                                         </table>
                                         <div id="emptyHistory" class="absolute inset-0 flex items-center justify-center text-emeraldLight text-sm flex-col gap-1 lg:gap-2 pointer-events-none">
                                             <span class="text-3xl lg:text-4xl opacity-50">📝</span>
@@ -272,26 +298,29 @@
                     </div>
                 </section>
 
-                <!-- ТАБ 2: СКЕНЕР С КАМЕРА (Фото-Асистент) -->
+                <!-- ТАБ 2: AI СКАНИРАНЕ -->
                 <section id="tab-scan" class="tab-content h-full max-w-3xl mx-auto space-y-4 lg:space-y-5 lg:pt-2">
                     <div class="bg-blue-900/20 border border-blue-500/30 p-4 lg:p-5 rounded-2xl text-xs lg:text-sm text-blue-200 shadow-md">
-                        <strong class="text-blue-400 block mb-1 lg:mb-2 text-sm lg:text-base uppercase tracking-wider">Фото Асистент</strong> 
-                        Насочи камерата към картите и "снимай", за да ги замразиш на екрана. След това спокойно ги нацъкай в решетката отдолу.
+                        <strong class="text-blue-400 block mb-1 lg:mb-2 text-sm lg:text-base uppercase tracking-wider">Фото Асистент</strong>
+                        Насочи камерата към картите и "снимай", за да ги замразиш на екрана. После сам маркираш картите в решетката — <strong>това не е автоматично разпознаване</strong> (компютърно зрение), а бърз ръчен инструмент за пресмятане.
                     </div>
 
                     <div class="relative w-full aspect-[4/3] sm:aspect-video lg:max-h-[350px] bg-black rounded-2xl overflow-hidden border border-emeraldLight flex items-center justify-center shadow-inner">
-                        <video id="cameraFeed" playsinline class="absolute inset-0 w-full h-full object-cover hidden"></video>
+                        <video id="cameraFeed" playsinline muted class="absolute inset-0 w-full h-full object-cover hidden"></video>
                         <canvas id="snapshotCanvas" class="absolute inset-0 w-full h-full object-cover hidden"></canvas>
-                        
+
                         <div id="cameraPlaceholder" class="text-center p-4">
                             <div class="text-4xl lg:text-5xl mb-2 lg:mb-3 opacity-20">📷</div>
                             <p class="text-[9px] lg:text-[10px] font-bold text-gray-600 uppercase tracking-widest">Камерата е изключена</p>
                         </div>
                     </div>
-                    
+
                     <div id="cameraControls" class="flex gap-2 lg:gap-3">
                         <button onclick="startCamera()" class="flex-1 bg-emeraldLight hover:bg-emeraldLight/80 border border-success/50 text-success p-3 lg:p-4 rounded-xl font-bold active:scale-95 transition-all flex justify-center items-center gap-2 shadow-md uppercase tracking-wider text-[10px] lg:text-xs">
                             Включи Камера
+                        </button>
+                        <button onclick="openManualGrid()" class="flex-1 bg-anthracite border border-gold/40 text-gold p-3 lg:p-4 rounded-xl font-bold active:scale-95 transition-all flex justify-center items-center gap-2 shadow-md uppercase tracking-wider text-[10px] lg:text-xs">
+                            Въведи ръчно
                         </button>
                     </div>
 
@@ -306,15 +335,14 @@
 
                     <div id="analysisResultBox" class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg mt-3 lg:mt-4 hidden">
                         <div class="flex justify-between items-center mb-3 lg:mb-4">
-                            <h3 class="font-bold text-[10px] lg:text-xs text-gray-400 uppercase tracking-widest">Въведи картите</h3>
+                            <h3 class="font-bold text-[10px] lg:text-xs text-gray-400 uppercase tracking-widest">Маркирай видените карти</h3>
                             <span class="text-[9px] lg:text-[10px] font-black bg-gold/10 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full text-gold border border-gold/30 uppercase tracking-wider" id="scanContractInfo">Договор</span>
                         </div>
-                        
-                        <!-- На мобилен решетката е леко по-сбита -->
+
                         <div class="grid grid-cols-4 gap-1.5 lg:gap-3" id="cardGrid"></div>
 
                         <div class="mt-4 lg:mt-6 flex justify-between items-center bg-anthracite p-3 lg:p-4 rounded-xl border border-emeraldLight/50">
-                            <div class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 leading-tight tracking-wider">Открити точки<br><span id="scanTotal" class="font-display text-3xl lg:text-4xl font-black text-white">0</span></div>
+                            <div class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 leading-tight tracking-wider">Открити точки<br><span id="scanTotal" class="font-mono text-3xl lg:text-4xl font-bold text-white">0</span></div>
                             <button onclick="sendToCalculator()" class="font-sans bg-gold text-anthracite px-4 lg:px-8 py-3 lg:py-4 rounded-xl font-black active:scale-95 hover:bg-goldHover transition-all shadow-glow uppercase tracking-widest text-[10px] lg:text-xs">
                                 ПРЕХВЪРЛИ
                             </button>
@@ -322,50 +350,138 @@
                     </div>
                 </section>
 
-                <!-- ТАБ 3: ПРАВИЛА (ОФИЦИАЛНИ) -->
-                <section id="tab-rules" class="tab-content h-full max-w-5xl mx-auto pb-10">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 h-full items-start">
-                        <div class="bg-forest/20 rounded-2xl p-5 lg:p-8 border border-emeraldLight/50 shadow-lg space-y-4 lg:space-y-6">
-                            <h3 class="font-black text-white text-lg lg:text-xl uppercase tracking-widest mb-2 lg:mb-4 flex items-center gap-2"><span class="text-xl lg:text-2xl">📖</span> Точкуване</h3>
-                            <div class="space-y-3 lg:space-y-4">
-                                <div class="bg-anthracite p-3 lg:p-4 rounded-xl border border-emeraldLight/50">
-                                    <h4 class="font-bold text-gold mb-2 text-[10px] lg:text-xs uppercase tracking-widest border-b border-emeraldLight/50 pb-2">Бази за игра</h4>
-                                    <ul class="text-xs lg:text-sm text-gray-300 space-y-1.5 lg:space-y-2 font-medium">
-                                        <li class="flex justify-between"><span>Боя (Коз)</span><strong class="text-white">162 точки</strong></li>
-                                        <li class="flex justify-between"><span>Всичко Коз</span><strong class="text-white">258 точки</strong></li>
-                                        <li class="flex justify-between"><span>Без Коз</span><strong class="text-white">130 (удвоява се = 260)</strong></li>
-                                    </ul>
-                                </div>
-                                <div class="bg-anthracite p-3 lg:p-4 rounded-xl border border-emeraldLight/50">
-                                    <h4 class="font-bold text-gold mb-2 text-[10px] lg:text-xs uppercase tracking-widest border-b border-emeraldLight/50 pb-2">Закръгляне</h4>
-                                    <p class="text-xs lg:text-sm text-gray-300 font-medium leading-relaxed">
-                                        Точките се делят на 10 и се закръглят (пр: 145 = 15).<br>
-                                        <span class="text-gold block mt-1 lg:mt-2">Изключение на Всичко Коз:</span> Ако двата отбора завършат на 4 (напр. 154:104), отборът с <strong>по-малко точки закръгля нагоре</strong> (11), а другият надолу (15).
-                                    </p>
-                                </div>
-                                <div class="bg-anthracite p-3 lg:p-4 rounded-xl border border-danger/40">
-                                    <h4 class="font-bold text-danger mb-2 text-[10px] lg:text-xs uppercase tracking-widest border-b border-danger/30 pb-2">Вътре / Висяща (Равенство)</h4>
-                                    <p class="text-xs lg:text-sm text-gray-300 font-medium leading-relaxed">
-                                        Ако обявилият изкара <strong>по-малко</strong>, той е вътре и противникът взима всичко.<br>
-                                        Ако са <strong>по равно</strong> (напр. 81:81), обявилият не записва нищо — точките му "висят" за следващото раздаване.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-anthracite rounded-2xl p-5 lg:p-8 border border-emeraldLight/50 shadow-lg">
-                            <h3 class="font-black text-gold text-lg lg:text-xl uppercase tracking-widest mb-2 lg:mb-4 flex items-center gap-2"><span class="text-xl lg:text-2xl">📣</span> Анонси</h3>
-                            <p class="text-[10px] lg:text-xs text-gray-400 mb-4 lg:mb-6 leading-relaxed uppercase tracking-wider font-bold">На Без Коз няма анонси. Поредица бие по дължина, после по сила. Каретата бият само по точкова стойност в коз.</p>
-                            <div class="space-y-2 lg:space-y-3 text-xs lg:text-sm font-bold font-sans">
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Белот (K+Q коз)</span><span class="text-gold font-black font-display text-sm lg:text-base">20</span></div>
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Терца (3 поредни)</span><span class="text-gold font-black font-display text-sm lg:text-base">20</span></div>
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Кварта (4 поредни)</span><span class="text-gold font-black font-display text-sm lg:text-base">50</span></div>
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Квинта (5+ поредни)</span><span class="text-gold font-black font-display text-sm lg:text-base">100</span></div>
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Каре (10, Q, K, A)</span><span class="text-gold font-black font-display text-sm lg:text-base">100</span></div>
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Каре Деветки</span><span class="text-gold font-black font-display text-sm lg:text-base">150</span></div>
-                                <div class="flex justify-between p-1.5 lg:p-2"><span class="text-gray-200">Каре Валета</span><span class="text-gold font-black font-display text-sm lg:text-base">200</span></div>
-                            </div>
+                <!-- ТАБ 3: АНОНСИ -->
+                <section id="tab-announce" class="tab-content h-full max-w-3xl mx-auto space-y-4 lg:space-y-5 lg:pt-2 pb-6">
+                    <div class="bg-danger/10 border-2 border-danger/50 p-4 lg:p-5 rounded-2xl text-center shadow-md">
+                        <span class="text-danger font-black text-sm lg:text-base uppercase tracking-widest">⚠️ На "Без Коз" няма анонси</span>
+                        <p class="text-[10px] lg:text-xs text-gray-300 mt-1.5 font-medium">Изключение: последно 10 и капо важат винаги, дори на Без Коз.</p>
+                    </div>
+
+                    <div class="bg-forest/20 rounded-2xl p-4 lg:p-6 border border-emeraldLight/50 shadow-lg">
+                        <h3 class="font-black text-white text-base lg:text-lg uppercase tracking-widest mb-3 lg:mb-4 flex items-center gap-2"><span class="text-xl">📣</span> Стойности</h3>
+                        <div class="space-y-2 lg:space-y-2.5 text-xs lg:text-sm font-bold font-sans">
+                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Белот <span class="text-gray-500 font-normal">(K+Q коз)</span></span><span class="text-gold font-mono text-sm lg:text-base">20</span></div>
+                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Терца <span class="text-gray-500 font-normal">(3 поредни)</span></span><span class="text-gold font-mono text-sm lg:text-base">20</span></div>
+                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Кварта <span class="text-gray-500 font-normal">(4 поредни)</span></span><span class="text-gold font-mono text-sm lg:text-base">50</span></div>
+                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Квинта <span class="text-gray-500 font-normal">(5 поредни)</span></span><span class="text-gold font-mono text-sm lg:text-base">100</span></div>
+                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Каре <span class="text-gray-500 font-normal">(10/Q/K/A)</span></span><span class="text-gold font-mono text-sm lg:text-base">100</span></div>
+                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Каре Деветки</span><span class="text-gold font-mono text-sm lg:text-base">150</span></div>
+                            <div class="flex justify-between items-center p-1.5 lg:p-2"><span class="text-gray-200">Каре Валета</span><span class="text-gold font-mono text-sm lg:text-base">200</span></div>
                         </div>
                     </div>
+
+                    <div class="bg-anthracite rounded-2xl p-4 lg:p-6 border border-emeraldLight/50 shadow-lg space-y-3 lg:space-y-4">
+                        <h3 class="font-black text-white text-base lg:text-lg uppercase tracking-widest mb-1 flex items-center gap-2"><span class="text-xl">⚖️</span> Йерархия при спор</h3>
+                        <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/30">
+                            <h4 class="font-bold text-gold text-[10px] lg:text-xs uppercase tracking-widest mb-1.5">Кога се обявяват</h4>
+                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">При изиграването на <strong>първата карта</strong> от раздаването — независимо дали тя участва в комбинацията.</p>
+                        </div>
+                        <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/30">
+                            <h4 class="font-bold text-gold text-[10px] lg:text-xs uppercase tracking-widest mb-1.5">Терца / Кварта / Квинта</h4>
+                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">Записва се само на отбора с <strong>най-дългата поредица</strong>. При равна дължина печели тази, която започва от по-висока карта (ред: 7-8-9-10-J-Q-K-A). При пълно равенство (различна боя, но същата дължина и стартова карта) — <strong>всички премии за поредици отпадат</strong>.</p>
+                        </div>
+                        <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/30">
+                            <h4 class="font-bold text-gold text-[10px] lg:text-xs uppercase tracking-widest mb-1.5">Каре</h4>
+                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">Записва се само каре с <strong>най-висока точкова стойност</strong> (Валета 200 &gt; Деветки 150 &gt; останалите 100). Каре не отменя поредица — те са отделни категории и могат да важат едновременно за различни отбори.</p>
+                        </div>
+                        <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/30">
+                            <h4 class="font-bold text-gold text-[10px] lg:text-xs uppercase tracking-widest mb-1.5">Белот</h4>
+                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">Винаги е <strong>независим</strong> от горната йерархия — важи, ако е обявен правилно, дори двата отбора да имат белот (възможно на Всичко Коз, в различна боя).</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ТАБ 4: ПРАВИЛА (ACCORDION) -->
+                <section id="tab-rules" class="tab-content h-full max-w-3xl mx-auto pb-10 space-y-3">
+
+                    <details class="bg-forest/20 rounded-2xl border border-emeraldLight/50 overflow-hidden group" open>
+                        <summary class="p-4 lg:p-5 flex justify-between items-center font-black text-white text-sm lg:text-base uppercase tracking-wider">
+                            <span class="flex items-center gap-2"><span class="text-lg">🂡</span> Раздаване и наддаване</span>
+                            <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed border-t border-emeraldLight/30 pt-3">
+                            <p>Раздава се обратно на часовниковата стрелка: първо по 3, после по 2 карти на играч (общо 5 за наддаването).</p>
+                            <p>Пръв обявява играчът вдясно от раздаващия — предлага боя, "Без Коз" или "Всичко Коз", или пасува. Силата на обявите нараства: <strong class="text-gray-100">Спатия &lt; Каро &lt; Купа &lt; Пика &lt; Без Коз &lt; Всичко Коз</strong>.</p>
+                            <p>Наддаването приключва при 3 последователни паса. Ако всички пасуват без избран договор, картите се събират и раздава следващият.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-forest/20 rounded-2xl border border-emeraldLight/50 overflow-hidden">
+                        <summary class="p-4 lg:p-5 flex justify-between items-center font-black text-white text-sm lg:text-base uppercase tracking-wider">
+                            <span class="flex items-center gap-2"><span class="text-lg">🃏</span> Разиграване</span>
+                            <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed border-t border-emeraldLight/30 pt-3">
+                            <p><strong class="text-gray-100">Боя (един коз):</strong> задължително отговаряне в цвета; ако нямаш — цакаш коз; ако противник е цакал — надцакваш, ако можеш.</p>
+                            <p><strong class="text-gray-100">Всичко Коз:</strong> освен отговаряне в цвета, задължително и качване (по-висока карта), независимо кой води взятката.</p>
+                            <p><strong class="text-gray-100">Без Коз:</strong> единствено задължение е отговарянето в искания цвят.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-forest/20 rounded-2xl border border-emeraldLight/50 overflow-hidden">
+                        <summary class="p-4 lg:p-5 flex justify-between items-center font-black text-white text-sm lg:text-base uppercase tracking-wider">
+                            <span class="flex items-center gap-2"><span class="text-lg">📊</span> Точкуване и закръгляне</span>
+                            <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-3 leading-relaxed border-t border-emeraldLight/30 pt-3">
+                            <div class="bg-anthracite p-3 rounded-xl border border-emeraldLight/50">
+                                <table class="w-full text-[11px] lg:text-xs">
+                                    <thead><tr class="text-gray-500 uppercase text-[9px]"><th class="text-left pb-1">Карта</th><th class="pb-1">Коз</th><th class="pb-1">Не-коз</th></tr></thead>
+                                    <tbody class="font-mono text-gray-200">
+                                        <tr><td>J</td><td class="text-center text-gold">20</td><td class="text-center">2</td></tr>
+                                        <tr><td>9</td><td class="text-center text-gold">14</td><td class="text-center">0</td></tr>
+                                        <tr><td>A</td><td class="text-center">11</td><td class="text-center">11</td></tr>
+                                        <tr><td>10</td><td class="text-center">10</td><td class="text-center">10</td></tr>
+                                        <tr><td>K</td><td class="text-center">4</td><td class="text-center">4</td></tr>
+                                        <tr><td>Q</td><td class="text-center">3</td><td class="text-center">3</td></tr>
+                                        <tr><td>8 / 7</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p><strong class="text-gray-100">Общо точки за раздаване (с последно 10):</strong> Боя — 162 · Всичко Коз — 258 · Без Коз — 130, но точките от картите се <strong>удвояват</strong> преди запис (крайно общо 260); закръгля се <em>след</em> удвояването.</p>
+                            <p><strong class="text-gray-100">Изкарана</strong> — обявилият отбор има повече точки (карти + анонси): всеки записва каквото е събрал, разделено на 10 и закръглено.</p>
+                            <p><strong class="text-gray-100">Вкарана</strong> — обявилият има по-малко: противникът взима <em>всичко</em> (двата отбора точки + всички анонси).</p>
+                            <p><strong class="text-gray-100">Висяща</strong> — точна равенство: обявилият не записва нищо, точките му "висят" за следващото решаващо раздаване (натрупват се, ако виси и то).</p>
+                            <p><strong class="text-gold">Изключение на Всичко Коз:</strong> ако двата отбора завършат на цифра 4 (напр. 154/104), отборът с по-малко точки закръгля <strong>нагоре</strong>, другият — надолу.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-forest/20 rounded-2xl border border-emeraldLight/50 overflow-hidden">
+                        <summary class="p-4 lg:p-5 flex justify-between items-center font-black text-white text-sm lg:text-base uppercase tracking-wider">
+                            <span class="flex items-center gap-2"><span class="text-lg">⚡</span> Контра и Реконтра</span>
+                            <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed border-t border-emeraldLight/30 pt-3">
+                            <p>Обявяват се след последната обява на противника по време на наддаването — залог, че ще победиш при неговия договор.</p>
+                            <p><strong class="text-gray-100">Важно:</strong> контра и реконтра променят логиката — <strong>целият пул от точки в раздаването</strong> (карти на двата отбора + всички анонси + капо) се удвоява (×2) или учетворява (×4), и отива <strong>изцяло</strong> при отбора с повече точки, независимо кой е обявил контрата. Другият отбор записва 0 за раздаването.</p>
+                            <p class="text-gray-400 text-[11px]">Пример: чиста игра на Всичко Коз с контра — 258 × 2 ÷ 10 = 52. Единият отбор пише 52, другият — 0.</p>
+                            <p>Ако раздаването увисне дори при контра/реконтра, удвоеният/учетвореният пул виси за следващото решаващо раздаване.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-forest/20 rounded-2xl border border-emeraldLight/50 overflow-hidden">
+                        <summary class="p-4 lg:p-5 flex justify-between items-center font-black text-white text-sm lg:text-base uppercase tracking-wider">
+                            <span class="flex items-center gap-2"><span class="text-lg">👑</span> Капо (Валат)</span>
+                            <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed border-t border-emeraldLight/30 pt-3">
+                            <p>Ако отбор вземе <strong>всички</strong> взятки в раздаването, получава бонус от <strong class="text-gold">+90 точки</strong> (в допълнение на последно 10, което така или иначе е част от неговите точки).</p>
+                            <p>Капо <strong>не се удвоява</strong> при "Без Коз" (единственото изключение от удвояването там), но <strong>се</strong> удвоява/учетворява при контра/реконтра.</p>
+                            <p><strong class="text-danger">С капо не се излиза играта:</strong> ако капо би прекрачило целта от 151 точки, играта не свършва — изиграва се поне още едно раздаване.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-forest/20 rounded-2xl border border-emeraldLight/50 overflow-hidden">
+                        <summary class="p-4 lg:p-5 flex justify-between items-center font-black text-white text-sm lg:text-base uppercase tracking-wider">
+                            <span class="flex items-center gap-2"><span class="text-lg">🏁</span> Край на играта</span>
+                            <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </summary>
+                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed border-t border-emeraldLight/30 pt-3">
+                            <p>Играта свършва при <strong class="text-gold">151 или повече</strong> точки — <strong>едно и също число за всички договори</strong> (Боя, Всичко Коз и Без Коз се сумират в един общ резултат).</p>
+                            <p>Ако двата отбора прекрачат 151 в едно и също раздаване, печели този с повече точки.</p>
+                            <p>Ако точките излязат равни дори след прекрачването, играта продължава докато някой отбор поведе.</p>
+                        </div>
+                    </details>
                 </section>
             </main>
         </div>
@@ -385,44 +501,82 @@
     <div id="toastContainer" class="fixed top-4 lg:top-10 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-max max-w-[95%] pointer-events-none font-sans"></div>
 
     <script>
+        /* ======================= STATE ======================= */
         let state = {
             t1Name: "Ние", t2Name: "Вие", total1: 0, total2: 0, hangingPoints: 0, rounds: [],
-            currentContract: 'all', currentSuit: '', targetScore: 151
+            currentContract: 'all', currentSuit: '', targetScore: 151,
+            gameOver: false, winner: null
         };
 
+        // cat: 'belot' (независим), 'seq' (терца/кварта/квинта - йерархия по tier), 'careta' (йерархия по tier)
         const annTypes = [
-            { id: 'belot', label: 'Белот (20)', val: 20 }, { id: 'tierce', label: 'Терца (20)', val: 20 },
-            { id: 'quarte', label: 'Кварта (50)', val: 50 }, { id: 'quinte', label: 'Квинта (100)', val: 100 },
-            { id: 'carre100', label: 'Каре (100)', val: 100 }, { id: 'carre150', label: 'Каре 9-ки (150)', val: 150 },
-            { id: 'carre200', label: 'Каре J-та (200)', val: 200 }
+            { id: 'belot', label: 'Белот (20)', val: 20, cat: 'belot', tier: 0 },
+            { id: 'tierce', label: 'Терца (20)', val: 20, cat: 'seq', tier: 1 },
+            { id: 'quarte', label: 'Кварта (50)', val: 50, cat: 'seq', tier: 2 },
+            { id: 'quinte', label: 'Квинта (100)', val: 100, cat: 'seq', tier: 3 },
+            { id: 'carre100', label: 'Каре (100)', val: 100, cat: 'careta', tier: 1 },
+            { id: 'carre150', label: 'Каре 9-ки (150)', val: 150, cat: 'careta', tier: 2 },
+            { id: 'carre200', label: 'Каре J-та (200)', val: 200, cat: 'careta', tier: 3 }
         ];
 
+        // Преходен избор при равенство в анонсите (нулира се при всяка промяна на чекбоксите / запис)
+        let seqTieChoice = null;   // '1' | '2' | 'void' | null
+        let careTieChoice = null;  // '1' | '2' | 'void' | null
+
+        /* ======================= INIT / PERSISTENCE ======================= */
         window.onload = () => {
             const saved = localStorage.getItem('beloteStatePro');
             if (saved) {
-                state = JSON.parse(saved);
-                document.getElementById('team1Name').value = state.t1Name;
-                document.getElementById('team2Name').value = state.t2Name;
+                try {
+                    const parsed = JSON.parse(saved);
+                    state = Object.assign(state, parsed);
+                } catch (e) { console.error('Невалидно запазено състояние, стартирам чисто.', e); }
             }
-            if(state.hangingPoints === undefined) state.hangingPoints = 0;
-            updateOverallScore(); renderHistory(); selectContract(state.currentContract);
-            buildAnnouncementsUI(); buildCardGrid();
+            if (state.hangingPoints === undefined) state.hangingPoints = 0;
+            if (state.gameOver === undefined) state.gameOver = false;
+            if (state.targetScore !== 151) state.targetScore = 151; // миграция от стара грешна логика (251 за Без Коз)
+
+            document.getElementById('team1Name').value = state.t1Name;
+            document.getElementById('team2Name').value = state.t2Name;
+
+            buildAnnouncementsUI();
+            buildCardGrid();
+            selectContract(state.currentContract, true);
+            if (state.currentContract === 'suit' && state.currentSuit) highlightSuitButton(state.currentSuit);
+            setCaller(document.getElementById('inputPoints') ? (state.lastCaller || '1') : '1');
+            setContra(1);
+            updateOverallScore();
+            renderHistory();
+            checkGameOverUI();
         };
 
         function saveState() {
-            state.t1Name = document.getElementById('team1Name').value || "Ние";
-            state.t2Name = document.getElementById('team2Name').value || "Вие";
+            state.t1Name = document.getElementById('team1Name').value.trim() || "Ние";
+            state.t2Name = document.getElementById('team2Name').value.trim() || "Вие";
             localStorage.setItem('beloteStatePro', JSON.stringify(state));
-            document.getElementById('lblPoints1').innerText = state.t1Name;
-            document.getElementById('lblPoints2').innerText = state.t2Name;
-            updateCallerSelect();
+            syncTeamNameDisplays();
         }
 
-        function updateCallerSelect() {
-            const sel = document.getElementById('callerSelect');
-            sel.options[0].text = state.t1Name; sel.options[1].text = state.t2Name;
+        function onNameInput() {
+            // Леко обновяване докато потребителят пише — не презаписваме localStorage при всеки клавиш, за да не губим фокус/производителност
+            state.t1Name = document.getElementById('team1Name').value.trim() || "Ние";
+            state.t2Name = document.getElementById('team2Name').value.trim() || "Вие";
+            syncTeamNameDisplays();
         }
 
+        function syncTeamNameDisplays() {
+            document.getElementById('lblPoints1').innerText = document.getElementById('callerBtn1').dataset.active === "1" ? state.t1Name : state.t1Name;
+            document.getElementById('callerBtn1').innerText = state.t1Name;
+            document.getElementById('callerBtn2').innerText = state.t2Name;
+            document.getElementById('historyHeadUs').innerText = state.t1Name;
+            document.getElementById('historyHeadThem').innerText = state.t2Name;
+            const caller = document.querySelector('.caller-btn[data-active="1"]');
+            const callerIsOne = caller && caller.dataset.caller === '1';
+            document.getElementById('lblPoints1').innerText = 'Обявил';
+            document.getElementById('lblPoints2').innerText = 'Другият';
+        }
+
+        /* ======================= TOASTS / MODAL ======================= */
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -441,7 +595,7 @@
             const box = document.getElementById('modalBox');
             overlay.classList.remove('hidden');
             setTimeout(() => { overlay.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
-            document.getElementById('modalConfirmBtn').onclick = () => { closeModal(); if(modalCallback) modalCallback(); };
+            document.getElementById('modalConfirmBtn').onclick = () => { closeModal(); if (modalCallback) modalCallback(); };
         }
 
         function closeModal() {
@@ -451,24 +605,24 @@
             setTimeout(() => overlay.classList.add('hidden'), 200);
         }
 
+        /* ======================= TABS ======================= */
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 if (btn.dataset.target === tabId) {
                     btn.classList.add('text-gold', 'bg-emeraldLight/10'); btn.classList.remove('text-gray-500');
-                    if(btn.querySelector('svg')) btn.querySelector('svg').classList.add('drop-shadow-md');
                 } else {
                     btn.classList.remove('text-gold', 'bg-emeraldLight/10'); btn.classList.add('text-gray-500');
-                    if(btn.querySelector('svg')) btn.querySelector('svg').classList.remove('drop-shadow-md');
                 }
             });
-            document.getElementById('mainContainer').scrollTo({top: 0, behavior: 'smooth'});
+            document.getElementById('mainContainer').scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        /* ======================= CONTRACT / SUIT / CALLER / CONTRA ======================= */
         function getBaseForContract(cType) { return cType === 'all' ? 258 : (cType === 'none' ? 130 : 162); }
 
-        function selectContract(cType) {
+        function selectContract(cType, skipRecalc) {
             state.currentContract = cType;
             document.querySelectorAll('.contract-btn').forEach(btn => {
                 if (btn.dataset.contract === cType) {
@@ -478,42 +632,82 @@
                 }
             });
             const suitDiv = document.getElementById('suitSelector');
-            if (cType === 'suit') suitDiv.classList.remove('hidden'); else { suitDiv.classList.add('hidden'); state.currentSuit = ''; }
+            if (cType === 'suit') {
+                suitDiv.classList.remove('hidden'); suitDiv.classList.add('grid');
+            } else {
+                suitDiv.classList.add('hidden'); suitDiv.classList.remove('grid');
+                state.currentSuit = '';
+            }
             const base = getBaseForContract(cType);
             document.getElementById('basePointsLabel').innerText = `ОБЩО: ${base}`;
             document.getElementById('inputPoints').max = base;
-            state.targetScore = (cType === 'none') ? 251 : 151;
-            document.getElementById('targetScoreLabel').innerText = `Цел: ${state.targetScore}`;
-            
+
             let contractStr = cType === 'none' ? "Без Коз" : (cType === 'all' ? "Всичко Коз" : (state.currentSuit ? `Боя: ${state.currentSuit}` : "Боя"));
             document.getElementById('scanContractInfo').innerText = contractStr;
 
             if (cType === 'none') {
-                document.getElementById('announcementsSection').classList.add('opacity-30', 'pointer-events-none');
+                document.getElementById('announcementsSection').classList.add('hidden');
                 document.getElementById('noTrumpsWarning').classList.remove('hidden');
                 document.querySelectorAll('.ann-chk').forEach(c => c.checked = false);
+                seqTieChoice = null; careTieChoice = null;
             } else {
-                document.getElementById('announcementsSection').classList.remove('opacity-30', 'pointer-events-none');
+                document.getElementById('announcementsSection').classList.remove('hidden');
                 document.getElementById('noTrumpsWarning').classList.add('hidden');
             }
-            updateCalc(); updateOverallScore(); recalcScan();
+            if (!skipRecalc) { updateCalc(); recalcScan(); saveState(); }
+            else { updateCalc(); recalcScan(); }
         }
 
-        function setSuit(s, btnEl) {
+        function highlightSuitButton(suit) {
+            document.querySelectorAll('.suit-btn').forEach(b => {
+                b.classList.remove('border-gold', 'shadow-glow');
+                b.classList.add('border-emeraldLight');
+                if (!b.classList.contains('text-red-500')) b.classList.remove('text-gold');
+            });
+            const target = document.querySelector(`.suit-btn[data-suit="${suit}"]`);
+            if (target) {
+                target.classList.remove('border-emeraldLight');
+                target.classList.add('border-gold', 'shadow-glow');
+                if (!target.classList.contains('text-red-500')) target.classList.add('text-gold');
+            }
+        }
+
+        function setSuit(s) {
             state.currentSuit = s;
-            document.querySelectorAll('.suit-btn').forEach(b => { b.classList.remove('border-gold', 'text-gold', 'shadow-glow'); b.classList.add('border-emeraldLight'); });
-            btnEl.classList.remove('border-emeraldLight'); btnEl.classList.add('border-gold', 'text-gold', 'shadow-glow');
+            highlightSuitButton(s);
             document.getElementById('scanContractInfo').innerText = `Боя: ${s}`;
             recalcScan();
+            saveState();
         }
 
+        function setCaller(id) {
+            document.querySelectorAll('.caller-btn').forEach(b => {
+                const active = b.dataset.caller === id;
+                b.dataset.active = active ? "1" : "0";
+                if (active) { b.classList.add('bg-gold', 'text-anthracite'); b.classList.remove('bg-transparent', 'text-white'); }
+                else { b.classList.remove('bg-gold', 'text-anthracite'); b.classList.add('bg-transparent', 'text-white'); }
+            });
+            state.lastCaller = id;
+            updateCalc();
+        }
+
+        function setContra(mult) {
+            document.querySelectorAll('.contra-btn').forEach(b => {
+                const active = parseInt(b.dataset.mult) === mult;
+                if (active) { b.classList.add('bg-gold', 'text-anthracite'); b.classList.remove('bg-transparent', 'text-white'); }
+                else { b.classList.remove('bg-gold', 'text-anthracite'); b.classList.add('bg-transparent', 'text-white'); }
+            });
+            state.currentMultiplier = mult;
+        }
+
+        /* ======================= ANNOUNCEMENTS UI + HIERARCHY ======================= */
         function buildAnnouncementsUI() {
             const container1 = document.getElementById('ann1'); const container2 = document.getElementById('ann2');
             container1.innerHTML = ''; container2.innerHTML = '';
             annTypes.forEach(t => {
                 const makeRow = (team) => `
                     <label class="custom-checkbox flex items-center space-x-2 bg-emeraldLight/20 hover:bg-emeraldLight/40 p-2 lg:p-2.5 rounded-xl cursor-pointer transition-colors border border-emeraldLight/30">
-                        <input type="checkbox" class="hidden ann-chk t${team}-ann" data-val="${t.val}">
+                        <input type="checkbox" class="hidden ann-chk t${team}-ann" data-id="${t.id}" data-val="${t.val}" data-cat="${t.cat}" data-tier="${t.tier}" onchange="onAnnouncementChange()">
                         <div class="w-4 h-4 lg:w-5 lg:h-5 flex-none rounded border border-gray-500 flex items-center justify-center transition-colors">
                             <svg class="hidden w-2.5 h-2.5 lg:w-3 lg:h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
@@ -524,6 +718,92 @@
             });
         }
 
+        function onAnnouncementChange() {
+            seqTieChoice = null; careTieChoice = null;
+            renderAnnouncementConflicts();
+        }
+
+        // Връща сумите за двата отбора СЛЕД прилагане на йерархията, плюс флагове дали има неразрешен конфликт
+        function computeAnnouncementResult() {
+            const checked1 = {}, checked2 = {};
+            document.querySelectorAll('.t1-ann').forEach(c => checked1[c.dataset.id] = c.checked);
+            document.querySelectorAll('.t2-ann').forEach(c => checked2[c.dataded ? c.dataset.id : c.dataset.id] = c.checked);
+
+            function tierInfo(checked, cat) {
+                let maxTier = 0, sum = 0;
+                annTypes.filter(a => a.cat === cat).forEach(a => { if (checked[a.id]) { sum += a.val; if (a.tier > maxTier) maxTier = a.tier; } });
+                return { sum, maxTier };
+            }
+
+            let seq1 = tierInfo(checked1, 'seq'), seq2 = tierInfo(checked2, 'seq');
+            let car1 = tierInfo(checked1, 'careta'), car2 = tierInfo(checked2, 'careta');
+            let conflict = { seq: false, careta: false };
+
+            if (seq1.maxTier > 0 || seq2.maxTier > 0) {
+                if (seq1.maxTier > seq2.maxTier) seq2.sum = 0;
+                else if (seq2.maxTier > seq1.maxTier) seq1.sum = 0;
+                else {
+                    if (seqTieChoice === '1') seq2.sum = 0;
+                    else if (seqTieChoice === '2') seq1.sum = 0;
+                    else if (seqTieChoice === 'void') { seq1.sum = 0; seq2.sum = 0; }
+                    else conflict.seq = true;
+                }
+            }
+            if (car1.maxTier > 0 || car2.maxTier > 0) {
+                if (car1.maxTier > car2.maxTier) car2.sum = 0;
+                else if (car2.maxTier > car1.maxTier) car1.sum = 0;
+                else {
+                    if (careTieChoice === '1') car2.sum = 0;
+                    else if (careTieChoice === '2') car1.sum = 0;
+                    else if (careTieChoice === 'void') { car1.sum = 0; car2.sum = 0; }
+                    else conflict.careta = true;
+                }
+            }
+
+            const belot1 = checked1['belot'] ? 20 : 0, belot2 = checked2['belot'] ? 20 : 0;
+
+            return {
+                ann1: seq1.sum + car1.sum + belot1,
+                ann2: seq2.sum + car2.sum + belot2,
+                conflict
+            };
+        }
+
+        function renderAnnouncementConflicts() {
+            const res = computeAnnouncementResult();
+            const box = document.getElementById('annConflictBox');
+            const btns = document.getElementById('annConflictButtons');
+            const msg = document.getElementById('annConflictMsg');
+
+            if (res.conflict.seq || res.conflict.careta) {
+                box.classList.remove('hidden');
+                const kind = res.conflict.seq ? 'поредицата (терца/кварта/квинта)' : 'карето';
+                msg.innerText = `Двата отбора имат равностойна по дължина/стойност ${kind} — коя печели?`;
+                btns.innerHTML = `
+                    <button onclick="resolveAnnTie('1')" class="bg-emeraldLight/40 hover:bg-emeraldLight/60 text-white text-[10px] font-bold py-2 rounded-lg active:scale-95 transition-all truncate px-1">${state.t1Name}</button>
+                    <button onclick="resolveAnnTie('2')" class="bg-emeraldLight/40 hover:bg-emeraldLight/60 text-white text-[10px] font-bold py-2 rounded-lg active:scale-95 transition-all truncate px-1">${state.t2Name}</button>
+                    <button onclick="resolveAnnTie('void')" class="bg-danger/30 hover:bg-danger/50 text-white text-[10px] font-bold py-2 rounded-lg active:scale-95 transition-all">Равни</button>
+                `;
+            } else {
+                box.classList.add('hidden');
+            }
+            return res;
+        }
+
+        function resolveAnnTie(choice) {
+            // определяме дали текущият конфликт е seq или careta, за да запишем правилния tie-choice
+            const checked1 = {}, checked2 = {};
+            document.querySelectorAll('.t1-ann').forEach(c => checked1[c.dataset.id] = c.checked);
+            document.querySelectorAll('.t2-ann').forEach(c => checked2[c.dataset.id] = c.checked);
+            function maxTier(checked, cat) { let m = 0; annTypes.filter(a => a.cat === cat).forEach(a => { if (checked[a.id] && a.tier > m) m = a.tier; }); return m; }
+            const seqConflict = maxTier(checked1, 'seq') > 0 && maxTier(checked1, 'seq') === maxTier(checked2, 'seq');
+            const careConflict = maxTier(checked1, 'careta') > 0 && maxTier(checked1, 'careta') === maxTier(checked2, 'careta');
+            if (seqConflict && seqTieChoice === null) seqTieChoice = choice;
+            else if (careConflict) careTieChoice = choice;
+            renderAnnouncementConflicts();
+        }
+
+        /* ======================= POINTS / CAPO ======================= */
         function adjPts(amount) {
             let input = document.getElementById('inputPoints'); let val = parseInt(input.value) || 0;
             val += amount; if (val < 0) val = 0;
@@ -532,46 +812,87 @@
         }
 
         function updateCalc() {
-            const base = getBaseForContract(state.currentContract); let inputEl = document.getElementById('inputPoints'); let inputVal = parseInt(inputEl.value);
-            if (isNaN(inputVal)) { document.getElementById('autoPoints').innerText = '0'; return; }
+            const base = getBaseForContract(state.currentContract);
+            let inputEl = document.getElementById('inputPoints'); let inputVal = parseInt(inputEl.value);
+            const capoBox = document.getElementById('capoIndicator');
+
+            if (isNaN(inputVal)) {
+                document.getElementById('autoPoints').innerText = base;
+                capoBox.classList.add('hidden');
+                return;
+            }
             if (inputVal > base) { inputVal = base; inputEl.value = base; }
             if (inputVal < 0) { inputVal = 0; inputEl.value = 0; }
             document.getElementById('autoPoints').innerText = base - inputVal;
+
+            // Капо се засича автоматично: 0 точки (обявилият е "капутиран") или пълния максимум (обявилият взима всичко)
+            const callerBtn = document.querySelector('.caller-btn[data-active="1"]');
+            const callerId = callerBtn ? callerBtn.dataset.caller : '1';
+            const callerName = callerId === '1' ? state.t1Name : state.t2Name;
+            const otherName = callerId === '1' ? state.t2Name : state.t1Name;
+
+            if (inputVal === base && base > 0) {
+                capoBox.classList.remove('hidden');
+                document.getElementById('capoTeamName').innerText = callerName;
+            } else if (inputVal === 0) {
+                capoBox.classList.remove('hidden');
+                document.getElementById('capoTeamName').innerText = otherName;
+            } else {
+                capoBox.classList.add('hidden');
+            }
         }
 
+        /* ======================= SAVE ROUND ======================= */
         function saveRound() {
-            const isNoTrump = state.currentContract === 'none'; const isAllTrump = state.currentContract === 'all';
+            if (state.gameOver) { showToast('Играта приключи — започни нова, за да продължиш.', 'error'); return; }
+
+            const isNoTrump = state.currentContract === 'none';
+            const isAllTrump = state.currentContract === 'all';
             const base = getBaseForContract(state.currentContract);
-            const caller = document.getElementById('callerSelect').value; const multiplier = parseInt(document.getElementById('multiplierSelect').value);
+            const callerBtn = document.querySelector('.caller-btn[data-active="1"]');
+            const caller = callerBtn ? callerBtn.dataset.caller : '1';
+            const multiplier = state.currentMultiplier || 1;
             let inputPts = parseInt(document.getElementById('inputPoints').value);
+
             if (isNaN(inputPts)) return showToast("Въведете точки!", "error");
             if (state.currentContract === 'suit' && !state.currentSuit) return showToast("Изберете боя!", "error");
 
-            let raw1 = caller === '1' ? inputPts : (base - inputPts); let raw2 = caller === '2' ? inputPts : (base - inputPts);
-            let ann1 = 0, ann2 = 0;
-            if (!isNoTrump) {
-                document.querySelectorAll('.t1-ann:checked').forEach(c => ann1 += parseInt(c.dataset.val));
-                document.querySelectorAll('.t2-ann:checked').forEach(c => ann2 += parseInt(c.dataset.val));
+            const annRes = renderAnnouncementConflicts();
+            if (!isNoTrump && (annRes.conflict.seq || annRes.conflict.careta)) {
+                return showToast("Разреши равенството в анонсите преди запис!", "error");
             }
-            const valat1 = document.getElementById('valat1').checked; const valat2 = document.getElementById('valat2').checked;
-            let score1 = isNoTrump ? (raw1 * 2 + (valat1 ? 90 : 0)) : (raw1 + ann1 + (valat1 ? 90 : 0));
-            let score2 = isNoTrump ? (raw2 * 2 + (valat2 ? 90 : 0)) : (raw2 + ann2 + (valat2 ? 90 : 0));
-            
-            let pool = score1 + score2; let final1 = 0; let final2 = 0;
-            let hangingToAdd = state.hangingPoints; let newHanging = 0;
-            const callerScore = caller === '1' ? score1 : score2; const defScore = caller === '1' ? score2 : score1;
 
-            if (multiplier > 1) { 
-                if (callerScore < defScore) {
+            let raw1 = caller === '1' ? inputPts : (base - inputPts);
+            let raw2 = caller === '2' ? inputPts : (base - inputPts);
+            let ann1 = 0, ann2 = 0;
+            if (!isNoTrump) { ann1 = annRes.ann1; ann2 = annRes.ann2; }
+
+            // Капо се определя АВТОМАТИЧНО от суровите точки на картите (0 или пълния максимум) — не е ръчен избор
+            const capo1 = raw1 === base && base > 0;
+            const capo2 = raw2 === base && base > 0;
+            const isCapo = capo1 || capo2;
+
+            let score1 = isNoTrump ? (raw1 * 2 + (capo1 ? 90 : 0)) : (raw1 + ann1 + (capo1 ? 90 : 0));
+            let score2 = isNoTrump ? (raw2 * 2 + (capo2 ? 90 : 0)) : (raw2 + ann2 + (capo2 ? 90 : 0));
+
+            let pool = score1 + score2;
+            let final1 = 0, final2 = 0;
+            let hangingToAdd = state.hangingPoints;
+            let newHanging = 0;
+            const hangingBefore = state.hangingPoints; // за коректно "връщане на ход"
+            const callerScore = caller === '1' ? score1 : score2;
+            const defScore = caller === '1' ? score2 : score1;
+            let outcome = callerScore > defScore ? 'success' : (callerScore < defScore ? 'failure' : 'tie');
+
+            if (multiplier > 1) {
+                if (callerScore !== defScore) {
                     let total = Math.round((pool * multiplier) / 10);
-                    if (caller === '1') final2 = total + hangingToAdd; else final1 = total + hangingToAdd;
-                    state.hangingPoints = 0;
-                } else if (callerScore > defScore) {
-                    let total = Math.round((pool * multiplier) / 10);
-                    if (caller === '1') final1 = total + hangingToAdd; else final2 = total + hangingToAdd;
+                    if (callerScore > defScore) { if (caller === '1') final1 = total + hangingToAdd; else final2 = total + hangingToAdd; }
+                    else { if (caller === '1') final2 = total + hangingToAdd; else final1 = total + hangingToAdd; }
                     state.hangingPoints = 0;
                 } else {
-                    newHanging = Math.round((pool * multiplier) / 10); state.hangingPoints += newHanging;
+                    newHanging = Math.round((pool * multiplier) / 10);
+                    state.hangingPoints += newHanging;
                 }
             } else {
                 if (callerScore < defScore) {
@@ -580,66 +901,133 @@
                     state.hangingPoints = 0;
                 } else if (callerScore > defScore) {
                     if (isAllTrump && score1 % 10 === 4 && score2 % 10 === 4) {
-                        if (score1 < score2) { final1 = Math.ceil(score1 / 10); final2 = Math.floor(score2 / 10); } 
+                        if (score1 < score2) { final1 = Math.ceil(score1 / 10); final2 = Math.floor(score2 / 10); }
                         else { final1 = Math.floor(score1 / 10); final2 = Math.ceil(score2 / 10); }
                     } else { final1 = Math.round(score1 / 10); final2 = Math.round(score2 / 10); }
                     if (caller === '1') final1 += hangingToAdd; else final2 += hangingToAdd;
                     state.hangingPoints = 0;
                 } else {
                     if (isAllTrump && score1 % 10 === 4 && score2 % 10 === 4) {
-                        if (caller === '1') { newHanging = Math.ceil(score1 / 10); final2 = Math.floor(score2 / 10); } 
+                        if (caller === '1') { newHanging = Math.ceil(score1 / 10); final2 = Math.floor(score2 / 10); }
                         else { newHanging = Math.ceil(score2 / 10); final1 = Math.floor(score1 / 10); }
                     } else {
-                        if (caller === '1') { newHanging = Math.round(score1 / 10); final2 = Math.round(score2 / 10); } 
+                        if (caller === '1') { newHanging = Math.round(score1 / 10); final2 = Math.round(score2 / 10); }
                         else { newHanging = Math.round(score2 / 10); final1 = Math.round(score1 / 10); }
                     }
                     state.hangingPoints += newHanging;
                 }
             }
 
-            let cStr = isNoTrump ? 'Без Коз' : (isAllTrump ? 'Вс. Коз' : state.currentSuit);
-            if(multiplier === 2) cStr += ' (К)'; if(multiplier === 4) cStr += ' (РК)';
-            state.rounds.push({ contract: cStr, p1: final1, p2: final2, caller: caller, inside: (callerScore < defScore), tie: (callerScore === defScore) });
-            
-            showToast("Записано!");
-            document.getElementById('inputPoints').value = ''; document.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
-            document.getElementById('multiplierSelect').value = "1"; updateCalc(); updateOverallScore(); renderHistory(); saveState();
-            
+            let cStr = isNoTrump ? 'Без Коз' : (isAllTrump ? 'Вс. Коз' : (state.currentSuit || 'Боя'));
+            if (multiplier === 2) cStr += ' (К)'; if (multiplier === 4) cStr += ' (РК)';
+
+            state.rounds.push({
+                n: state.rounds.length + 1,
+                contract: cStr, p1: final1, p2: final2, caller: caller,
+                outcome: outcome, isCapo: isCapo, capoTeam: capo1 ? '1' : (capo2 ? '2' : null),
+                hangingBefore: hangingBefore
+            });
+
+            const wasCapoBlocking = checkGameEnd(isCapo);
+
+            showToast(isCapo ? "Капо записано! +90" : "Записано!");
+            document.getElementById('inputPoints').value = '';
+            document.querySelectorAll('.ann-chk').forEach(c => c.checked = false);
+            seqTieChoice = null; careTieChoice = null;
+            document.getElementById('annConflictBox').classList.add('hidden');
+            setContra(1);
+            updateCalc(); updateOverallScore(); renderHistory(); saveState();
+
+            if (wasCapoBlocking) {
+                setTimeout(() => showToast("Капо! Играта продължава — с капо не се излиза.", "error"), 400);
+            }
+
             setTimeout(() => {
                 const tBody = document.getElementById('historyBody');
-                if(tBody && tBody.parentElement && tBody.parentElement.parentElement) {
+                if (tBody && tBody.parentElement && tBody.parentElement.parentElement) {
                     const scrollArea = tBody.parentElement.parentElement;
                     scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
                 }
             }, 100);
         }
 
+        /* ======================= GAME END ======================= */
+        // Връща true ако капо блокира прекратяването на играта, за да покажем допълнително известие
+        function checkGameEnd(wasCapoThisRound) {
+            const over1 = state.total1IsPreview || false; // placeholder, реалната сметка е долу
+            const t1 = state.rounds.reduce((a, r) => a + r.p1, 0);
+            const t2 = state.rounds.reduce((a, r) => a + r.p2, 0);
+            const cross1 = t1 >= state.targetScore, cross2 = t2 >= state.targetScore;
+
+            if (!cross1 && !cross2) { state.gameOver = false; state.winner = null; return false; }
+
+            if (wasCapoThisRound) {
+                // "С капо не се излиза" — дори да е прекрачена целта, играта продължава
+                state.gameOver = false; state.winner = null;
+                return true;
+            }
+
+            if (cross1 && cross2) {
+                if (t1 === t2) { state.gameOver = false; state.winner = null; return false; }
+                state.gameOver = true; state.winner = t1 > t2 ? '1' : '2';
+            } else {
+                state.gameOver = true; state.winner = cross1 ? '1' : '2';
+            }
+            return false;
+        }
+
+        function checkGameOverUI() {
+            const banner = document.getElementById('gameOverBanner');
+            const saveBtn = document.getElementById('saveRoundBtn');
+            if (state.gameOver && state.winner) {
+                const name = state.winner === '1' ? state.t1Name : state.t2Name;
+                document.getElementById('gameOverText').innerText = `${name} печели играта!`;
+                banner.classList.remove('hidden');
+                saveBtn.disabled = true;
+                saveBtn.classList.add('opacity-40', 'pointer-events-none');
+            } else {
+                banner.classList.add('hidden');
+                saveBtn.disabled = false;
+                saveBtn.classList.remove('opacity-40', 'pointer-events-none');
+            }
+        }
+
+        /* ======================= SCORE / HISTORY ======================= */
         function updateOverallScore() {
-            state.total1 = state.rounds.reduce((a, r) => a + r.p1, 0); state.total2 = state.rounds.reduce((a, r) => a + r.p2, 0);
-            document.getElementById('score1').innerText = state.total1; document.getElementById('score2').innerText = state.total2;
-            const p1Percent = Math.min((state.total1 / state.targetScore) * 100, 100); const p2Percent = Math.min((state.total2 / state.targetScore) * 100, 100);
-            document.getElementById('progress1').style.width = `${p1Percent}%`; document.getElementById('progress2').style.width = `${p2Percent}%`;
-            
+            state.total1 = state.rounds.reduce((a, r) => a + r.p1, 0);
+            state.total2 = state.rounds.reduce((a, r) => a + r.p2, 0);
+            document.getElementById('score1').innerText = state.total1;
+            document.getElementById('score2').innerText = state.total2;
+            const p1Percent = Math.min((state.total1 / state.targetScore) * 100, 100);
+            const p2Percent = Math.min((state.total2 / state.targetScore) * 100, 100);
+            document.getElementById('progress1').style.width = `${p1Percent}%`;
+            document.getElementById('progress2').style.width = `${p2Percent}%`;
+
             const s1 = document.getElementById('score1'); const s2 = document.getElementById('score2');
-            s1.className = `font-display text-4xl sm:text-5xl lg:text-6xl font-black mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total1 >= state.targetScore ? 'text-success' : 'text-white'}`;
-            s2.className = `font-display text-4xl sm:text-5xl lg:text-6xl font-black mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total2 >= state.targetScore ? 'text-success' : 'text-white'}`;
+            s1.className = `font-mono text-4xl sm:text-5xl lg:text-6xl font-bold mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total1 >= state.targetScore ? 'text-success' : 'text-white'}`;
+            s2.className = `font-mono text-4xl sm:text-5xl lg:text-6xl font-bold mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total2 >= state.targetScore ? 'text-success' : 'text-white'}`;
 
             const badge = document.getElementById('hangingBadge');
-            if(state.hangingPoints > 0) { document.getElementById('hangingPointsDisplay').innerText = state.hangingPoints; badge.classList.remove('hidden'); } 
+            if (state.hangingPoints > 0) { document.getElementById('hangingPointsDisplay').innerText = state.hangingPoints; badge.classList.remove('hidden'); }
             else { badge.classList.add('hidden'); }
+
+            syncTeamNameDisplays();
+            checkGameOverUI();
         }
 
         function renderHistory() {
             const tbody = document.getElementById('historyBody'); const empty = document.getElementById('emptyHistory'); tbody.innerHTML = '';
-            if(state.rounds.length === 0) { tbody.parentElement.classList.add('invisible'); empty.classList.remove('hidden'); return; }
+            if (state.rounds.length === 0) { tbody.parentElement.classList.add('invisible'); empty.classList.remove('hidden'); return; }
             tbody.parentElement.classList.remove('invisible'); empty.classList.add('hidden');
             state.rounds.forEach((r) => {
                 const tr = document.createElement('tr'); tr.className = "hover:bg-emeraldLight/20 transition-colors";
                 let badge = '';
-                if(r.inside) badge = `<span class="text-[8px] lg:text-[9px] font-sans font-bold uppercase bg-danger text-white px-1 py-0.5 rounded shadow-sm">Вътре (${r.caller==='1'?state.t1Name:state.t2Name})</span>`;
-                if(r.tie) badge = `<span class="text-[8px] lg:text-[9px] font-sans font-bold uppercase bg-gold text-anthracite px-1 py-0.5 rounded shadow-sm">Висяща</span>`;
+                if (r.outcome === 'failure') badge = `<span class="text-[8px] lg:text-[9px] font-sans font-bold uppercase bg-danger text-white px-1 py-0.5 rounded shadow-sm">Вкарана</span>`;
+                if (r.outcome === 'tie') badge = `<span class="text-[8px] lg:text-[9px] font-sans font-bold uppercase bg-gray-500 text-white px-1 py-0.5 rounded shadow-sm">Висяща</span>`;
+                if (r.isCapo) badge += ` <span class="text-[8px] lg:text-[9px] font-sans font-bold uppercase bg-gold text-anthracite px-1 py-0.5 rounded shadow-sm">🏆 Капо</span>`;
                 tr.innerHTML = `
-                    <td class="p-3 lg:p-4 border-b border-emeraldLight/20"><span class="font-black text-gold block text-sm lg:text-base">${r.contract}</span>${badge}</td>
+                    <td class="p-3 lg:p-4 border-b border-emeraldLight/20 text-gray-600 text-[10px] lg:text-xs">${r.n}</td>
+                    <td class="p-3 lg:p-4 border-b border-emeraldLight/20"><span class="font-black text-gold block text-sm lg:text-base font-sans">${r.contract}</span>${badge}</td>
                     <td class="p-3 lg:p-4 text-center border-b border-emeraldLight/20 text-lg lg:text-xl ${r.caller === '1' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p1}</td>
                     <td class="p-3 lg:p-4 text-center border-b border-emeraldLight/20 text-lg lg:text-xl ${r.caller === '2' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p2}</td>`;
                 tbody.appendChild(tr);
@@ -648,25 +1036,26 @@
 
         function undoLast() {
             if (state.rounds.length === 0) return showToast("Няма ходове за връщане.", "error");
-            state.rounds.pop(); state.hangingPoints = 0; updateOverallScore(); renderHistory(); saveState();
+            const last = state.rounds.pop();
+            state.hangingPoints = last.hangingBefore || 0; // коректно възстановяване, не грубо нулиране
+            state.gameOver = false; state.winner = null;
+            updateOverallScore(); renderHistory(); saveState();
             showToast("Последното раздаване е изтрито!");
         }
 
         function resetGame() {
-            state.rounds = []; state.hangingPoints = 0; updateOverallScore(); renderHistory(); saveState();
+            state.rounds = []; state.hangingPoints = 0; state.gameOver = false; state.winner = null;
+            updateOverallScore(); renderHistory(); saveState();
             showToast("Нова игра започната!");
         }
 
-        // --- КАМЕРА (Фото-асистент) ---
+        /* ======================= КАМЕРА / AI СКАН ======================= */
         let stream = null, scanTotal = 0;
-        
+
         async function startCamera() {
             try {
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                } catch(e) {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                }
+                try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); }
+                catch (e) { stream = await navigator.mediaDevices.getUserMedia({ video: true }); }
                 const video = document.getElementById('cameraFeed');
                 video.srcObject = stream;
                 await video.play();
@@ -675,66 +1064,68 @@
                 document.getElementById('cameraPlaceholder').classList.add('hidden');
                 document.getElementById('cameraControls').classList.add('hidden');
                 document.getElementById('captureControls').classList.remove('hidden');
-                
+
                 document.getElementById('snapshotCanvas').classList.add('hidden');
                 document.getElementById('analysisResultBox').classList.add('hidden');
-                
             } catch (err) {
                 console.error(err);
-                showToast("Грешка при достъп до камерата.", "error");
+                showToast("Няма достъп до камера — може да въведеш ръчно.", "error");
+                openManualGrid();
             }
         }
 
         function stopCamera() {
-            if (stream) {
-                stream.getTracks().forEach(t => t.stop());
-                document.getElementById('cameraFeed').classList.add('hidden');
-                document.getElementById('cameraPlaceholder').classList.remove('hidden');
-                document.getElementById('cameraControls').classList.remove('hidden');
-                document.getElementById('captureControls').classList.add('hidden');
-                document.getElementById('snapshotCanvas').classList.add('hidden');
-            }
+            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+            document.getElementById('cameraFeed').classList.add('hidden');
+            document.getElementById('cameraPlaceholder').classList.remove('hidden');
+            document.getElementById('cameraControls').classList.remove('hidden');
+            document.getElementById('captureControls').classList.add('hidden');
+            document.getElementById('snapshotCanvas').classList.add('hidden');
         }
 
-        // НОВАТА ЛОГИКА ЗА СНИМАНЕ (БЕЗ ФАЛШИВ AI)
+        // Директен достъп до решетката за ръчно броене — не изисква камера/разрешение
+        function openManualGrid() {
+            document.getElementById('analysisResultBox').classList.remove('hidden');
+            resetCardGrid();
+            setTimeout(() => {
+                document.getElementById('mainContainer').scrollTo({ top: document.getElementById('analysisResultBox').offsetTop, behavior: 'smooth' });
+            }, 50);
+        }
+
         async function takeSnapshot() {
             if (!stream) return;
             const video = document.getElementById('cameraFeed');
             const canvas = document.getElementById('snapshotCanvas');
             const ctx = canvas.getContext('2d');
 
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             video.classList.add('hidden');
             canvas.classList.remove('hidden');
-            
+
             document.getElementById('analysisResultBox').classList.remove('hidden');
-            
-            // Зануляване на решетката
+            resetCardGrid();
+            showToast("Снимката е замразена! Маркирай картите.", "success");
+
+            setTimeout(() => {
+                document.getElementById('mainContainer').scrollTo({ top: document.getElementById('analysisResultBox').offsetTop, behavior: 'smooth' });
+            }, 100);
+        }
+
+        function resetCardGrid() {
             document.querySelectorAll('#cardGrid button').forEach(b => {
                 b.dataset.active = "0";
                 b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
                 b.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
-                if(['♥','♦'].includes(b.dataset.suit)) b.classList.add('text-red-400');
-                else b.classList.add('text-white');
+                if (['♥', '♦'].includes(b.dataset.suit)) b.classList.add('text-red-400'); else b.classList.add('text-white');
             });
             recalcScan();
-            
-            showToast("Снимката е запазена! Маркирай картите.", "success");
-            
-            setTimeout(() => {
-                document.getElementById('mainContainer').scrollTo({
-                    top: document.getElementById('analysisResultBox').offsetTop,
-                    behavior: 'smooth'
-                });
-            }, 100);
         }
 
-        const cardsDef = ['7','8','9','10','J','Q','K','A'];
-        const suitsDef = ['♠','♥','♦','♣'];
-        
+        const cardsDef = ['7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        const suitsDef = ['♠', '♥', '♦', '♣'];
+
         function getCardValue(rank, suit) {
             const isNoTrump = state.currentContract === 'none';
             const isAllTrump = state.currentContract === 'all';
@@ -753,7 +1144,7 @@
             suitsDef.forEach(suit => {
                 cardsDef.forEach(rank => {
                     const btn = document.createElement('button');
-                    btn.className = `font-sans font-bold bg-emeraldLight/30 hover:bg-emeraldLight/50 text-white text-[10px] lg:text-sm py-2.5 lg:py-4 rounded-xl border border-transparent transition-all transform active:scale-90 shadow-sm ${['♥','♦'].includes(suit) ? 'text-red-400' : ''}`;
+                    btn.className = `font-sans font-bold bg-emeraldLight/30 hover:bg-emeraldLight/50 text-white text-[10px] lg:text-sm py-2.5 lg:py-4 rounded-xl border border-transparent transition-all transform active:scale-90 shadow-sm ${['♥', '♦'].includes(suit) ? 'text-red-400' : ''}`;
                     btn.innerHTML = `${rank}${suit}`;
                     btn.dataset.rank = rank; btn.dataset.suit = suit; btn.dataset.active = "0";
                     btn.onclick = () => {
@@ -764,8 +1155,7 @@
                         } else {
                             btn.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
                             btn.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
-                            if(['♥','♦'].includes(suit)) btn.classList.add('text-red-400');
-                            else btn.classList.add('text-white');
+                            if (['♥', '♦'].includes(suit)) btn.classList.add('text-red-400'); else btn.classList.add('text-white');
                         }
                         recalcScan();
                     };
@@ -779,27 +1169,17 @@
             document.querySelectorAll('#cardGrid button[data-active="1"]').forEach(btn => {
                 scanTotal += getCardValue(btn.dataset.rank, btn.dataset.suit);
             });
-            document.getElementById('scanTotal').innerText = scanTotal;
+            const el = document.getElementById('scanTotal');
+            if (el) el.innerText = scanTotal;
         }
 
         function sendToCalculator() {
             document.getElementById('inputPoints').value = scanTotal;
             switchTab('score');
             updateCalc();
-            
-            document.querySelectorAll('#cardGrid button').forEach(b => {
-                b.dataset.active = "0";
-                b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
-                b.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
-                if(['♥','♦'].includes(b.dataset.suit)) b.classList.add('text-red-400');
-                else b.classList.add('text-white');
-            });
-            scanTotal = 0;
-            document.getElementById('scanTotal').innerText = "0";
-            
+            resetCardGrid();
             document.getElementById('analysisResultBox').classList.add('hidden');
             stopCamera();
-            
             showToast("Стойностите са прехвърлени!");
         }
     </script>
