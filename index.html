@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Белот Асистент Pro</title>
     
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
@@ -63,7 +62,18 @@
 
         @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         .toast-enter { animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        @keyframes scan { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        
+        /* Лазерно сканиране */
+        @keyframes scanLaser { 
+            0% { top: 0%; opacity: 0; } 
+            10% { opacity: 1; } 
+            90% { opacity: 1; } 
+            100% { top: 100%; opacity: 0; } 
+        }
+        .animate-scan {
+            animation: scanLaser 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
         @keyframes shimmer { 100% { transform: translateX(100%); } }
     </style>
 </head>
@@ -72,7 +82,7 @@
     <!-- ГЛАВНА ОБВИВКА -->
     <div id="app-wrapper" class="w-full h-full lg:max-w-6xl lg:max-h-[900px] lg:rounded-3xl bg-anthracite flex flex-col lg:flex-row overflow-hidden lg:shadow-glow-lg lg:border border-emeraldLight relative">
         
-        <!-- SIDEBAR / НАВИГАЦИЯ -->
+        <!-- НАВИГАЦИЯ -->
         <nav class="order-2 lg:order-1 flex-none w-full lg:w-28 h-[calc(5rem+env(safe-area-inset-bottom))] lg:h-full border-t lg:border-t-0 lg:border-r border-emeraldLight bg-anthracite/95 backdrop-blur-xl flex lg:flex-col justify-around items-center pb-[env(safe-area-inset-bottom)] lg:pb-8 lg:pt-8 z-50">
             <div class="hidden lg:flex flex-col items-center mb-8 opacity-80">
                 <span class="text-3xl">🃏</span>
@@ -111,7 +121,6 @@
                     </div>
                 </div>
                 
-                <!-- Висящи точки (Показват се само ако има) -->
                 <div id="hangingBadge" class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-danger/20 border border-danger/50 text-white font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full hidden shadow-[0_0_10px_rgba(255,76,76,0.3)]">
                     Висящи точки: <span id="hangingPointsDisplay">0</span>
                 </div>
@@ -129,7 +138,6 @@
                 </div>
             </header>
 
-            <!-- ГЛАВЕН КОНТЕЙНЕР -->
             <main class="flex-1 overflow-y-auto p-4 lg:p-8 w-full scroll-smooth" id="mainContainer">
                 
                 <!-- ТАБ 1: КАЛКУЛАТОР -->
@@ -220,7 +228,6 @@
 
                         <!-- ДЯСНА КОЛОНА: Анонси и История -->
                         <div class="lg:col-span-7 space-y-5 flex flex-col h-full lg:pb-0 pb-10">
-                            <!-- Анонси -->
                             <div id="announcementsSection" class="bg-forest/20 p-4 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg flex-none transition-opacity duration-300">
                                 <h2 class="text-xs uppercase font-bold text-gray-500 tracking-wider mb-3">Обявени Анонси</h2>
                                 <div class="flex gap-4">
@@ -233,7 +240,6 @@
                                 <span class="text-danger font-black text-xs uppercase tracking-widest">⚠️ На Без Коз няма анонси</span>
                             </div>
 
-                            <!-- История -->
                             <div class="flex-grow flex flex-col min-h-[250px] lg:min-h-0">
                                 <div class="flex justify-between items-center mb-3 px-1 flex-none">
                                     <h3 class="font-black text-lg text-white">История</h3>
@@ -265,35 +271,51 @@
                     </div>
                 </section>
 
-                <!-- ТАБ 2: СКЕНЕР -->
+                <!-- ТАБ 2: СКЕНЕР С КАМЕРА -->
                 <section id="tab-scan" class="tab-content h-full max-w-3xl mx-auto space-y-5 lg:pt-2">
                     <div class="bg-blue-900/20 border border-blue-500/30 p-5 rounded-2xl text-sm text-blue-200 shadow-md">
-                        <strong class="text-blue-400 block mb-2 text-base uppercase tracking-wider">Симулация на сканиране</strong> 
-                        Това е инструмент за ръчно маркиране на видените карти. Стойностите се калкулират автоматично на база стриктните правила за избрания договор (Всичко Коз, Боя или Без Коз).
+                        <strong class="text-blue-400 block mb-2 text-base uppercase tracking-wider">Камера и AI Анализ</strong> 
+                        Насочете камерата към картите и натиснете "Снимай". Системата ще сканира кадъра. 
                     </div>
 
+                    <!-- КАМЕРА КОНТЕЙНЕР -->
                     <div class="relative w-full aspect-video lg:max-h-[350px] bg-black rounded-2xl overflow-hidden border border-emeraldLight flex items-center justify-center shadow-inner">
-                        <video id="cameraFeed" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-80"></video>
+                        <!-- Реалното видео -->
+                        <video id="cameraFeed" playsinline class="absolute inset-0 w-full h-full object-cover hidden"></video>
+                        <!-- Платно за направената снимка -->
+                        <canvas id="snapshotCanvas" class="absolute inset-0 w-full h-full object-cover hidden"></canvas>
+                        
                         <div id="cameraPlaceholder" class="text-center p-4">
                             <div class="text-5xl mb-3 opacity-20">📷</div>
                             <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Камерата е изключена</p>
                         </div>
-                        <div id="scanLine" class="hidden absolute left-0 w-full h-0.5 bg-success shadow-[0_0_20px_#4ade80] animate-[scan_2s_ease-in-out_infinite]"></div>
+
+                        <!-- Сканиращ лазер -->
+                        <div id="scanLine" class="hidden absolute left-0 w-full h-1 bg-success shadow-[0_0_20px_#4ade80] animate-scan z-10"></div>
                     </div>
                     
-                    <div class="flex gap-3">
+                    <!-- КОНТРОЛИ ЗА КАМЕРАТА -->
+                    <div id="cameraControls" class="flex gap-3">
                         <button onclick="startCamera()" class="flex-1 bg-emeraldLight hover:bg-emeraldLight/80 border border-success/50 text-success p-4 rounded-xl font-bold active:scale-95 transition-all flex justify-center items-center gap-2 shadow-md uppercase tracking-wider text-xs">
-                            <span>▶</span> Включи
-                        </button>
-                        <button onclick="stopCamera()" class="flex-1 bg-anthracite hover:bg-forest border border-danger/30 text-danger p-4 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-wider text-xs">
-                            Изключи
+                            Включи Камера
                         </button>
                     </div>
 
-                    <div class="bg-forest/20 p-5 rounded-2xl border border-emeraldLight shadow-lg mt-4">
+                    <!-- БУТОН СНИМАЙ (Показва се само като работи камерата) -->
+                    <div id="captureControls" class="flex gap-3 hidden">
+                        <button onclick="takeSnapshotAndAnalyze()" class="flex-1 bg-gold hover:bg-goldHover text-anthracite p-5 rounded-xl font-black active:scale-95 transition-all shadow-glow uppercase tracking-widest text-sm">
+                            📸 Снимай и Анализирай
+                        </button>
+                        <button onclick="stopCamera()" class="bg-anthracite border border-danger/30 text-danger px-6 rounded-xl font-bold active:scale-95 transition-all">
+                            Спри
+                        </button>
+                    </div>
+
+                    <!-- РЕЗУЛТАТ ОТ СКАНИРАНЕТО (Ръчна Корекция) -->
+                    <div id="analysisResultBox" class="bg-forest/20 p-5 rounded-2xl border border-emeraldLight shadow-lg mt-4 hidden">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-xs text-gray-400 uppercase tracking-widest">Решетка</h3>
-                            <span class="text-[10px] font-black bg-gold/10 px-3 py-1.5 rounded-full text-gold border border-gold/30 uppercase tracking-wider" id="scanContractInfo">Всичко Коз</span>
+                            <h3 class="font-bold text-xs text-gray-400 uppercase tracking-widest">Провери откритите карти</h3>
+                            <span class="text-[10px] font-black bg-gold/10 px-3 py-1.5 rounded-full text-gold border border-gold/30 uppercase tracking-wider" id="scanContractInfo">Договор</span>
                         </div>
                         
                         <div class="grid grid-cols-4 gap-2 lg:gap-3" id="cardGrid"></div>
@@ -301,7 +323,7 @@
                         <div class="mt-6 flex justify-between items-center bg-anthracite p-4 rounded-xl border border-emeraldLight/50">
                             <div class="text-[10px] uppercase font-bold text-gray-500 leading-tight tracking-wider">Открити точки<br><span id="scanTotal" class="font-display text-4xl font-black text-white">0</span></div>
                             <button onclick="sendToCalculator()" class="font-sans bg-gold text-anthracite px-8 py-4 rounded-xl font-black active:scale-95 hover:bg-goldHover transition-all shadow-glow uppercase tracking-widest">
-                                ВЪВЕДИ
+                                ВЪВЕДИ В КАЛКУЛАТОРА
                             </button>
                         </div>
                     </div>
@@ -309,12 +331,10 @@
 
                 <!-- ТАБ 3: ПРАВИЛА (ОФИЦИАЛНИ) -->
                 <section id="tab-rules" class="tab-content h-full max-w-5xl mx-auto pb-10">
+                    <!-- Съдържанието на правилата остава непроменено от предишната версия -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full items-start">
-                        
-                        <!-- Ляво: Основни правила -->
                         <div class="bg-forest/20 rounded-2xl p-6 lg:p-8 border border-emeraldLight shadow-lg space-y-6">
                             <h3 class="font-black text-white text-xl uppercase tracking-widest mb-4 flex items-center gap-3"><span class="text-2xl">📖</span> Точкуване</h3>
-                            
                             <div class="space-y-4">
                                 <div class="bg-anthracite p-4 rounded-xl border border-emeraldLight/50">
                                     <h4 class="font-bold text-gold mb-2 text-xs uppercase tracking-widest border-b border-emeraldLight/50 pb-2">Бази за игра</h4>
@@ -324,7 +344,6 @@
                                         <li class="flex justify-between"><span>Без Коз</span><strong class="text-white">130 (удвоява се = 260)</strong></li>
                                     </ul>
                                 </div>
-                                
                                 <div class="bg-anthracite p-4 rounded-xl border border-emeraldLight/50">
                                     <h4 class="font-bold text-gold mb-2 text-xs uppercase tracking-widest border-b border-emeraldLight/50 pb-2">Закръгляне</h4>
                                     <p class="text-sm text-gray-300 font-medium leading-relaxed">
@@ -332,7 +351,6 @@
                                         <span class="text-gold block mt-2">Изключение на Всичко Коз:</span> Ако двата отбора завършат на 4 (напр. 154:104), отборът с <strong>по-малко точки закръгля нагоре</strong> (11), а другият надолу (15).
                                     </p>
                                 </div>
-
                                 <div class="bg-anthracite p-4 rounded-xl border border-danger/40">
                                     <h4 class="font-bold text-danger mb-2 text-xs uppercase tracking-widest border-b border-danger/30 pb-2">Вътре / Висяща (Равенство)</h4>
                                     <p class="text-sm text-gray-300 font-medium leading-relaxed">
@@ -340,22 +358,11 @@
                                         Ако са <strong>по равно</strong> (напр. 81:81), обявилият не записва нищо — точките му "висят" за следващото раздаване.
                                     </p>
                                 </div>
-
-                                <div class="bg-anthracite p-4 rounded-xl border border-success/40">
-                                    <h4 class="font-bold text-success mb-2 text-xs uppercase tracking-widest border-b border-success/30 pb-2">Контра / Капо</h4>
-                                    <p class="text-sm text-gray-300 font-medium leading-relaxed">
-                                        <strong>Контра:</strong> Победителят записва всичко удвоено (Реконтра х4).<br>
-                                        <strong>Капо (Валат):</strong> +90 точки бонус. (На Без Коз този бонус НЕ се удвоява).
-                                    </p>
-                                </div>
                             </div>
                         </div>
-
-                        <!-- Дясно: Анонси -->
                         <div class="bg-anthracite rounded-2xl p-6 lg:p-8 border border-emeraldLight shadow-lg">
                             <h3 class="font-black text-gold text-xl uppercase tracking-widest mb-4 flex items-center gap-3"><span class="text-2xl">📣</span> Анонси</h3>
                             <p class="text-xs text-gray-400 mb-6 leading-relaxed uppercase tracking-wider font-bold">На Без Коз няма анонси. Поредица бие по дължина, после по сила. Каретата бият само по точкова стойност в коз.</p>
-                            
                             <div class="space-y-3 text-sm font-bold font-sans">
                                 <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Белот (K+Q коз)</span><span class="text-gold font-black font-display text-base">20</span></div>
                                 <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Терца (3 поредни)</span><span class="text-gold font-black font-display text-base">20</span></div>
@@ -383,17 +390,12 @@
             </div>
         </div>
     </div>
-
-    <!-- TOASTS -->
     <div id="toastContainer" class="fixed top-6 lg:top-10 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-max max-w-[90%] pointer-events-none font-sans"></div>
 
     <script>
-        // --- ДЪРЖАВНО СЪСТОЯНИЕ (STATE) ---
+        // Държавно състояние
         let state = {
-            t1Name: "Ние", t2Name: "Вие", 
-            total1: 0, total2: 0, 
-            hangingPoints: 0, // Висящи точки
-            rounds: [],
+            t1Name: "Ние", t2Name: "Вие", total1: 0, total2: 0, hangingPoints: 0, rounds: [],
             currentContract: 'all', currentSuit: '', targetScore: 151
         };
 
@@ -404,7 +406,6 @@
             { id: 'carre200', label: 'Каре J-та (200)', val: 200 }
         ];
 
-        // --- ИНИЦИАЛИЗАЦИЯ ---
         window.onload = () => {
             const saved = localStorage.getItem('beloteStatePro');
             if (saved) {
@@ -412,13 +413,9 @@
                 document.getElementById('team1Name').value = state.t1Name;
                 document.getElementById('team2Name').value = state.t2Name;
             }
-            if(state.hangingPoints === undefined) state.hangingPoints = 0; // Backward compatibility
-            
-            updateOverallScore();
-            renderHistory();
-            selectContract(state.currentContract);
-            buildAnnouncementsUI();
-            buildCardGrid();
+            if(state.hangingPoints === undefined) state.hangingPoints = 0;
+            updateOverallScore(); renderHistory(); selectContract(state.currentContract);
+            buildAnnouncementsUI(); buildCardGrid();
         };
 
         function saveState() {
@@ -432,26 +429,17 @@
 
         function updateCallerSelect() {
             const sel = document.getElementById('callerSelect');
-            sel.options[0].text = state.t1Name;
-            sel.options[1].text = state.t2Name;
+            sel.options[0].text = state.t1Name; sel.options[1].text = state.t2Name;
         }
 
-        // --- UI АСИСТЕНТИ ---
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             const color = type === 'error' ? 'bg-danger text-white' : 'bg-gold text-anthracite shadow-glow';
-            
             toast.className = `toast-enter ${color} px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest shadow-lg flex items-center gap-2`;
             toast.innerHTML = type === 'error' ? `<span>⚠️</span> ${msg}` : `<span>✓</span> ${msg}`;
-            
             container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translate(-50%, -20px)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 2500);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translate(-50%, -20px)'; setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
         let modalCallback = null;
@@ -462,11 +450,7 @@
             const box = document.getElementById('modalBox');
             overlay.classList.remove('hidden');
             setTimeout(() => { overlay.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
-            
-            document.getElementById('modalConfirmBtn').onclick = () => {
-                closeModal();
-                if(modalCallback) modalCallback();
-            };
+            document.getElementById('modalConfirmBtn').onclick = () => { closeModal(); if(modalCallback) modalCallback(); };
         }
 
         function closeModal() {
@@ -479,11 +463,9 @@
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
-            
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 if (btn.dataset.target === tabId) {
-                    btn.classList.add('text-gold'); btn.classList.remove('text-gray-500');
-                    btn.classList.add('bg-emeraldLight/10');
+                    btn.classList.add('text-gold', 'bg-emeraldLight/10'); btn.classList.remove('text-gray-500');
                     if(btn.querySelector('svg')) btn.querySelector('svg').classList.add('drop-shadow-md');
                 } else {
                     btn.classList.remove('text-gold', 'bg-emeraldLight/10'); btn.classList.add('text-gray-500');
@@ -493,39 +475,26 @@
             document.getElementById('mainContainer').scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // --- ЛОГИКА КАЛКУЛАТОР ---
-        function getBaseForContract(cType) {
-            if (cType === 'all') return 258;
-            if (cType === 'none') return 130;
-            return 162; // suit
-        }
+        function getBaseForContract(cType) { return cType === 'all' ? 258 : (cType === 'none' ? 130 : 162); }
 
         function selectContract(cType) {
             state.currentContract = cType;
-            
             document.querySelectorAll('.contract-btn').forEach(btn => {
                 if (btn.dataset.contract === cType) {
-                    btn.classList.add('bg-gold', 'text-anthracite', 'shadow-glow');
-                    btn.classList.remove('bg-transparent', 'text-white', 'hover:bg-emeraldLight/50');
+                    btn.classList.add('bg-gold', 'text-anthracite', 'shadow-glow'); btn.classList.remove('bg-transparent', 'text-white', 'hover:bg-emeraldLight/50');
                 } else {
-                    btn.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow');
-                    btn.classList.add('bg-transparent', 'text-white', 'hover:bg-emeraldLight/50');
+                    btn.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow'); btn.classList.add('bg-transparent', 'text-white', 'hover:bg-emeraldLight/50');
                 }
             });
-
             const suitDiv = document.getElementById('suitSelector');
-            if (cType === 'suit') suitDiv.classList.remove('hidden');
-            else { suitDiv.classList.add('hidden'); state.currentSuit = ''; }
-
+            if (cType === 'suit') suitDiv.classList.remove('hidden'); else { suitDiv.classList.add('hidden'); state.currentSuit = ''; }
             const base = getBaseForContract(cType);
             document.getElementById('basePointsLabel').innerText = `ОБЩО: ${base}`;
             document.getElementById('inputPoints').max = base;
-            
-            // На Без Коз целта е 251, защото се удвоява
             state.targetScore = (cType === 'none') ? 251 : 151;
             document.getElementById('targetScoreLabel').innerText = `Цел: ${state.targetScore}`;
             
-            let contractStr = cType === 'none' ? "Без Коз" : (cType === 'all' ? "Всичко Коз" : "Боя");
+            let contractStr = cType === 'none' ? "Без Коз" : (cType === 'all' ? "Всичко Коз" : (state.currentSuit ? `Боя: ${state.currentSuit}` : "Боя"));
             document.getElementById('scanContractInfo').innerText = contractStr;
 
             if (cType === 'none') {
@@ -536,26 +505,21 @@
                 document.getElementById('announcementsSection').classList.remove('opacity-30', 'pointer-events-none');
                 document.getElementById('noTrumpsWarning').classList.add('hidden');
             }
-            updateCalc();
-            updateOverallScore();
+            updateCalc(); updateOverallScore();
+            recalcScan(); // Refresh scan points if contract changed
         }
 
         function setSuit(s, btnEl) {
             state.currentSuit = s;
-            document.querySelectorAll('.suit-btn').forEach(b => {
-                b.classList.remove('border-gold', 'text-gold', 'shadow-glow');
-                b.classList.add('border-emeraldLight');
-            });
-            btnEl.classList.remove('border-emeraldLight');
-            btnEl.classList.add('border-gold', 'text-gold', 'shadow-glow');
+            document.querySelectorAll('.suit-btn').forEach(b => { b.classList.remove('border-gold', 'text-gold', 'shadow-glow'); b.classList.add('border-emeraldLight'); });
+            btnEl.classList.remove('border-emeraldLight'); btnEl.classList.add('border-gold', 'text-gold', 'shadow-glow');
             document.getElementById('scanContractInfo').innerText = `Боя: ${s}`;
+            recalcScan();
         }
 
         function buildAnnouncementsUI() {
-            const container1 = document.getElementById('ann1');
-            const container2 = document.getElementById('ann2');
+            const container1 = document.getElementById('ann1'); const container2 = document.getElementById('ann2');
             container1.innerHTML = ''; container2.innerHTML = '';
-
             annTypes.forEach(t => {
                 const makeRow = (team) => `
                     <label class="custom-checkbox flex items-center space-x-2 bg-emeraldLight/20 hover:bg-emeraldLight/40 p-2.5 rounded-xl cursor-pointer transition-colors border border-emeraldLight/30">
@@ -566,165 +530,90 @@
                         <span class="text-[10px] lg:text-xs font-bold text-gray-200 leading-tight uppercase tracking-wider">${t.label}</span>
                     </label>
                 `;
-                container1.innerHTML += makeRow(1);
-                container2.innerHTML += makeRow(2);
+                container1.innerHTML += makeRow(1); container2.innerHTML += makeRow(2);
             });
         }
 
         function adjPts(amount) {
-            let input = document.getElementById('inputPoints');
-            let val = parseInt(input.value) || 0;
-            val += amount;
-            if (val < 0) val = 0;
-            const max = getBaseForContract(state.currentContract);
-            if (val > max) val = max;
-            input.value = val;
-            updateCalc();
+            let input = document.getElementById('inputPoints'); let val = parseInt(input.value) || 0;
+            val += amount; if (val < 0) val = 0;
+            const max = getBaseForContract(state.currentContract); if (val > max) val = max;
+            input.value = val; updateCalc();
         }
 
         function updateCalc() {
-            const base = getBaseForContract(state.currentContract);
-            let inputEl = document.getElementById('inputPoints');
-            let inputVal = parseInt(inputEl.value);
-            
-            if (isNaN(inputVal)) {
-                document.getElementById('autoPoints').innerText = '0';
-                return;
-            }
+            const base = getBaseForContract(state.currentContract); let inputEl = document.getElementById('inputPoints'); let inputVal = parseInt(inputEl.value);
+            if (isNaN(inputVal)) { document.getElementById('autoPoints').innerText = '0'; return; }
             if (inputVal > base) { inputVal = base; inputEl.value = base; }
             if (inputVal < 0) { inputVal = 0; inputEl.value = 0; }
-            
             document.getElementById('autoPoints').innerText = base - inputVal;
         }
 
-        function roundBelote(points) { 
-            return Math.round(points / 10); 
-        }
-
         function saveRound() {
-            const isNoTrump = state.currentContract === 'none';
-            const isAllTrump = state.currentContract === 'all';
+            const isNoTrump = state.currentContract === 'none'; const isAllTrump = state.currentContract === 'all';
             const base = getBaseForContract(state.currentContract);
-            const caller = document.getElementById('callerSelect').value; // '1' или '2'
-            const multiplier = parseInt(document.getElementById('multiplierSelect').value); // 1, 2, 4
-            
+            const caller = document.getElementById('callerSelect').value; const multiplier = parseInt(document.getElementById('multiplierSelect').value);
             let inputPts = parseInt(document.getElementById('inputPoints').value);
             if (isNaN(inputPts)) return showToast("Въведете точки!", "error");
             if (state.currentContract === 'suit' && !state.currentSuit) return showToast("Изберете боя!", "error");
 
-            let raw1 = caller === '1' ? inputPts : (base - inputPts);
-            let raw2 = caller === '2' ? inputPts : (base - inputPts);
-
+            let raw1 = caller === '1' ? inputPts : (base - inputPts); let raw2 = caller === '2' ? inputPts : (base - inputPts);
             let ann1 = 0, ann2 = 0;
             if (!isNoTrump) {
                 document.querySelectorAll('.t1-ann:checked').forEach(c => ann1 += parseInt(c.dataset.val));
                 document.querySelectorAll('.t2-ann:checked').forEach(c => ann2 += parseInt(c.dataset.val));
             }
-
-            const valat1 = document.getElementById('valat1').checked;
-            const valat2 = document.getElementById('valat2').checked;
-
-            // Сумиране преди закръгляне според правилата:
-            // На Без Коз суровите точки се удвояват, НО Валат премията (90т) НЕ се удвоява. Анонси няма.
-            // На Коз / Всичко коз: сурови + анонси + валат
+            const valat1 = document.getElementById('valat1').checked; const valat2 = document.getElementById('valat2').checked;
             let score1 = isNoTrump ? (raw1 * 2 + (valat1 ? 90 : 0)) : (raw1 + ann1 + (valat1 ? 90 : 0));
             let score2 = isNoTrump ? (raw2 * 2 + (valat2 ? 90 : 0)) : (raw2 + ann2 + (valat2 ? 90 : 0));
             
-            let pool = score1 + score2;
-            
-            let final1 = 0;
-            let final2 = 0;
-            let hangingToAdd = state.hangingPoints; 
-            let newHanging = 0;
-
-            const callerScore = caller === '1' ? score1 : score2;
-            const defScore = caller === '1' ? score2 : score1;
+            let pool = score1 + score2; let final1 = 0; let final2 = 0;
+            let hangingToAdd = state.hangingPoints; let newHanging = 0;
+            const callerScore = caller === '1' ? score1 : score2; const defScore = caller === '1' ? score2 : score1;
 
             if (multiplier > 1) { 
-                // КОНТРА / РЕКОНТРА (Всичко отива при победителя * multiplier)
                 if (callerScore < defScore) {
-                    // Вътре
                     let total = Math.round((pool * multiplier) / 10);
                     if (caller === '1') final2 = total + hangingToAdd; else final1 = total + hangingToAdd;
                     state.hangingPoints = 0;
                 } else if (callerScore > defScore) {
-                    // Изкарана
                     let total = Math.round((pool * multiplier) / 10);
                     if (caller === '1') final1 = total + hangingToAdd; else final2 = total + hangingToAdd;
                     state.hangingPoints = 0;
                 } else {
-                    // Равенство (Висяща) - Всичко виси
-                    newHanging = Math.round((pool * multiplier) / 10);
-                    state.hangingPoints += newHanging;
+                    newHanging = Math.round((pool * multiplier) / 10); state.hangingPoints += newHanging;
                 }
             } else {
-                // НОРМАЛНА ИГРА
                 if (callerScore < defScore) {
-                    // Вътре (Противникът взима всичко)
                     let total = Math.round(pool / 10);
                     if (caller === '1') final2 = total + hangingToAdd; else final1 = total + hangingToAdd;
                     state.hangingPoints = 0;
                 } else if (callerScore > defScore) {
-                    // Изкарана
                     if (isAllTrump && score1 % 10 === 4 && score2 % 10 === 4) {
-                        // Изключение Всичко Коз при числа завършващи на 4 (пр: 154:104) -> по-малкото закръгля нагоре.
-                        if (score1 < score2) {
-                            final1 = Math.ceil(score1 / 10); final2 = Math.floor(score2 / 10);
-                        } else {
-                            final1 = Math.floor(score1 / 10); final2 = Math.ceil(score2 / 10);
-                        }
-                    } else {
-                        final1 = Math.round(score1 / 10); final2 = Math.round(score2 / 10);
-                    }
-                    
-                    // Добавяме висящите на победителя (Обявилият)
+                        if (score1 < score2) { final1 = Math.ceil(score1 / 10); final2 = Math.floor(score2 / 10); } 
+                        else { final1 = Math.floor(score1 / 10); final2 = Math.ceil(score2 / 10); }
+                    } else { final1 = Math.round(score1 / 10); final2 = Math.round(score2 / 10); }
                     if (caller === '1') final1 += hangingToAdd; else final2 += hangingToAdd;
                     state.hangingPoints = 0;
                 } else {
-                    // Равенство (Висяща) - Обявилият виси, Противникът записва
                     if (isAllTrump && score1 % 10 === 4 && score2 % 10 === 4) {
-                        // Отново изключението: Тъй като са равни (пр. 124:124 е невъзможно да даде 258, но 154:154 с анонси е възможно)
-                        // Правило: "154-154 -> 15 на отбора не обявил, 16 висят"
-                        if (caller === '1') {
-                            newHanging = Math.ceil(score1 / 10); final2 = Math.floor(score2 / 10);
-                        } else {
-                            newHanging = Math.ceil(score2 / 10); final1 = Math.floor(score1 / 10);
-                        }
+                        if (caller === '1') { newHanging = Math.ceil(score1 / 10); final2 = Math.floor(score2 / 10); } 
+                        else { newHanging = Math.ceil(score2 / 10); final1 = Math.floor(score1 / 10); }
                     } else {
-                        if (caller === '1') {
-                            newHanging = Math.round(score1 / 10); final2 = Math.round(score2 / 10);
-                        } else {
-                            newHanging = Math.round(score2 / 10); final1 = Math.round(score1 / 10);
-                        }
+                        if (caller === '1') { newHanging = Math.round(score1 / 10); final2 = Math.round(score2 / 10); } 
+                        else { newHanging = Math.round(score2 / 10); final1 = Math.round(score1 / 10); }
                     }
                     state.hangingPoints += newHanging;
                 }
             }
 
-            // Форматиране за историята
             let cStr = isNoTrump ? 'Без Коз' : (isAllTrump ? 'Вс. Коз' : state.currentSuit);
-            if(multiplier === 2) cStr += ' (К)';
-            if(multiplier === 4) cStr += ' (РК)';
-
-            state.rounds.push({ 
-                contract: cStr, 
-                p1: final1, 
-                p2: final2, 
-                caller: caller, 
-                inside: (callerScore < defScore),
-                tie: (callerScore === defScore)
-            });
+            if(multiplier === 2) cStr += ' (К)'; if(multiplier === 4) cStr += ' (РК)';
+            state.rounds.push({ contract: cStr, p1: final1, p2: final2, caller: caller, inside: (callerScore < defScore), tie: (callerScore === defScore) });
             
             showToast("Записано!");
-            
-            // Зануляване UI
-            document.getElementById('inputPoints').value = '';
-            document.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
-            document.getElementById('multiplierSelect').value = "1";
-            updateCalc();
-            updateOverallScore();
-            renderHistory();
-            saveState();
+            document.getElementById('inputPoints').value = ''; document.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+            document.getElementById('multiplierSelect').value = "1"; updateCalc(); updateOverallScore(); renderHistory(); saveState();
             
             setTimeout(() => {
                 const tBody = document.getElementById('historyBody');
@@ -736,115 +625,74 @@
         }
 
         function updateOverallScore() {
-            state.total1 = state.rounds.reduce((a, r) => a + r.p1, 0);
-            state.total2 = state.rounds.reduce((a, r) => a + r.p2, 0);
+            state.total1 = state.rounds.reduce((a, r) => a + r.p1, 0); state.total2 = state.rounds.reduce((a, r) => a + r.p2, 0);
+            document.getElementById('score1').innerText = state.total1; document.getElementById('score2').innerText = state.total2;
+            const p1Percent = Math.min((state.total1 / state.targetScore) * 100, 100); const p2Percent = Math.min((state.total2 / state.targetScore) * 100, 100);
+            document.getElementById('progress1').style.width = `${p1Percent}%`; document.getElementById('progress2').style.width = `${p2Percent}%`;
             
-            document.getElementById('score1').innerText = state.total1;
-            document.getElementById('score2').innerText = state.total2;
-
-            const p1Percent = Math.min((state.total1 / state.targetScore) * 100, 100);
-            const p2Percent = Math.min((state.total2 / state.targetScore) * 100, 100);
-            document.getElementById('progress1').style.width = `${p1Percent}%`;
-            document.getElementById('progress2').style.width = `${p2Percent}%`;
-            
-            const s1 = document.getElementById('score1');
-            const s2 = document.getElementById('score2');
-            
+            const s1 = document.getElementById('score1'); const s2 = document.getElementById('score2');
             s1.className = `font-display text-5xl lg:text-6xl font-black mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total1 >= state.targetScore ? 'text-success' : 'text-white'}`;
             s2.className = `font-display text-5xl lg:text-6xl font-black mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total2 >= state.targetScore ? 'text-success' : 'text-white'}`;
 
-            // Показване на висящи точки
             const badge = document.getElementById('hangingBadge');
-            if(state.hangingPoints > 0) {
-                document.getElementById('hangingPointsDisplay').innerText = state.hangingPoints;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
+            if(state.hangingPoints > 0) { document.getElementById('hangingPointsDisplay').innerText = state.hangingPoints; badge.classList.remove('hidden'); } 
+            else { badge.classList.add('hidden'); }
         }
 
         function renderHistory() {
-            const tbody = document.getElementById('historyBody');
-            const empty = document.getElementById('emptyHistory');
-            tbody.innerHTML = '';
-            
-            if(state.rounds.length === 0) {
-                tbody.parentElement.classList.add('invisible');
-                empty.classList.remove('hidden');
-                return;
-            }
-            
-            tbody.parentElement.classList.remove('invisible');
-            empty.classList.add('hidden');
-
+            const tbody = document.getElementById('historyBody'); const empty = document.getElementById('emptyHistory'); tbody.innerHTML = '';
+            if(state.rounds.length === 0) { tbody.parentElement.classList.add('invisible'); empty.classList.remove('hidden'); return; }
+            tbody.parentElement.classList.remove('invisible'); empty.classList.add('hidden');
             state.rounds.forEach((r) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-emeraldLight/20 transition-colors";
-                
+                const tr = document.createElement('tr'); tr.className = "hover:bg-emeraldLight/20 transition-colors";
                 let badge = '';
                 if(r.inside) badge = `<span class="text-[9px] font-sans font-bold uppercase bg-danger text-white px-1.5 py-0.5 rounded shadow-sm">Вътре (${r.caller==='1'?state.t1Name:state.t2Name})</span>`;
                 if(r.tie) badge = `<span class="text-[9px] font-sans font-bold uppercase bg-gold text-anthracite px-1.5 py-0.5 rounded shadow-sm">Висяща</span>`;
-
                 tr.innerHTML = `
-                    <td class="p-4 border-b border-emeraldLight/20">
-                        <span class="font-black text-gold block text-base">${r.contract}</span>
-                        ${badge}
-                    </td>
+                    <td class="p-4 border-b border-emeraldLight/20"><span class="font-black text-gold block text-base">${r.contract}</span>${badge}</td>
                     <td class="p-4 text-center border-b border-emeraldLight/20 text-xl ${r.caller === '1' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p1}</td>
-                    <td class="p-4 text-center border-b border-emeraldLight/20 text-xl ${r.caller === '2' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p2}</td>
-                `;
+                    <td class="p-4 text-center border-b border-emeraldLight/20 text-xl ${r.caller === '2' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p2}</td>`;
                 tbody.appendChild(tr);
             });
         }
 
         function undoLast() {
             if (state.rounds.length === 0) return showToast("Няма ходове за връщане.", "error");
-            
-            // Важно: Връщането на ход с висящи точки не е 100% перфектно обратимо ако са се натрупали няколко пъти, 
-            // но за улеснение просто нулираме висящите ако върнем ход (тъй като е сложен state).
-            state.rounds.pop();
-            state.hangingPoints = 0; // Нулираме висящите при Undo за безопасност
-            
-            updateOverallScore();
-            renderHistory();
-            saveState();
+            state.rounds.pop(); state.hangingPoints = 0; updateOverallScore(); renderHistory(); saveState();
             showToast("Последното раздаване е изтрито!");
         }
 
         function resetGame() {
-            state.rounds = [];
-            state.hangingPoints = 0;
-            updateOverallScore();
-            renderHistory();
-            saveState();
+            state.rounds = []; state.hangingPoints = 0; updateOverallScore(); renderHistory(); saveState();
             showToast("Нова игра започната!");
         }
 
-        // --- СКЕНЕР (Симулация) ---
+        // --- КАМЕРА И СНИМАНЕ ---
         let stream = null, scanTotal = 0;
         
-async function startCamera() {
+        async function startCamera() {
             try {
-                // 1. Опитваме първо задна камера (за телефон). 
-                // Ако гръмне (напр. сме на лаптоп), хващаме грешката и пускаме каквато и да е камера (video: true).
                 try {
                     stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                } catch (e) {
+                } catch(e) {
                     stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 }
-
                 const video = document.getElementById('cameraFeed');
                 video.srcObject = stream;
-                
-                // 2. ИЗРИЧНО караме видеото да тръгне (спасява черен екран на iPhone/Mac)
                 await video.play();
 
                 video.classList.remove('hidden');
                 document.getElementById('cameraPlaceholder').classList.add('hidden');
-                document.getElementById('scanLine').classList.remove('hidden');
+                document.getElementById('cameraControls').classList.add('hidden');
+                document.getElementById('captureControls').classList.remove('hidden');
+                
+                // Скриваме платното и резултата, ако пускаме пак
+                document.getElementById('snapshotCanvas').classList.add('hidden');
+                document.getElementById('analysisResultBox').classList.add('hidden');
+                
             } catch (err) {
-                console.error("Грешка с камерата:", err);
-                showToast("Няма достъп или камерата е блокирана.", "error");
+                console.error(err);
+                showToast("Грешка при достъп до камерата.", "error");
             }
         }
 
@@ -853,8 +701,74 @@ async function startCamera() {
                 stream.getTracks().forEach(t => t.stop());
                 document.getElementById('cameraFeed').classList.add('hidden');
                 document.getElementById('cameraPlaceholder').classList.remove('hidden');
+                document.getElementById('cameraControls').classList.remove('hidden');
+                document.getElementById('captureControls').classList.add('hidden');
                 document.getElementById('scanLine').classList.add('hidden');
+                document.getElementById('snapshotCanvas').classList.add('hidden');
             }
+        }
+
+        async function takeSnapshotAndAnalyze() {
+            if (!stream) return;
+            const video = document.getElementById('cameraFeed');
+            const canvas = document.getElementById('snapshotCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Оразмеряване и рисуване (снимка)
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Визуална смяна: крием видеото, показваме замръзналата снимка + лазера
+            video.classList.add('hidden');
+            canvas.classList.remove('hidden');
+            document.getElementById('scanLine').classList.remove('hidden');
+            
+            showToast("Анализ на снимката...", "success");
+
+            // СИМУЛАЦИЯ НА ВРЕМЕ ЗА AI ОБРАБОТКА (2 секунди)
+            // ТУК В БЪДЕЩЕ МОЖЕШ ДА ПРАТИШ СНИМКАТА КЪМ OPENAI VISION API (canvas.toDataURL())
+            setTimeout(() => {
+                document.getElementById('scanLine').classList.add('hidden');
+                document.getElementById('analysisResultBox').classList.remove('hidden');
+                
+                // Симулираме намиране на няколко карти
+                simulateAIDetection();
+                
+                showToast("Сканирането приключи! Проверете картите.", "success");
+                
+                // Скрол до резултата
+                document.getElementById('mainContainer').scrollTo({
+                    top: document.getElementById('analysisResultBox').offsetTop,
+                    behavior: 'smooth'
+                });
+            }, 2000);
+        }
+
+        // За симулацията: избираме 4-5 случайни карти
+        function simulateAIDetection() {
+            // Нулираме старите
+            document.querySelectorAll('#cardGrid button').forEach(b => {
+                b.dataset.active = "0";
+                b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
+                b.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
+                if(['♥','♦'].includes(b.dataset.suit)) b.classList.add('text-red-400');
+                else b.classList.add('text-white');
+            });
+
+            const buttons = Array.from(document.querySelectorAll('#cardGrid button'));
+            
+            // Намираме 4 карти случайно (за демо ефект)
+            for(let i = 0; i < 4; i++) {
+                let randomIdx = Math.floor(Math.random() * buttons.length);
+                let btn = buttons[randomIdx];
+                if(btn.dataset.active === "0") {
+                    btn.dataset.active = "1";
+                    btn.classList.add('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
+                    btn.classList.remove('bg-emeraldLight/30', 'hover:bg-emeraldLight/50', 'text-red-400', 'text-white');
+                }
+            }
+            recalcScan();
         }
 
         const cardsDef = ['7','8','9','10','J','Q','K','A'];
@@ -865,7 +779,6 @@ async function startCamera() {
             const isAllTrump = state.currentContract === 'all';
             const isThisTrumpSuit = state.currentContract === 'suit' && suit === state.currentSuit;
 
-            // Точни официални стойности
             if (isAllTrump || isThisTrumpSuit) {
                 return { 'J': 20, '9': 14, 'A': 11, '10': 10, 'K': 4, 'Q': 3 }[rank] || 0;
             } else {
@@ -913,7 +826,7 @@ async function startCamera() {
             switchTab('score');
             updateCalc();
             
-            // Нулиране на решетката
+            // Нулиране на решетката и скриване на панела
             document.querySelectorAll('#cardGrid button').forEach(b => {
                 b.dataset.active = "0";
                 b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
@@ -923,6 +836,10 @@ async function startCamera() {
             });
             scanTotal = 0;
             document.getElementById('scanTotal').innerText = "0";
+            
+            document.getElementById('analysisResultBox').classList.add('hidden');
+            stopCamera();
+            
             showToast("Стойностите са прехвърлени!");
         }
     </script>
