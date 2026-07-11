@@ -708,41 +708,41 @@
             }
         }
 
-        async function takeSnapshotAndAnalyze() {
+async function takeSnapshotAndAnalyze() {
             if (!stream) return;
             const video = document.getElementById('cameraFeed');
             const canvas = document.getElementById('snapshotCanvas');
             const ctx = canvas.getContext('2d');
 
-            // Оразмеряване и рисуване (снимка)
+            // Оразмеряване и рисуване (правим снимката)
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Визуална смяна: крием видеото, показваме замръзналата снимка + лазера
+            // Визуална смяна: крием видеото, показваме замръзналата снимка
             video.classList.add('hidden');
             canvas.classList.remove('hidden');
-            document.getElementById('scanLine').classList.remove('hidden');
             
-            showToast("Анализ на снимката...", "success");
-
-            // СИМУЛАЦИЯ НА ВРЕМЕ ЗА AI ОБРАБОТКА (2 секунди)
-            // ТУК В БЪДЕЩЕ МОЖЕШ ДА ПРАТИШ СНИМКАТА КЪМ OPENAI VISION API (canvas.toDataURL())
-            setTimeout(() => {
-                document.getElementById('scanLine').classList.add('hidden');
-                document.getElementById('analysisResultBox').classList.remove('hidden');
-                
-                // Симулираме намиране на няколко карти
-                simulateAIDetection();
-                
-                showToast("Сканирането приключи! Проверете картите.", "success");
-                
-                // Скрол до резултата
-                document.getElementById('mainContainer').scrollTo({
-                    top: document.getElementById('analysisResultBox').offsetTop,
-                    behavior: 'smooth'
-                });
-            }, 2000);
+            // Директно показваме панела за въвеждане
+            document.getElementById('analysisResultBox').classList.remove('hidden');
+            
+            // Зануляваме решетката (премахваме фалшивия AI)
+            document.querySelectorAll('#cardGrid button').forEach(b => {
+                b.dataset.active = "0";
+                b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
+                b.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
+                if(['♥','♦'].includes(b.dataset.suit)) b.classList.add('text-red-400');
+                else b.classList.add('text-white');
+            });
+            recalcScan();
+            
+            showToast("Снимката е запазена! Маркирай картите.", "success");
+            
+            // Скрол до резултата
+            document.getElementById('mainContainer').scrollTo({
+                top: document.getElementById('analysisResultBox').offsetTop,
+                behavior: 'smooth'
+            });
         }
 
         // За симулацията: избираме 4-5 случайни карти
