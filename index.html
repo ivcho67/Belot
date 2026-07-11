@@ -4,19 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Белот Асистент Pro</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                        display: ['Unbounded', 'sans-serif'],
+                    },
                     colors: {
                         bgApp: '#050806',
-                        bgDark: '#0a0d0b',
-                        bgBase: '#121714',
-                        panel: '#1b2921',
-                        panelLight: '#263b2f',
-                        accentGold: '#e3be52',
-                        accentHover: '#f5d67a',
+                        anthracite: '#111612',
+                        forest: '#162e20',
+                        emeraldLight: '#1f422e',
+                        gold: '#e3be52',
+                        goldHover: '#f5d67a',
                         danger: '#ff4c4c',
                         success: '#4ade80'
                     },
@@ -29,152 +38,132 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
-        
         body {
             background-color: #050806;
-            background-image: radial-gradient(circle at 50% 0%, #1b2921 0%, #050806 70%);
+            background-image: radial-gradient(circle at 50% 0%, #162e20 0%, #050806 70%);
             color: #ffffff;
             -webkit-tap-highlight-color: transparent;
-            font-family: 'Inter', sans-serif;
             overscroll-behavior-y: none;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #263b2f; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #1f422e; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #e3be52; }
         
         input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
 
-        .tab-content {
-            display: none;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .tab-content.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .tab-content { display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
 
-        .custom-checkbox input:checked + div {
-            background-color: #e3be52;
-            border-color: #e3be52;
-        }
-        .custom-checkbox input:checked + div svg {
-            display: block;
-        }
+        .custom-checkbox input:checked + div { background-color: #e3be52; border-color: #e3be52; }
+        .custom-checkbox input:checked + div svg { display: block; }
 
-        @keyframes slideUp {
-            from { transform: translate(-50%, 100%); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
-        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         .toast-enter { animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         @keyframes scan { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
     </style>
 </head>
-<body class="h-screen w-full overflow-hidden flex justify-center items-center lg:p-6 selection:bg-accentGold selection:text-bgDark">
+<body class="h-screen w-full overflow-hidden flex justify-center items-center lg:p-6 selection:bg-gold selection:text-anthracite">
 
-    <!-- Главен Контейнер на Приложението (Адаптивен) -->
-    <div id="app-wrapper" class="w-full h-full lg:max-w-6xl lg:max-h-[900px] lg:rounded-3xl bg-bgDark flex flex-col lg:flex-row overflow-hidden lg:shadow-glow-lg lg:border border-panelLight relative">
+    <!-- ГЛАВНА ОБВИВКА -->
+    <div id="app-wrapper" class="w-full h-full lg:max-w-6xl lg:max-h-[900px] lg:rounded-3xl bg-anthracite flex flex-col lg:flex-row overflow-hidden lg:shadow-glow-lg lg:border border-emeraldLight relative">
         
-        <!-- Навигация (Долу на телефон, Отляво на десктоп) -->
-        <nav class="order-2 lg:order-1 flex-none w-full lg:w-28 h-[calc(5rem+env(safe-area-inset-bottom))] lg:h-full border-t lg:border-t-0 lg:border-r border-panelLight bg-bgDark/95 backdrop-blur-xl flex lg:flex-col justify-around items-center pb-[env(safe-area-inset-bottom)] lg:pb-8 lg:pt-8 z-50 transition-all">
-            <!-- Лого само за десктоп -->
+        <!-- SIDEBAR / НАВИГАЦИЯ -->
+        <nav class="order-2 lg:order-1 flex-none w-full lg:w-28 h-[calc(5rem+env(safe-area-inset-bottom))] lg:h-full border-t lg:border-t-0 lg:border-r border-emeraldLight bg-anthracite/95 backdrop-blur-xl flex lg:flex-col justify-around items-center pb-[env(safe-area-inset-bottom)] lg:pb-8 lg:pt-8 z-50">
             <div class="hidden lg:flex flex-col items-center mb-8 opacity-80">
-                <span class="text-3xl">♠️</span>
-                <span class="text-[10px] font-black text-accentGold tracking-widest mt-1">BELOT</span>
+                <span class="text-3xl">🃏</span>
+                <span class="font-display text-[9px] font-black text-gold tracking-widest mt-1">BELOT</span>
             </div>
 
-            <button onclick="switchTab('score')" class="nav-btn active w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-accentGold transition-all transform active:scale-90 hover:bg-panelLight/20 lg:rounded-2xl" data-target="score">
+            <button onclick="switchTab('score')" class="nav-btn active w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gold transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="score">
                 <svg class="w-7 h-7 mb-1.5 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                <span class="text-[10px] font-black uppercase tracking-wider">Игра</span>
+                <span class="font-sans text-[10px] font-bold uppercase tracking-wider">Игра</span>
             </button>
-            <button onclick="switchTab('scan')" class="nav-btn w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-panelLight/20 lg:rounded-2xl" data-target="scan">
+            <button onclick="switchTab('scan')" class="nav-btn w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="scan">
                 <svg class="w-7 h-7 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span class="text-[10px] font-black uppercase tracking-wider">Скенер</span>
+                <span class="font-sans text-[10px] font-bold uppercase tracking-wider">Скенер</span>
             </button>
-            <button onclick="switchTab('rules')" class="nav-btn w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-panelLight/20 lg:rounded-2xl" data-target="rules">
+            <button onclick="switchTab('rules')" class="nav-btn w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="rules">
                 <svg class="w-7 h-7 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                <span class="text-[10px] font-black uppercase tracking-wider">Правила</span>
+                <span class="font-sans text-[10px] font-bold uppercase tracking-wider">Правила</span>
             </button>
             <div class="hidden lg:block flex-grow"></div>
         </nav>
 
-        <!-- Работна Зона -->
-        <div class="order-1 lg:order-2 flex-1 flex flex-col relative overflow-hidden bg-bgDark">
+        <!-- РАБОТНА ЗОНА -->
+        <div class="order-1 lg:order-2 flex-1 flex flex-col relative overflow-hidden bg-transparent">
             
-            <!-- Хедър (Резултат) -->
-            <header class="flex-none bg-bgDark/90 backdrop-blur-md border-b border-panelLight pt-[max(env(safe-area-inset-top),1rem)] pb-4 px-4 lg:px-8 z-40">
-                <div class="max-w-3xl mx-auto flex justify-between items-end">
+            <!-- ХЕДЪР -->
+            <header class="flex-none bg-anthracite/85 backdrop-blur-md border-b border-emeraldLight pt-[max(env(safe-area-inset-top),1rem)] pb-4 px-4 lg:px-8 z-40">
+                <div class="max-w-4xl mx-auto flex justify-between items-end">
                     <div class="text-center w-[40%]">
-                        <input type="text" id="team1Name" value="Ние" class="bg-transparent text-gray-400 font-semibold text-sm w-full text-center focus:outline-none focus:text-accentGold transition-colors" onchange="saveState()">
-                        <div class="text-4xl lg:text-5xl font-black mt-1 tracking-tight text-white drop-shadow-md" id="score1">0</div>
+                        <input type="text" id="team1Name" value="Ние" class="font-sans bg-transparent text-gray-400 font-bold text-sm w-full text-center focus:outline-none focus:text-gold transition-colors" onchange="saveState()">
+                        <div class="font-display text-5xl lg:text-6xl font-black mt-1 tracking-tighter text-white drop-shadow-md" id="score1">0</div>
                     </div>
-                    <div class="text-2xl lg:text-3xl font-black text-panelLight w-[10%] text-center pb-1 lg:pb-2">VS</div>
+                    <div class="text-2xl lg:text-3xl font-display font-black text-emeraldLight w-[10%] text-center pb-2 opacity-50">VS</div>
                     <div class="text-center w-[40%]">
-                        <input type="text" id="team2Name" value="Вие" class="bg-transparent text-gray-400 font-semibold text-sm w-full text-center focus:outline-none focus:text-accentGold transition-colors" onchange="saveState()">
-                        <div class="text-4xl lg:text-5xl font-black mt-1 tracking-tight text-white drop-shadow-md" id="score2">0</div>
+                        <input type="text" id="team2Name" value="Вие" class="font-sans bg-transparent text-gray-400 font-bold text-sm w-full text-center focus:outline-none focus:text-gold transition-colors" onchange="saveState()">
+                        <div class="font-display text-5xl lg:text-6xl font-black mt-1 tracking-tighter text-white drop-shadow-md" id="score2">0</div>
                     </div>
                 </div>
-                <div class="max-w-3xl mx-auto mt-4">
+                
+                <!-- Висящи точки (Показват се само ако има) -->
+                <div id="hangingBadge" class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-danger/20 border border-danger/50 text-white font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full hidden shadow-[0_0_10px_rgba(255,76,76,0.3)]">
+                    Висящи точки: <span id="hangingPointsDisplay">0</span>
+                </div>
+
+                <div class="max-w-4xl mx-auto mt-4">
                     <div class="flex justify-between text-[10px] uppercase font-bold text-gray-500 mb-1.5 tracking-wider">
                         <span>Прогрес</span>
-                        <span id="targetScoreLabel" class="text-accentGold">Цел: 151</span>
+                        <span id="targetScoreLabel" class="text-gold">Цел: 151</span>
                     </div>
-                    <div class="w-full bg-bgBase rounded-full h-2 flex overflow-hidden shadow-inner border border-gray-800">
-                        <div id="progress1" class="bg-accentGold h-full transition-all duration-500 ease-out" style="width: 0%"></div>
-                        <div class="flex-grow bg-bgBase"></div>
-                        <div id="progress2" class="bg-accentGold h-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                    <div class="w-full bg-[#0a0d0b] rounded-full h-2 flex overflow-hidden shadow-inner border border-forest">
+                        <div id="progress1" class="bg-gold h-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                        <div class="flex-grow bg-transparent"></div>
+                        <div id="progress2" class="bg-gold h-full transition-all duration-500 ease-out" style="width: 0%"></div>
                     </div>
                 </div>
             </header>
 
-            <!-- Основно Скролиращо Съдържание -->
-            <main class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth w-full" id="mainContainer">
+            <!-- ГЛАВЕН КОНТЕЙНЕР -->
+            <main class="flex-1 overflow-y-auto p-4 lg:p-8 w-full scroll-smooth" id="mainContainer">
                 
                 <!-- ТАБ 1: КАЛКУЛАТОР -->
                 <section id="tab-score" class="tab-content active h-full max-w-5xl mx-auto">
-                    <!-- Грид за Десктоп (2 колони), Flex за Мобилно (1 колона) -->
                     <div class="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 lg:h-full lg:items-start">
                         
                         <!-- ЛЯВА КОЛОНА: Въвеждане -->
                         <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-0">
                             <!-- Договор -->
-                            <div class="bg-bgBase p-4 lg:p-5 rounded-2xl border border-panelLight shadow-lg">
-                                <div class="grid grid-cols-3 gap-2 bg-panel p-1.5 rounded-xl">
-                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm lg:text-base transition-all duration-200 active:scale-95" data-contract="all" onclick="selectContract('all')">Вс. Коз</button>
-                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm lg:text-base transition-all duration-200 active:scale-95" data-contract="none" onclick="selectContract('none')">Без Коз</button>
-                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm lg:text-base transition-all duration-200 active:scale-95" data-contract="suit" onclick="selectContract('suit')">Боя</button>
+                            <div class="bg-forest/20 p-4 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg">
+                                <div class="grid grid-cols-3 gap-2 bg-anthracite p-1.5 rounded-xl border border-emeraldLight/30">
+                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm transition-all duration-200 active:scale-95 bg-gold text-anthracite shadow-glow" data-contract="all" onclick="selectContract('all')">Вс. Коз</button>
+                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm transition-all duration-200 active:scale-95 bg-transparent text-white hover:bg-emeraldLight/50" data-contract="none" onclick="selectContract('none')">Без Коз</button>
+                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm transition-all duration-200 active:scale-95 bg-transparent text-white hover:bg-emeraldLight/50" data-contract="suit" onclick="selectContract('suit')">Боя</button>
                                 </div>
                                 <div id="suitSelector" class="hidden grid-cols-4 gap-2 mt-3">
-                                    <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl hover:border-accentGold transition-all" onclick="setSuit('♠', this)">♠</button>
-                                    <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl text-red-500 hover:border-accentGold transition-all" onclick="setSuit('♥', this)">♥</button>
-                                    <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl text-red-500 hover:border-accentGold transition-all" onclick="setSuit('♦', this)">♦</button>
-                                    <button class="suit-btn bg-bgDark border border-panelLight text-2xl py-2 rounded-xl hover:border-accentGold transition-all" onclick="setSuit('♣', this)">♣</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-2xl py-2 rounded-xl hover:border-gold transition-all" onclick="setSuit('♠', this)">♠</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-2xl py-2 rounded-xl text-red-500 hover:border-gold transition-all" onclick="setSuit('♥', this)">♥</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-2xl py-2 rounded-xl text-red-500 hover:border-gold transition-all" onclick="setSuit('♦', this)">♦</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-2xl py-2 rounded-xl hover:border-gold transition-all" onclick="setSuit('♣', this)">♣</button>
                                 </div>
                                 <div class="mt-4 grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Обявил</label>
-                                        <select id="callerSelect" class="w-full bg-panelLight text-white rounded-xl p-3 outline-none focus:ring-2 ring-accentGold mt-1 font-semibold cursor-pointer appearance-none" onchange="updateCalc()">
+                                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Обявил играта</label>
+                                        <select id="callerSelect" class="w-full bg-emeraldLight/40 border border-emeraldLight text-white rounded-xl p-3 outline-none focus:border-gold focus:ring-1 ring-gold mt-1 font-semibold appearance-none cursor-pointer" onchange="updateCalc()">
                                             <option value="1">Ние</option>
                                             <option value="2">Вие</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Множител</label>
-                                        <select id="multiplierSelect" class="w-full bg-panelLight text-white rounded-xl p-3 outline-none focus:ring-2 ring-accentGold mt-1 font-semibold cursor-pointer appearance-none text-center">
+                                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Наддаване</label>
+                                        <select id="multiplierSelect" class="w-full bg-emeraldLight/40 border border-emeraldLight text-white rounded-xl p-3 outline-none focus:border-gold focus:ring-1 ring-gold mt-1 font-semibold appearance-none text-center cursor-pointer">
                                             <option value="1">Нормално x1</option>
-                                            <option value="2" class="text-accentGold">Контра x2</option>
+                                            <option value="2" class="text-gold">Контра x2</option>
                                             <option value="4" class="text-danger">Реконтра x4</option>
                                         </select>
                                     </div>
@@ -182,49 +171,49 @@
                             </div>
 
                             <!-- Точки -->
-                            <div class="bg-bgBase p-4 lg:p-5 rounded-2xl border border-panelLight shadow-lg relative overflow-hidden">
-                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accentGold/20 to-transparent"></div>
+                            <div class="bg-forest/20 p-4 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold/30 to-transparent"></div>
                                 <div class="flex justify-between items-center mb-4">
                                     <h2 class="text-xs uppercase font-bold text-gray-500 tracking-wider">Точки от карти</h2>
-                                    <span id="basePointsLabel" class="text-xs font-bold bg-accentGold/10 text-accentGold px-3 py-1 rounded-full border border-accentGold/20">Макс: 162</span>
+                                    <span id="basePointsLabel" class="text-[10px] font-black bg-gold/10 text-gold px-3 py-1 rounded-full border border-gold/30 uppercase tracking-wider">Общо: 258</span>
                                 </div>
                                 
-                                <div class="flex items-center justify-between gap-3 bg-bgDark p-3 rounded-2xl border border-panelLight">
+                                <div class="flex items-center justify-between gap-3 bg-anthracite p-3 rounded-2xl border border-emeraldLight/50">
                                     <div class="flex flex-col items-center w-1/2 relative">
-                                        <label id="lblPoints1" class="text-[10px] uppercase font-bold text-gray-500 mb-1">Ние</label>
+                                        <label id="lblPoints1" class="text-[10px] uppercase font-bold text-gray-400 mb-1 tracking-wider">Ние</label>
                                         <div class="flex items-center w-full gap-1">
-                                            <button onclick="adjPts(-10)" class="bg-panel w-10 h-12 lg:h-14 rounded-lg text-gray-400 active:scale-90 hover:bg-panelLight font-bold transition-all">-</button>
-                                            <input type="number" id="inputPoints" inputmode="numeric" pattern="[0-9]*" class="flex-grow bg-transparent text-center text-4xl lg:text-5xl font-black text-white outline-none w-full h-12 lg:h-14 focus:text-accentGold transition-colors" placeholder="0" oninput="updateCalc()" onclick="this.select()">
-                                            <button onclick="adjPts(10)" class="bg-panel w-10 h-12 lg:h-14 rounded-lg text-gray-400 active:scale-90 hover:bg-panelLight font-bold transition-all">+</button>
+                                            <button onclick="adjPts(-10)" class="bg-emeraldLight w-10 h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">-</button>
+                                            <input type="number" id="inputPoints" inputmode="numeric" pattern="[0-9]*" class="font-display flex-grow bg-transparent text-center text-4xl lg:text-5xl font-black text-white outline-none w-full h-12 lg:h-14 focus:text-gold transition-colors" placeholder="0" oninput="updateCalc()" onclick="this.select()">
+                                            <button onclick="adjPts(10)" class="bg-emeraldLight w-10 h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">+</button>
                                         </div>
                                     </div>
-                                    <div class="text-2xl text-panelLight font-black">/</div>
+                                    <div class="text-2xl text-emeraldLight font-black">/</div>
                                     <div class="flex flex-col items-center w-1/3 opacity-50">
-                                        <label id="lblPoints2" class="text-[10px] uppercase font-bold text-gray-500 mb-1">Вие</label>
-                                        <div id="autoPoints" class="text-4xl lg:text-5xl font-black text-gray-400 h-12 lg:h-14 flex items-center justify-center">0</div>
+                                        <label id="lblPoints2" class="text-[10px] uppercase font-bold text-gray-400 mb-1 tracking-wider">Вие</label>
+                                        <div id="autoPoints" class="font-display text-4xl lg:text-5xl font-black text-gray-500 h-12 lg:h-14 flex items-center justify-center">0</div>
                                     </div>
                                 </div>
 
                                 <div class="mt-4 grid grid-cols-2 gap-3">
-                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-panelLight/30 p-3 rounded-xl cursor-pointer hover:bg-panelLight/50 transition-colors">
+                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-emeraldLight/30 border border-emeraldLight/50 p-3 rounded-xl cursor-pointer hover:bg-emeraldLight/60 transition-colors">
                                         <input type="checkbox" id="valat1" class="hidden">
-                                        <div class="w-5 h-5 rounded border-2 border-gray-500 flex items-center justify-center transition-colors">
-                                            <svg class="hidden w-3 h-3 text-bgDark font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        <div class="w-5 h-5 rounded border-2 border-gray-400 flex items-center justify-center transition-colors">
+                                            <svg class="hidden w-3 h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                         </div>
-                                        <span class="text-sm font-semibold text-gray-300">Валат (Ние)</span>
+                                        <span class="text-sm font-bold text-gray-200">Капо (Ние)</span>
                                     </label>
-                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-panelLight/30 p-3 rounded-xl cursor-pointer hover:bg-panelLight/50 transition-colors">
+                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-emeraldLight/30 border border-emeraldLight/50 p-3 rounded-xl cursor-pointer hover:bg-emeraldLight/60 transition-colors">
                                         <input type="checkbox" id="valat2" class="hidden">
-                                        <div class="w-5 h-5 rounded border-2 border-gray-500 flex items-center justify-center transition-colors">
-                                            <svg class="hidden w-3 h-3 text-bgDark font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        <div class="w-5 h-5 rounded border-2 border-gray-400 flex items-center justify-center transition-colors">
+                                            <svg class="hidden w-3 h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                         </div>
-                                        <span class="text-sm font-semibold text-gray-300">Валат (Вие)</span>
+                                        <span class="text-sm font-bold text-gray-200">Капо (Вие)</span>
                                     </label>
                                 </div>
                             </div>
 
-                            <button onclick="saveRound()" class="w-full bg-accentGold text-bgDark font-black text-lg p-5 rounded-2xl shadow-glow hover:bg-accentHover active:scale-95 transition-all flex justify-center items-center gap-2 relative overflow-hidden group">
-                                <span class="relative z-10">ЗАПИШИ РУНДА</span>
+                            <button onclick="saveRound()" class="font-sans w-full bg-gold text-anthracite font-black text-lg p-5 rounded-2xl shadow-glow hover:bg-goldHover active:scale-95 transition-all flex justify-center items-center gap-2 relative overflow-hidden group">
+                                <span class="relative z-10 uppercase tracking-widest">Запиши Рунда</span>
                                 <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                             </button>
                         </div>
@@ -232,8 +221,8 @@
                         <!-- ДЯСНА КОЛОНА: Анонси и История -->
                         <div class="lg:col-span-7 space-y-5 flex flex-col h-full lg:pb-0 pb-10">
                             <!-- Анонси -->
-                            <div id="announcementsSection" class="bg-bgBase p-4 lg:p-5 rounded-2xl border border-panelLight shadow-lg flex-none">
-                                <h2 class="text-xs uppercase font-bold text-gray-500 tracking-wider mb-3">Добави Анонси</h2>
+                            <div id="announcementsSection" class="bg-forest/20 p-4 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg flex-none transition-opacity duration-300">
+                                <h2 class="text-xs uppercase font-bold text-gray-500 tracking-wider mb-3">Обявени Анонси</h2>
                                 <div class="flex gap-4">
                                     <div class="w-1/2 space-y-2" id="ann1"></div>
                                     <div class="w-1/2 space-y-2" id="ann2"></div>
@@ -241,34 +230,34 @@
                             </div>
                             
                             <div id="noTrumpsWarning" class="hidden bg-danger/10 border border-danger/30 p-4 rounded-2xl text-center flex-none">
-                                <span class="text-danger font-black text-sm uppercase tracking-wide">⚠️ На Без Коз няма анонси</span>
+                                <span class="text-danger font-black text-xs uppercase tracking-widest">⚠️ На Без Коз няма анонси</span>
                             </div>
 
                             <!-- История -->
                             <div class="flex-grow flex flex-col min-h-[250px] lg:min-h-0">
                                 <div class="flex justify-between items-center mb-3 px-1 flex-none">
                                     <h3 class="font-black text-lg text-white">История</h3>
-                                    <button onclick="confirmAction('Искате ли да изтриете последното раздаване?', undoLast)" class="text-xs font-bold text-danger/80 hover:text-danger bg-danger/10 px-3 py-1.5 rounded-full transition-colors cursor-pointer">Върни ход</button>
+                                    <button onclick="confirmAction('Искате ли да изтриете последното раздаване?', undoLast)" class="text-xs font-bold text-danger/80 hover:text-danger bg-danger/10 px-3 py-1.5 rounded-full transition-colors cursor-pointer uppercase tracking-wider">Върни ход</button>
                                 </div>
-                                <div class="bg-bgBase rounded-2xl border border-panelLight overflow-hidden shadow-lg flex-grow flex flex-col">
-                                    <div class="overflow-y-auto flex-grow relative">
-                                        <table class="w-full text-sm text-left relative">
-                                            <thead class="text-[10px] uppercase font-bold text-gray-500 bg-panelLight/50 sticky top-0 backdrop-blur-md z-10">
+                                <div class="bg-anthracite rounded-2xl border border-emeraldLight overflow-hidden shadow-lg flex-grow flex flex-col relative">
+                                    <div class="overflow-y-auto flex-grow">
+                                        <table class="w-full text-sm text-left">
+                                            <thead class="text-[10px] uppercase font-bold text-gray-500 bg-emeraldLight/30 sticky top-0 backdrop-blur-md z-10 border-b border-emeraldLight">
                                                 <tr>
-                                                    <th class="p-3 pl-4">Договор</th>
-                                                    <th class="p-3 text-center">Ние</th>
-                                                    <th class="p-3 text-center pr-4">Вие</th>
+                                                    <th class="p-4">Договор</th>
+                                                    <th class="p-4 text-center">Ние</th>
+                                                    <th class="p-4 text-center">Вие</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="historyBody" class="divide-y divide-panelLight/30 font-medium"></tbody>
+                                            <tbody id="historyBody" class="divide-y divide-emeraldLight/30 font-semibold font-display"></tbody>
                                         </table>
-                                        <div id="emptyHistory" class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm hidden flex-col gap-2 bg-bgBase">
-                                            <span class="text-3xl opacity-50">📝</span>
-                                            <span>Няма записани раздавания.</span>
+                                        <div id="emptyHistory" class="absolute inset-0 flex items-center justify-center text-emeraldLight text-sm flex-col gap-2 pointer-events-none">
+                                            <span class="text-4xl opacity-50">📝</span>
+                                            <span class="font-sans font-bold uppercase tracking-wider opacity-70">Няма записани ръце</span>
                                         </div>
                                     </div>
-                                    <button onclick="confirmAction('Сигурни ли сте, че искате да започнете нова игра?', resetGame)" class="w-full bg-panelLight/20 hover:bg-panelLight/40 text-gray-400 font-bold p-3 text-xs transition-colors flex-none border-t border-panelLight">
-                                        Изтрий всичко и започни нова игра
+                                    <button onclick="confirmAction('Сигурни ли сте, че искате да занулите резултата и да започнете нова игра?', resetGame)" class="font-sans w-full bg-emeraldLight/10 hover:bg-emeraldLight/30 text-gray-400 font-bold p-4 text-xs transition-colors flex-none border-t border-emeraldLight uppercase tracking-wider">
+                                        Започни Нова Игра
                                     </button>
                                 </div>
                             </div>
@@ -277,90 +266,104 @@
                 </section>
 
                 <!-- ТАБ 2: СКЕНЕР -->
-                <section id="tab-scan" class="tab-content h-full max-w-3xl mx-auto space-y-4 lg:space-y-6 lg:pt-4">
-                    <div class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-2xl text-sm text-blue-200 shadow-md">
-                        <strong class="text-blue-400 block mb-1 text-base">Камера Асистент</strong> 
-                        Симулация: Отворете камерата, вижте картите и ги маркирайте в решетката. Точките се изчисляват спрямо избрания договор.
+                <section id="tab-scan" class="tab-content h-full max-w-3xl mx-auto space-y-5 lg:pt-2">
+                    <div class="bg-blue-900/20 border border-blue-500/30 p-5 rounded-2xl text-sm text-blue-200 shadow-md">
+                        <strong class="text-blue-400 block mb-2 text-base uppercase tracking-wider">Симулация на сканиране</strong> 
+                        Това е инструмент за ръчно маркиране на видените карти. Стойностите се калкулират автоматично на база стриктните правила за избрания договор (Всичко Коз, Боя или Без Коз).
                     </div>
 
-                    <div class="relative w-full aspect-video lg:max-h-[400px] bg-black rounded-2xl overflow-hidden border-2 border-panelLight flex items-center justify-center shadow-inner">
+                    <div class="relative w-full aspect-video lg:max-h-[350px] bg-black rounded-2xl overflow-hidden border border-emeraldLight flex items-center justify-center shadow-inner">
                         <video id="cameraFeed" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden opacity-80"></video>
                         <div id="cameraPlaceholder" class="text-center p-4">
-                            <div class="text-5xl mb-3 opacity-30">📷</div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Камерата е спряна</p>
+                            <div class="text-5xl mb-3 opacity-20">📷</div>
+                            <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Камерата е изключена</p>
                         </div>
                         <div id="scanLine" class="hidden absolute left-0 w-full h-0.5 bg-success shadow-[0_0_20px_#4ade80] animate-[scan_2s_ease-in-out_infinite]"></div>
                     </div>
                     
                     <div class="flex gap-3">
-                        <button onclick="startCamera()" class="flex-1 bg-panelLight hover:bg-panelLight/80 border border-success/50 text-success p-4 rounded-xl font-bold active:scale-95 transition-all flex justify-center items-center gap-2 text-lg shadow-md cursor-pointer">
+                        <button onclick="startCamera()" class="flex-1 bg-emeraldLight hover:bg-emeraldLight/80 border border-success/50 text-success p-4 rounded-xl font-bold active:scale-95 transition-all flex justify-center items-center gap-2 shadow-md uppercase tracking-wider text-xs">
                             <span>▶</span> Включи
                         </button>
-                        <button onclick="stopCamera()" class="flex-1 bg-bgDark hover:bg-panel border border-danger/30 text-danger p-4 rounded-xl font-bold active:scale-95 transition-all cursor-pointer">
+                        <button onclick="stopCamera()" class="flex-1 bg-anthracite hover:bg-forest border border-danger/30 text-danger p-4 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-wider text-xs">
                             Изключи
                         </button>
                     </div>
 
-                    <div class="bg-bgBase p-5 rounded-2xl border border-panelLight shadow-lg mt-4">
+                    <div class="bg-forest/20 p-5 rounded-2xl border border-emeraldLight shadow-lg mt-4">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-sm text-white uppercase tracking-wide">Ръчна Решетка</h3>
-                            <span class="text-xs font-bold bg-accentGold/10 px-3 py-1.5 rounded-full text-accentGold border border-accentGold/20" id="scanContractInfo">Според договора</span>
+                            <h3 class="font-bold text-xs text-gray-400 uppercase tracking-widest">Решетка</h3>
+                            <span class="text-[10px] font-black bg-gold/10 px-3 py-1.5 rounded-full text-gold border border-gold/30 uppercase tracking-wider" id="scanContractInfo">Всичко Коз</span>
                         </div>
                         
                         <div class="grid grid-cols-4 gap-2 lg:gap-3" id="cardGrid"></div>
 
-                        <div class="mt-6 flex justify-between items-center bg-bgDark p-4 rounded-xl border border-panelLight">
-                            <div class="text-xs uppercase font-bold text-gray-500 leading-tight">Открити точки<br><span id="scanTotal" class="text-4xl font-black text-white">0</span></div>
-                            <button onclick="sendToCalculator()" class="bg-accentGold text-bgDark px-8 py-4 rounded-xl font-black active:scale-95 hover:bg-accentHover transition-all shadow-glow cursor-pointer text-lg">
-                                ВЪВЕДИ →
+                        <div class="mt-6 flex justify-between items-center bg-anthracite p-4 rounded-xl border border-emeraldLight/50">
+                            <div class="text-[10px] uppercase font-bold text-gray-500 leading-tight tracking-wider">Открити точки<br><span id="scanTotal" class="font-display text-4xl font-black text-white">0</span></div>
+                            <button onclick="sendToCalculator()" class="font-sans bg-gold text-anthracite px-8 py-4 rounded-xl font-black active:scale-95 hover:bg-goldHover transition-all shadow-glow uppercase tracking-widest">
+                                ВЪВЕДИ
                             </button>
                         </div>
                     </div>
                 </section>
 
-                <!-- ТАБ 3: ПРАВИЛА -->
+                <!-- ТАБ 3: ПРАВИЛА (ОФИЦИАЛНИ) -->
                 <section id="tab-rules" class="tab-content h-full max-w-5xl mx-auto pb-10">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full items-start">
-                        <!-- Ляво: Анонси -->
-                        <div class="bg-panel rounded-2xl p-6 border border-panelLight shadow-lg">
-                            <h3 class="font-black text-accentGold text-2xl mb-2 flex items-center gap-2"><span>📣</span> Таблица с Анонси</h3>
-                            <p class="text-sm text-gray-300 mb-6 leading-relaxed bg-bgDark/50 p-3 rounded-lg border border-panelLight/50"><strong>Важно:</strong> На Без Коз няма анонси. По-дълга поредица бие по-къса. При равна дължина - по-висока карта. При пълно равенство - Козът печели.</p>
+                        
+                        <!-- Ляво: Основни правила -->
+                        <div class="bg-forest/20 rounded-2xl p-6 lg:p-8 border border-emeraldLight shadow-lg space-y-6">
+                            <h3 class="font-black text-white text-xl uppercase tracking-widest mb-4 flex items-center gap-3"><span class="text-2xl">📖</span> Точкуване</h3>
                             
-                            <div class="space-y-3 text-sm font-medium">
-                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Белот (K+Q коз)</span><span class="text-accentGold font-black text-base">20</span></div>
-                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Терца (3 поредни)</span><span class="text-accentGold font-black text-base">20</span></div>
-                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Кварта (4 поредни)</span><span class="text-accentGold font-black text-base">50</span></div>
-                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Квинта (5+ поредни)</span><span class="text-accentGold font-black text-base">100</span></div>
-                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Каре Валета</span><span class="text-accentGold font-black text-base">200</span></div>
-                                <div class="flex justify-between border-b border-panelLight/50 pb-3 hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Каре Деветки</span><span class="text-accentGold font-black text-base">150</span></div>
-                                <div class="flex justify-between hover:bg-panelLight/20 p-2 rounded transition-colors"><span class="text-white">Каре (A/K/Q/10)</span><span class="text-accentGold font-black text-base">100</span></div>
+                            <div class="space-y-4">
+                                <div class="bg-anthracite p-4 rounded-xl border border-emeraldLight/50">
+                                    <h4 class="font-bold text-gold mb-2 text-xs uppercase tracking-widest border-b border-emeraldLight/50 pb-2">Бази за игра</h4>
+                                    <ul class="text-sm text-gray-300 space-y-2 font-medium">
+                                        <li class="flex justify-between"><span>Боя (Коз)</span><strong class="text-white">162 точки</strong></li>
+                                        <li class="flex justify-between"><span>Всичко Коз</span><strong class="text-white">258 точки</strong></li>
+                                        <li class="flex justify-between"><span>Без Коз</span><strong class="text-white">130 (удвоява се = 260)</strong></li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-anthracite p-4 rounded-xl border border-emeraldLight/50">
+                                    <h4 class="font-bold text-gold mb-2 text-xs uppercase tracking-widest border-b border-emeraldLight/50 pb-2">Закръгляне</h4>
+                                    <p class="text-sm text-gray-300 font-medium leading-relaxed">
+                                        Точките се делят на 10 и се закръглят (пр: 145 = 15).<br>
+                                        <span class="text-gold block mt-2">Изключение на Всичко Коз:</span> Ако двата отбора завършат на 4 (напр. 154:104), отборът с <strong>по-малко точки закръгля нагоре</strong> (11), а другият надолу (15).
+                                    </p>
+                                </div>
+
+                                <div class="bg-anthracite p-4 rounded-xl border border-danger/40">
+                                    <h4 class="font-bold text-danger mb-2 text-xs uppercase tracking-widest border-b border-danger/30 pb-2">Вътре / Висяща (Равенство)</h4>
+                                    <p class="text-sm text-gray-300 font-medium leading-relaxed">
+                                        Ако обявилият изкара <strong>по-малко</strong>, той е вътре и противникът взима всичко.<br>
+                                        Ако са <strong>по равно</strong> (напр. 81:81), обявилият не записва нищо — точките му "висят" за следващото раздаване.
+                                    </p>
+                                </div>
+
+                                <div class="bg-anthracite p-4 rounded-xl border border-success/40">
+                                    <h4 class="font-bold text-success mb-2 text-xs uppercase tracking-widest border-b border-success/30 pb-2">Контра / Капо</h4>
+                                    <p class="text-sm text-gray-300 font-medium leading-relaxed">
+                                        <strong>Контра:</strong> Победителят записва всичко удвоено (Реконтра х4).<br>
+                                        <strong>Капо (Валат):</strong> +90 точки бонус. (На Без Коз този бонус НЕ се удвоява).
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Дясно: Правила -->
-                        <div class="bg-bgBase rounded-2xl p-6 border border-panelLight shadow-lg space-y-6">
-                            <h3 class="font-black text-white text-2xl mb-4 flex items-center gap-2"><span>📖</span> Основни Правила</h3>
+                        <!-- Дясно: Анонси -->
+                        <div class="bg-anthracite rounded-2xl p-6 lg:p-8 border border-emeraldLight shadow-lg">
+                            <h3 class="font-black text-gold text-xl uppercase tracking-widest mb-4 flex items-center gap-3"><span class="text-2xl">📣</span> Анонси</h3>
+                            <p class="text-xs text-gray-400 mb-6 leading-relaxed uppercase tracking-wider font-bold">На Без Коз няма анонси. Поредица бие по дължина, после по сила. Каретата бият само по точкова стойност в коз.</p>
                             
-                            <div class="space-y-4">
-                                <div class="bg-panel/30 p-4 rounded-xl border border-panelLight/30">
-                                    <h4 class="font-bold text-accentGold mb-1 text-sm uppercase tracking-wider">Основи</h4>
-                                    <p class="text-sm text-gray-300">Раздават се общо 32 карти. Играе се до 151 т. (или 251 на чист Без Коз). След раздаване на 5 карти се обявява договор.</p>
-                                </div>
-                                
-                                <div class="bg-panel/30 p-4 rounded-xl border border-panelLight/30">
-                                    <h4 class="font-bold text-accentGold mb-1 text-sm uppercase tracking-wider">Закръгляне</h4>
-                                    <p class="text-sm text-gray-300">Резултатът от ръцете се дели на 10 и се закръгля. Пример: 145 т. се пишат 15. 144 т. се пишат 14.</p>
-                                </div>
-
-                                <div class="bg-panel/30 p-4 rounded-xl border border-danger/20">
-                                    <h4 class="font-bold text-danger mb-1 text-sm uppercase tracking-wider">Вътре си (Капут)</h4>
-                                    <p class="text-sm text-gray-300">Отборът обявил играта трябва да изкара повече от половината точки (над 81 на Коз, над 65 на Без Коз). При равенство (81-81), обявилият е вътре и противникът записва всичко (вкл. анонсите).</p>
-                                </div>
-
-                                <div class="bg-panel/30 p-4 rounded-xl border border-success/20">
-                                    <h4 class="font-bold text-success mb-1 text-sm uppercase tracking-wider">Валат / Капо</h4>
-                                    <p class="text-sm text-gray-300">Ако един отбор спечели всички взятки в раздаването, той получава бонус от +25 точки.</p>
-                                </div>
+                            <div class="space-y-3 text-sm font-bold font-sans">
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Белот (K+Q коз)</span><span class="text-gold font-black font-display text-base">20</span></div>
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Терца (3 поредни)</span><span class="text-gold font-black font-display text-base">20</span></div>
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Кварта (4 поредни)</span><span class="text-gold font-black font-display text-base">50</span></div>
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Квинта (5+ поредни)</span><span class="text-gold font-black font-display text-base">100</span></div>
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Каре (10, Q, K, A)</span><span class="text-gold font-black font-display text-base">100</span></div>
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Каре Деветки</span><span class="text-gold font-black font-display text-base">150</span></div>
+                                <div class="flex justify-between hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Каре Валета</span><span class="text-gold font-black font-display text-base">200</span></div>
                             </div>
                         </div>
                     </div>
@@ -369,33 +372,36 @@
         </div>
     </div>
 
-    <!-- Модален Прозорец -->
-    <div id="modalOverlay" class="fixed inset-0 bg-bgApp/90 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-200">
-        <div class="bg-bgBase border border-panelLight p-6 rounded-3xl max-w-sm w-full transform scale-95 transition-transform duration-200 shadow-2xl" id="modalBox">
-            <h3 class="text-xl font-black text-white mb-2">Потвърждение</h3>
-            <p id="modalMsg" class="text-sm text-gray-400 mb-8"></p>
-            <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 bg-panel hover:bg-panelLight text-white p-3.5 rounded-xl font-bold active:scale-95 transition-all">Отказ</button>
-                <button id="modalConfirmBtn" class="flex-1 bg-danger hover:bg-red-500 text-white p-3.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,76,76,0.3)] active:scale-95 transition-all">Потвърди</button>
+    <!-- МОДАЛ -->
+    <div id="modalOverlay" class="fixed inset-0 bg-bgApp/95 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-200">
+        <div class="bg-anthracite border border-emeraldLight p-6 rounded-3xl max-w-sm w-full transform scale-95 transition-transform duration-200 shadow-2xl" id="modalBox">
+            <h3 class="text-xl font-black text-white mb-2 font-display uppercase tracking-wider">Потвърждение</h3>
+            <p id="modalMsg" class="text-sm text-gray-400 mb-8 font-semibold"></p>
+            <div class="flex gap-3 font-sans">
+                <button onclick="closeModal()" class="flex-1 bg-emeraldLight/30 hover:bg-emeraldLight/50 text-white p-3.5 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-wider text-xs">Отказ</button>
+                <button id="modalConfirmBtn" class="flex-1 bg-danger hover:bg-red-500 text-white p-3.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,76,76,0.3)] active:scale-95 transition-all uppercase tracking-wider text-xs">Потвърди</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toastContainer" class="fixed top-6 lg:top-10 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-max max-w-[90%] pointer-events-none"></div>
+    <!-- TOASTS -->
+    <div id="toastContainer" class="fixed top-6 lg:top-10 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-max max-w-[90%] pointer-events-none font-sans"></div>
 
     <script>
-        // --- ДАННИ ---
+        // --- ДЪРЖАВНО СЪСТОЯНИЕ (STATE) ---
         let state = {
-            t1Name: "Ние", t2Name: "Вие", total1: 0, total2: 0, rounds: [],
+            t1Name: "Ние", t2Name: "Вие", 
+            total1: 0, total2: 0, 
+            hangingPoints: 0, // Висящи точки
+            rounds: [],
             currentContract: 'all', currentSuit: '', targetScore: 151
         };
 
         const annTypes = [
             { id: 'belot', label: 'Белот (20)', val: 20 }, { id: 'tierce', label: 'Терца (20)', val: 20 },
             { id: 'quarte', label: 'Кварта (50)', val: 50 }, { id: 'quinte', label: 'Квинта (100)', val: 100 },
-            { id: 'carre100', label: 'Каре (100)', val: 100 }, { id: 'carre150', label: 'Каре (150)', val: 150 },
-            { id: 'carre200', label: 'Каре (200)', val: 200 }
+            { id: 'carre100', label: 'Каре (100)', val: 100 }, { id: 'carre150', label: 'Каре 9-ки (150)', val: 150 },
+            { id: 'carre200', label: 'Каре J-та (200)', val: 200 }
         ];
 
         // --- ИНИЦИАЛИЗАЦИЯ ---
@@ -406,6 +412,8 @@
                 document.getElementById('team1Name').value = state.t1Name;
                 document.getElementById('team2Name').value = state.t2Name;
             }
+            if(state.hangingPoints === undefined) state.hangingPoints = 0; // Backward compatibility
+            
             updateOverallScore();
             renderHistory();
             selectContract(state.currentContract);
@@ -428,14 +436,13 @@
             sel.options[1].text = state.t2Name;
         }
 
-        // --- UI ФУНКЦИИ ---
+        // --- UI АСИСТЕНТИ ---
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            const color = type === 'error' ? 'bg-danger' : 'bg-accentGold';
-            const textColor = type === 'error' ? 'text-white' : 'text-bgDark';
+            const color = type === 'error' ? 'bg-danger text-white' : 'bg-gold text-anthracite shadow-glow';
             
-            toast.className = `toast-enter ${color} ${textColor} px-6 py-3 rounded-full font-black text-sm shadow-lg flex items-center gap-2`;
+            toast.className = `toast-enter ${color} px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest shadow-lg flex items-center gap-2`;
             toast.innerHTML = type === 'error' ? `<span>⚠️</span> ${msg}` : `<span>✓</span> ${msg}`;
             
             container.appendChild(toast);
@@ -454,10 +461,7 @@
             const overlay = document.getElementById('modalOverlay');
             const box = document.getElementById('modalBox');
             overlay.classList.remove('hidden');
-            setTimeout(() => {
-                overlay.classList.remove('opacity-0');
-                box.classList.remove('scale-95');
-            }, 10);
+            setTimeout(() => { overlay.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
             
             document.getElementById('modalConfirmBtn').onclick = () => {
                 closeModal();
@@ -468,8 +472,7 @@
         function closeModal() {
             const overlay = document.getElementById('modalOverlay');
             const box = document.getElementById('modalBox');
-            overlay.classList.add('opacity-0');
-            box.classList.add('scale-95');
+            overlay.classList.add('opacity-0'); box.classList.add('scale-95');
             setTimeout(() => overlay.classList.add('hidden'), 200);
         }
 
@@ -479,12 +482,11 @@
             
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 if (btn.dataset.target === tabId) {
-                    btn.classList.add('text-accentGold');
-                    btn.classList.remove('text-gray-500');
+                    btn.classList.add('text-gold'); btn.classList.remove('text-gray-500');
+                    btn.classList.add('bg-emeraldLight/10');
                     if(btn.querySelector('svg')) btn.querySelector('svg').classList.add('drop-shadow-md');
                 } else {
-                    btn.classList.remove('text-accentGold');
-                    btn.classList.add('text-gray-500');
+                    btn.classList.remove('text-gold', 'bg-emeraldLight/10'); btn.classList.add('text-gray-500');
                     if(btn.querySelector('svg')) btn.querySelector('svg').classList.remove('drop-shadow-md');
                 }
             });
@@ -492,16 +494,22 @@
         }
 
         // --- ЛОГИКА КАЛКУЛАТОР ---
+        function getBaseForContract(cType) {
+            if (cType === 'all') return 258;
+            if (cType === 'none') return 130;
+            return 162; // suit
+        }
+
         function selectContract(cType) {
             state.currentContract = cType;
             
             document.querySelectorAll('.contract-btn').forEach(btn => {
                 if (btn.dataset.contract === cType) {
-                    btn.classList.add('bg-accentGold', 'text-bgDark', 'shadow-glow');
-                    btn.classList.remove('bg-panelLight', 'text-white', 'hover:bg-panelLight/80');
+                    btn.classList.add('bg-gold', 'text-anthracite', 'shadow-glow');
+                    btn.classList.remove('bg-transparent', 'text-white', 'hover:bg-emeraldLight/50');
                 } else {
-                    btn.classList.remove('bg-accentGold', 'text-bgDark', 'shadow-glow');
-                    btn.classList.add('bg-panelLight', 'text-white', 'hover:bg-panelLight/80');
+                    btn.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow');
+                    btn.classList.add('bg-transparent', 'text-white', 'hover:bg-emeraldLight/50');
                 }
             });
 
@@ -509,15 +517,18 @@
             if (cType === 'suit') suitDiv.classList.remove('hidden');
             else { suitDiv.classList.add('hidden'); state.currentSuit = ''; }
 
-            const isNoTrump = (cType === 'none');
-            document.getElementById('basePointsLabel').innerText = isNoTrump ? 'Макс: 130' : 'Макс: 162';
-            document.getElementById('inputPoints').max = isNoTrump ? 130 : 162;
+            const base = getBaseForContract(cType);
+            document.getElementById('basePointsLabel').innerText = `ОБЩО: ${base}`;
+            document.getElementById('inputPoints').max = base;
             
-            state.targetScore = isNoTrump ? 251 : 151;
+            // На Без Коз целта е 251, защото се удвоява
+            state.targetScore = (cType === 'none') ? 251 : 151;
             document.getElementById('targetScoreLabel').innerText = `Цел: ${state.targetScore}`;
-            document.getElementById('scanContractInfo').innerText = isNoTrump ? "Без Коз" : (cType === 'all' ? "Всичко Коз" : "Боя");
+            
+            let contractStr = cType === 'none' ? "Без Коз" : (cType === 'all' ? "Всичко Коз" : "Боя");
+            document.getElementById('scanContractInfo').innerText = contractStr;
 
-            if (isNoTrump) {
+            if (cType === 'none') {
                 document.getElementById('announcementsSection').classList.add('opacity-30', 'pointer-events-none');
                 document.getElementById('noTrumpsWarning').classList.remove('hidden');
                 document.querySelectorAll('.ann-chk').forEach(c => c.checked = false);
@@ -532,11 +543,11 @@
         function setSuit(s, btnEl) {
             state.currentSuit = s;
             document.querySelectorAll('.suit-btn').forEach(b => {
-                b.classList.remove('bg-panelLight', 'border-accentGold', 'shadow-glow');
-                b.classList.add('bg-bgDark');
+                b.classList.remove('border-gold', 'text-gold', 'shadow-glow');
+                b.classList.add('border-emeraldLight');
             });
-            btnEl.classList.remove('bg-bgDark');
-            btnEl.classList.add('bg-panelLight', 'border-accentGold', 'shadow-glow');
+            btnEl.classList.remove('border-emeraldLight');
+            btnEl.classList.add('border-gold', 'text-gold', 'shadow-glow');
             document.getElementById('scanContractInfo').innerText = `Боя: ${s}`;
         }
 
@@ -547,12 +558,12 @@
 
             annTypes.forEach(t => {
                 const makeRow = (team) => `
-                    <label class="custom-checkbox flex items-center space-x-2 bg-panelLight/40 hover:bg-panelLight/70 p-2 lg:p-2.5 rounded-xl cursor-pointer transition-colors">
+                    <label class="custom-checkbox flex items-center space-x-2 bg-emeraldLight/20 hover:bg-emeraldLight/40 p-2.5 rounded-xl cursor-pointer transition-colors border border-emeraldLight/30">
                         <input type="checkbox" class="hidden ann-chk t${team}-ann" data-val="${t.val}">
-                        <div class="w-5 h-5 flex-none rounded border border-gray-400 flex items-center justify-center transition-colors">
-                            <svg class="hidden w-3 h-3 text-bgDark font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        <div class="w-5 h-5 flex-none rounded border border-gray-500 flex items-center justify-center transition-colors">
+                            <svg class="hidden w-3 h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
-                        <span class="text-[11px] lg:text-xs font-semibold text-gray-200 leading-tight">${t.label}</span>
+                        <span class="text-[10px] lg:text-xs font-bold text-gray-200 leading-tight uppercase tracking-wider">${t.label}</span>
                     </label>
                 `;
                 container1.innerHTML += makeRow(1);
@@ -565,14 +576,14 @@
             let val = parseInt(input.value) || 0;
             val += amount;
             if (val < 0) val = 0;
-            const max = state.currentContract === 'none' ? 130 : 162;
+            const max = getBaseForContract(state.currentContract);
             if (val > max) val = max;
             input.value = val;
             updateCalc();
         }
 
         function updateCalc() {
-            const base = state.currentContract === 'none' ? 130 : 162;
+            const base = getBaseForContract(state.currentContract);
             let inputEl = document.getElementById('inputPoints');
             let inputVal = parseInt(inputEl.value);
             
@@ -586,20 +597,20 @@
             document.getElementById('autoPoints').innerText = base - inputVal;
         }
 
-        function roundBelote(points) { return Math.round(points / 10); }
+        function roundBelote(points) { 
+            return Math.round(points / 10); 
+        }
 
         function saveRound() {
             const isNoTrump = state.currentContract === 'none';
-            const base = isNoTrump ? 130 : 162;
-            const caller = document.getElementById('callerSelect').value;
-            const multiplier = parseInt(document.getElementById('multiplierSelect').value);
+            const isAllTrump = state.currentContract === 'all';
+            const base = getBaseForContract(state.currentContract);
+            const caller = document.getElementById('callerSelect').value; // '1' или '2'
+            const multiplier = parseInt(document.getElementById('multiplierSelect').value); // 1, 2, 4
             
             let inputPts = parseInt(document.getElementById('inputPoints').value);
-            if (isNaN(inputPts)) return showToast("Моля, въведете точки!", "error");
-
-            if (state.currentContract === 'suit' && !state.currentSuit) {
-                return showToast("Изберете боя първо!", "error");
-            }
+            if (isNaN(inputPts)) return showToast("Въведете точки!", "error");
+            if (state.currentContract === 'suit' && !state.currentSuit) return showToast("Изберете боя!", "error");
 
             let raw1 = caller === '1' ? inputPts : (base - inputPts);
             let raw2 = caller === '2' ? inputPts : (base - inputPts);
@@ -610,28 +621,99 @@
                 document.querySelectorAll('.t2-ann:checked').forEach(c => ann2 += parseInt(c.dataset.val));
             }
 
-            const threshold = isNoTrump ? 66 : 82;
-            const isInside = (caller === '1' ? raw1 : raw2) < threshold;
+            const valat1 = document.getElementById('valat1').checked;
+            const valat2 = document.getElementById('valat2').checked;
 
-            let final1 = 0, final2 = 0;
+            // Сумиране преди закръгляне според правилата:
+            // На Без Коз суровите точки се удвояват, НО Валат премията (90т) НЕ се удвоява. Анонси няма.
+            // На Коз / Всичко коз: сурови + анонси + валат
+            let score1 = isNoTrump ? (raw1 * 2 + (valat1 ? 90 : 0)) : (raw1 + ann1 + (valat1 ? 90 : 0));
+            let score2 = isNoTrump ? (raw2 * 2 + (valat2 ? 90 : 0)) : (raw2 + ann2 + (valat2 ? 90 : 0));
+            
+            let pool = score1 + score2;
+            
+            let final1 = 0;
+            let final2 = 0;
+            let hangingToAdd = state.hangingPoints; 
+            let newHanging = 0;
 
-            if (isInside) {
-                const total = base + ann1 + ann2;
-                if (caller === '1') final2 = roundBelote(total * multiplier);
-                else final1 = roundBelote(total * multiplier);
+            const callerScore = caller === '1' ? score1 : score2;
+            const defScore = caller === '1' ? score2 : score1;
+
+            if (multiplier > 1) { 
+                // КОНТРА / РЕКОНТРА (Всичко отива при победителя * multiplier)
+                if (callerScore < defScore) {
+                    // Вътре
+                    let total = Math.round((pool * multiplier) / 10);
+                    if (caller === '1') final2 = total + hangingToAdd; else final1 = total + hangingToAdd;
+                    state.hangingPoints = 0;
+                } else if (callerScore > defScore) {
+                    // Изкарана
+                    let total = Math.round((pool * multiplier) / 10);
+                    if (caller === '1') final1 = total + hangingToAdd; else final2 = total + hangingToAdd;
+                    state.hangingPoints = 0;
+                } else {
+                    // Равенство (Висяща) - Всичко виси
+                    newHanging = Math.round((pool * multiplier) / 10);
+                    state.hangingPoints += newHanging;
+                }
             } else {
-                final1 = roundBelote((raw1 * multiplier) + ann1);
-                final2 = roundBelote((raw2 * multiplier) + ann2);
+                // НОРМАЛНА ИГРА
+                if (callerScore < defScore) {
+                    // Вътре (Противникът взима всичко)
+                    let total = Math.round(pool / 10);
+                    if (caller === '1') final2 = total + hangingToAdd; else final1 = total + hangingToAdd;
+                    state.hangingPoints = 0;
+                } else if (callerScore > defScore) {
+                    // Изкарана
+                    if (isAllTrump && score1 % 10 === 4 && score2 % 10 === 4) {
+                        // Изключение Всичко Коз при числа завършващи на 4 (пр: 154:104) -> по-малкото закръгля нагоре.
+                        if (score1 < score2) {
+                            final1 = Math.ceil(score1 / 10); final2 = Math.floor(score2 / 10);
+                        } else {
+                            final1 = Math.floor(score1 / 10); final2 = Math.ceil(score2 / 10);
+                        }
+                    } else {
+                        final1 = Math.round(score1 / 10); final2 = Math.round(score2 / 10);
+                    }
+                    
+                    // Добавяме висящите на победителя (Обявилият)
+                    if (caller === '1') final1 += hangingToAdd; else final2 += hangingToAdd;
+                    state.hangingPoints = 0;
+                } else {
+                    // Равенство (Висяща) - Обявилият виси, Противникът записва
+                    if (isAllTrump && score1 % 10 === 4 && score2 % 10 === 4) {
+                        // Отново изключението: Тъй като са равни (пр. 124:124 е невъзможно да даде 258, но 154:154 с анонси е възможно)
+                        // Правило: "154-154 -> 15 на отбора не обявил, 16 висят"
+                        if (caller === '1') {
+                            newHanging = Math.ceil(score1 / 10); final2 = Math.floor(score2 / 10);
+                        } else {
+                            newHanging = Math.ceil(score2 / 10); final1 = Math.floor(score1 / 10);
+                        }
+                    } else {
+                        if (caller === '1') {
+                            newHanging = Math.round(score1 / 10); final2 = Math.round(score2 / 10);
+                        } else {
+                            newHanging = Math.round(score2 / 10); final1 = Math.round(score1 / 10);
+                        }
+                    }
+                    state.hangingPoints += newHanging;
+                }
             }
 
-            if (document.getElementById('valat1').checked) final1 += 25;
-            if (document.getElementById('valat2').checked) final2 += 25;
-
-            let cStr = isNoTrump ? 'Без Коз' : (state.currentContract === 'all' ? 'Вс. Коз' : state.currentSuit);
+            // Форматиране за историята
+            let cStr = isNoTrump ? 'Без Коз' : (isAllTrump ? 'Вс. Коз' : state.currentSuit);
             if(multiplier === 2) cStr += ' (К)';
             if(multiplier === 4) cStr += ' (РК)';
 
-            state.rounds.push({ contract: cStr, p1: final1, p2: final2, caller: caller, inside: isInside });
+            state.rounds.push({ 
+                contract: cStr, 
+                p1: final1, 
+                p2: final2, 
+                caller: caller, 
+                inside: (callerScore < defScore),
+                tie: (callerScore === defScore)
+            });
             
             showToast("Записано!");
             
@@ -644,7 +726,6 @@
             renderHistory();
             saveState();
             
-            // Auto scroll history down
             setTimeout(() => {
                 const tBody = document.getElementById('historyBody');
                 if(tBody && tBody.parentElement && tBody.parentElement.parentElement) {
@@ -669,8 +750,17 @@
             const s1 = document.getElementById('score1');
             const s2 = document.getElementById('score2');
             
-            s1.className = `text-4xl lg:text-5xl font-black mt-1 tracking-tight drop-shadow-md transition-colors ${state.total1 >= state.targetScore ? 'text-success' : 'text-white'}`;
-            s2.className = `text-4xl lg:text-5xl font-black mt-1 tracking-tight drop-shadow-md transition-colors ${state.total2 >= state.targetScore ? 'text-success' : 'text-white'}`;
+            s1.className = `font-display text-5xl lg:text-6xl font-black mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total1 >= state.targetScore ? 'text-success' : 'text-white'}`;
+            s2.className = `font-display text-5xl lg:text-6xl font-black mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total2 >= state.targetScore ? 'text-success' : 'text-white'}`;
+
+            // Показване на висящи точки
+            const badge = document.getElementById('hangingBadge');
+            if(state.hangingPoints > 0) {
+                document.getElementById('hangingPointsDisplay').innerText = state.hangingPoints;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
         }
 
         function renderHistory() {
@@ -689,14 +779,19 @@
 
             state.rounds.forEach((r) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-panelLight/20 transition-colors";
+                tr.className = "hover:bg-emeraldLight/20 transition-colors";
+                
+                let badge = '';
+                if(r.inside) badge = `<span class="text-[9px] font-sans font-bold uppercase bg-danger text-white px-1.5 py-0.5 rounded shadow-sm">Вътре (${r.caller==='1'?state.t1Name:state.t2Name})</span>`;
+                if(r.tie) badge = `<span class="text-[9px] font-sans font-bold uppercase bg-gold text-anthracite px-1.5 py-0.5 rounded shadow-sm">Висяща</span>`;
+
                 tr.innerHTML = `
-                    <td class="p-3 pl-4 border-b border-panelLight/30">
-                        <span class="font-bold text-accentGold block text-base">${r.contract}</span>
-                        ${r.inside ? `<span class="text-[9px] uppercase font-black bg-danger text-white px-1.5 py-0.5 rounded shadow-sm">Вътре (${r.caller==='1'?state.t1Name:state.t2Name})</span>` : ''}
+                    <td class="p-4 border-b border-emeraldLight/20">
+                        <span class="font-black text-gold block text-base">${r.contract}</span>
+                        ${badge}
                     </td>
-                    <td class="p-3 text-center border-b border-panelLight/30 text-xl ${r.caller === '1' ? 'bg-panel/50 font-black text-white' : 'text-gray-400 font-medium'}">${r.p1}</td>
-                    <td class="p-3 text-center pr-4 border-b border-panelLight/30 text-xl ${r.caller === '2' ? 'bg-panel/50 font-black text-white' : 'text-gray-400 font-medium'}">${r.p2}</td>
+                    <td class="p-4 text-center border-b border-emeraldLight/20 text-xl ${r.caller === '1' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p1}</td>
+                    <td class="p-4 text-center border-b border-emeraldLight/20 text-xl ${r.caller === '2' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p2}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -704,7 +799,12 @@
 
         function undoLast() {
             if (state.rounds.length === 0) return showToast("Няма ходове за връщане.", "error");
+            
+            // Важно: Връщането на ход с висящи точки не е 100% перфектно обратимо ако са се натрупали няколко пъти, 
+            // но за улеснение просто нулираме висящите ако върнем ход (тъй като е сложен state).
             state.rounds.pop();
+            state.hangingPoints = 0; // Нулираме висящите при Undo за безопасност
+            
             updateOverallScore();
             renderHistory();
             saveState();
@@ -713,10 +813,11 @@
 
         function resetGame() {
             state.rounds = [];
+            state.hangingPoints = 0;
             updateOverallScore();
             renderHistory();
             saveState();
-            showToast("Нова игра е започната!");
+            showToast("Нова игра започната!");
         }
 
         // --- СКЕНЕР (Симулация) ---
@@ -731,7 +832,7 @@
                 document.getElementById('cameraPlaceholder').classList.add('hidden');
                 document.getElementById('scanLine').classList.remove('hidden');
             } catch (err) {
-                showToast("Достъпът до камерата е отказан.", "error");
+                showToast("Няма достъп до камерата.", "error");
             }
         }
 
@@ -752,6 +853,7 @@
             const isAllTrump = state.currentContract === 'all';
             const isThisTrumpSuit = state.currentContract === 'suit' && suit === state.currentSuit;
 
+            // Точни официални стойности
             if (isAllTrump || isThisTrumpSuit) {
                 return { 'J': 20, '9': 14, 'A': 11, '10': 10, 'K': 4, 'Q': 3 }[rank] || 0;
             } else {
@@ -765,17 +867,17 @@
             suitsDef.forEach(suit => {
                 cardsDef.forEach(rank => {
                     const btn = document.createElement('button');
-                    btn.className = `bg-panelLight hover:bg-panelLight/80 text-white text-xs lg:text-sm py-3 lg:py-4 rounded-xl border border-transparent transition-all transform active:scale-90 font-bold shadow-sm ${['♥','♦'].includes(suit) ? 'text-red-400' : ''}`;
+                    btn.className = `font-sans font-bold bg-emeraldLight/30 hover:bg-emeraldLight/50 text-white text-xs lg:text-sm py-3 lg:py-4 rounded-xl border border-transparent transition-all transform active:scale-90 shadow-sm ${['♥','♦'].includes(suit) ? 'text-red-400' : ''}`;
                     btn.innerHTML = `${rank}${suit}`;
                     btn.dataset.rank = rank; btn.dataset.suit = suit; btn.dataset.active = "0";
                     btn.onclick = () => {
                         btn.dataset.active = btn.dataset.active === "1" ? "0" : "1";
                         if (btn.dataset.active === "1") {
-                            btn.classList.add('bg-accentGold', 'text-bgDark', 'shadow-glow', 'scale-105');
-                            btn.classList.remove('bg-panelLight', 'hover:bg-panelLight/80', 'text-red-400', 'text-white');
+                            btn.classList.add('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
+                            btn.classList.remove('bg-emeraldLight/30', 'hover:bg-emeraldLight/50', 'text-red-400', 'text-white');
                         } else {
-                            btn.classList.remove('bg-accentGold', 'text-bgDark', 'shadow-glow', 'scale-105');
-                            btn.classList.add('bg-panelLight', 'hover:bg-panelLight/80');
+                            btn.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
+                            btn.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
                             if(['♥','♦'].includes(suit)) btn.classList.add('text-red-400');
                             else btn.classList.add('text-white');
                         }
@@ -799,16 +901,17 @@
             switchTab('score');
             updateCalc();
             
+            // Нулиране на решетката
             document.querySelectorAll('#cardGrid button').forEach(b => {
                 b.dataset.active = "0";
-                b.classList.remove('bg-accentGold', 'text-bgDark', 'shadow-glow', 'scale-105');
-                b.classList.add('bg-panelLight', 'hover:bg-panelLight/80');
+                b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
+                b.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
                 if(['♥','♦'].includes(b.dataset.suit)) b.classList.add('text-red-400');
                 else b.classList.add('text-white');
             });
             scanTotal = 0;
             document.getElementById('scanTotal').innerText = "0";
-            showToast("Точките са прехвърлени!");
+            showToast("Стойностите са прехвърлени!");
         }
     </script>
 </body>
