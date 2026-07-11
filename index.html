@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Белот Асистент Pro</title>
     
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
@@ -43,9 +44,17 @@
             color: #ffffff;
             -webkit-tap-highlight-color: transparent;
             overscroll-behavior-y: none;
+            /* Предотвратява маркирането на текст при случайно дълго натискане */
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        /* Разрешаваме селектирането само в инпут полетата */
+        input {
+            -webkit-user-select: auto;
+            user-select: auto;
         }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1f422e; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #e3be52; }
@@ -62,44 +71,33 @@
 
         @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         .toast-enter { animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        
-        /* Лазерно сканиране */
-        @keyframes scanLaser { 
-            0% { top: 0%; opacity: 0; } 
-            10% { opacity: 1; } 
-            90% { opacity: 1; } 
-            100% { top: 100%; opacity: 0; } 
-        }
-        .animate-scan {
-            animation: scanLaser 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
-
         @keyframes shimmer { 100% { transform: translateX(100%); } }
     </style>
 </head>
-<body class="h-screen w-full overflow-hidden flex justify-center items-center lg:p-6 selection:bg-gold selection:text-anthracite">
+<!-- h-[100dvh] е ключово за мобилни браузъри, за да не се реже долната част -->
+<body class="h-[100dvh] w-full overflow-hidden flex justify-center items-center lg:p-6 selection:bg-gold selection:text-anthracite">
 
-    <!-- ГЛАВНА ОБВИВКА -->
-    <div id="app-wrapper" class="w-full h-full lg:max-w-6xl lg:max-h-[900px] lg:rounded-3xl bg-anthracite flex flex-col lg:flex-row overflow-hidden lg:shadow-glow-lg lg:border border-emeraldLight relative">
+    <!-- ГЛАВНА ОБВИВКА: Без бордери и заобляне на телефон -->
+    <div id="app-wrapper" class="w-full h-full lg:max-w-6xl lg:max-h-[900px] lg:rounded-3xl bg-anthracite flex flex-col lg:flex-row overflow-hidden lg:shadow-glow-lg border-0 lg:border border-emeraldLight relative">
         
-        <!-- НАВИГАЦИЯ -->
-        <nav class="order-2 lg:order-1 flex-none w-full lg:w-28 h-[calc(5rem+env(safe-area-inset-bottom))] lg:h-full border-t lg:border-t-0 lg:border-r border-emeraldLight bg-anthracite/95 backdrop-blur-xl flex lg:flex-col justify-around items-center pb-[env(safe-area-inset-bottom)] lg:pb-8 lg:pt-8 z-50">
+        <!-- НАВИГАЦИЯ (TAB BAR НА ТЕЛЕФОН) -->
+        <nav class="order-2 lg:order-1 flex-none w-full lg:w-28 h-[calc(4.5rem+env(safe-area-inset-bottom))] lg:h-full border-t border-emeraldLight/40 lg:border-t-0 lg:border-r lg:border-emeraldLight bg-anthracite/95 backdrop-blur-xl flex lg:flex-col justify-around items-center pb-[env(safe-area-inset-bottom)] lg:pb-8 lg:pt-8 z-50">
             <div class="hidden lg:flex flex-col items-center mb-8 opacity-80">
                 <span class="text-3xl">🃏</span>
                 <span class="font-display text-[9px] font-black text-gold tracking-widest mt-1">BELOT</span>
             </div>
 
-            <button onclick="switchTab('score')" class="nav-btn active w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gold transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="score">
-                <svg class="w-7 h-7 mb-1.5 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                <span class="font-sans text-[10px] font-bold uppercase tracking-wider">Игра</span>
+            <button onclick="switchTab('score')" class="nav-btn active w-1/3 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gold transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="score">
+                <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Игра</span>
             </button>
-            <button onclick="switchTab('scan')" class="nav-btn w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="scan">
-                <svg class="w-7 h-7 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span class="font-sans text-[10px] font-bold uppercase tracking-wider">Скенер</span>
+            <button onclick="switchTab('scan')" class="nav-btn w-1/3 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="scan">
+                <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Скенер</span>
             </button>
-            <button onclick="switchTab('rules')" class="nav-btn w-1/4 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="rules">
-                <svg class="w-7 h-7 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                <span class="font-sans text-[10px] font-bold uppercase tracking-wider">Правила</span>
+            <button onclick="switchTab('rules')" class="nav-btn w-1/3 lg:w-full lg:py-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="rules">
+                <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Правила</span>
             </button>
             <div class="hidden lg:block flex-grow"></div>
         </nav>
@@ -108,29 +106,30 @@
         <div class="order-1 lg:order-2 flex-1 flex flex-col relative overflow-hidden bg-transparent">
             
             <!-- ХЕДЪР -->
-            <header class="flex-none bg-anthracite/85 backdrop-blur-md border-b border-emeraldLight pt-[max(env(safe-area-inset-top),1rem)] pb-4 px-4 lg:px-8 z-40">
+            <header class="flex-none bg-anthracite/85 backdrop-blur-md border-b border-emeraldLight/50 pt-[max(env(safe-area-inset-top),1rem)] pb-3 px-3 lg:px-8 z-40">
                 <div class="max-w-4xl mx-auto flex justify-between items-end">
                     <div class="text-center w-[40%]">
-                        <input type="text" id="team1Name" value="Ние" class="font-sans bg-transparent text-gray-400 font-bold text-sm w-full text-center focus:outline-none focus:text-gold transition-colors" onchange="saveState()">
-                        <div class="font-display text-5xl lg:text-6xl font-black mt-1 tracking-tighter text-white drop-shadow-md" id="score1">0</div>
+                        <input type="text" id="team1Name" value="Ние" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors" onchange="saveState()">
+                        <!-- Намален шрифт text-4xl за телефон, за да не се чупи при 3 цифри -->
+                        <div class="font-display text-4xl sm:text-5xl lg:text-6xl font-black mt-1 tracking-tighter text-white drop-shadow-md" id="score1">0</div>
                     </div>
-                    <div class="text-2xl lg:text-3xl font-display font-black text-emeraldLight w-[10%] text-center pb-2 opacity-50">VS</div>
+                    <div class="text-xl sm:text-2xl lg:text-3xl font-display font-black text-emeraldLight w-[10%] text-center pb-1 lg:pb-2 opacity-50">VS</div>
                     <div class="text-center w-[40%]">
-                        <input type="text" id="team2Name" value="Вие" class="font-sans bg-transparent text-gray-400 font-bold text-sm w-full text-center focus:outline-none focus:text-gold transition-colors" onchange="saveState()">
-                        <div class="font-display text-5xl lg:text-6xl font-black mt-1 tracking-tighter text-white drop-shadow-md" id="score2">0</div>
+                        <input type="text" id="team2Name" value="Вие" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors" onchange="saveState()">
+                        <div class="font-display text-4xl sm:text-5xl lg:text-6xl font-black mt-1 tracking-tighter text-white drop-shadow-md" id="score2">0</div>
                     </div>
                 </div>
                 
                 <div id="hangingBadge" class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-danger/20 border border-danger/50 text-white font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full hidden shadow-[0_0_10px_rgba(255,76,76,0.3)]">
-                    Висящи точки: <span id="hangingPointsDisplay">0</span>
+                    Висящи: <span id="hangingPointsDisplay">0</span>
                 </div>
 
-                <div class="max-w-4xl mx-auto mt-4">
-                    <div class="flex justify-between text-[10px] uppercase font-bold text-gray-500 mb-1.5 tracking-wider">
+                <div class="max-w-4xl mx-auto mt-3 lg:mt-4">
+                    <div class="flex justify-between text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 mb-1 lg:mb-1.5 tracking-wider">
                         <span>Прогрес</span>
                         <span id="targetScoreLabel" class="text-gold">Цел: 151</span>
                     </div>
-                    <div class="w-full bg-[#0a0d0b] rounded-full h-2 flex overflow-hidden shadow-inner border border-forest">
+                    <div class="w-full bg-[#0a0d0b] rounded-full h-1.5 lg:h-2 flex overflow-hidden shadow-inner border border-forest">
                         <div id="progress1" class="bg-gold h-full transition-all duration-500 ease-out" style="width: 0%"></div>
                         <div class="flex-grow bg-transparent"></div>
                         <div id="progress2" class="bg-gold h-full transition-all duration-500 ease-out" style="width: 0%"></div>
@@ -138,38 +137,38 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-4 lg:p-8 w-full scroll-smooth" id="mainContainer">
+            <main class="flex-1 overflow-y-auto p-3 lg:p-8 w-full scroll-smooth" id="mainContainer">
                 
                 <!-- ТАБ 1: КАЛКУЛАТОР -->
                 <section id="tab-score" class="tab-content active h-full max-w-5xl mx-auto">
-                    <div class="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 lg:h-full lg:items-start">
+                    <div class="flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-8 lg:h-full lg:items-start">
                         
                         <!-- ЛЯВА КОЛОНА: Въвеждане -->
-                        <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-0">
+                        <div class="lg:col-span-5 space-y-4 lg:space-y-5 lg:sticky lg:top-0">
                             <!-- Договор -->
-                            <div class="bg-forest/20 p-4 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg">
-                                <div class="grid grid-cols-3 gap-2 bg-anthracite p-1.5 rounded-xl border border-emeraldLight/30">
-                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm transition-all duration-200 active:scale-95 bg-gold text-anthracite shadow-glow" data-contract="all" onclick="selectContract('all')">Вс. Коз</button>
-                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm transition-all duration-200 active:scale-95 bg-transparent text-white hover:bg-emeraldLight/50" data-contract="none" onclick="selectContract('none')">Без Коз</button>
-                                    <button class="contract-btn py-3 rounded-lg font-bold text-sm transition-all duration-200 active:scale-95 bg-transparent text-white hover:bg-emeraldLight/50" data-contract="suit" onclick="selectContract('suit')">Боя</button>
+                            <div class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight/50 lg:border-emeraldLight shadow-lg">
+                                <div class="grid grid-cols-3 gap-1.5 lg:gap-2 bg-anthracite p-1 lg:p-1.5 rounded-xl border border-emeraldLight/30">
+                                    <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95 bg-gold text-anthracite shadow-glow" data-contract="all" onclick="selectContract('all')">Вс. Коз</button>
+                                    <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95 bg-transparent text-white hover:bg-emeraldLight/50" data-contract="none" onclick="selectContract('none')">Без Коз</button>
+                                    <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95 bg-transparent text-white hover:bg-emeraldLight/50" data-contract="suit" onclick="selectContract('suit')">Боя</button>
                                 </div>
-                                <div id="suitSelector" class="hidden grid-cols-4 gap-2 mt-3">
-                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-2xl py-2 rounded-xl hover:border-gold transition-all" onclick="setSuit('♠', this)">♠</button>
-                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-2xl py-2 rounded-xl text-red-500 hover:border-gold transition-all" onclick="setSuit('♥', this)">♥</button>
-                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-2xl py-2 rounded-xl text-red-500 hover:border-gold transition-all" onclick="setSuit('♦', this)">♦</button>
-                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-2xl py-2 rounded-xl hover:border-gold transition-all" onclick="setSuit('♣', this)">♣</button>
+                                <div id="suitSelector" class="hidden grid-cols-4 gap-2 mt-2 lg:mt-3">
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl hover:border-gold transition-all" onclick="setSuit('♠', this)">♠</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl text-red-500 hover:border-gold transition-all" onclick="setSuit('♥', this)">♥</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl text-red-500 hover:border-gold transition-all" onclick="setSuit('♦', this)">♦</button>
+                                    <button class="suit-btn bg-anthracite border border-emeraldLight text-xl lg:text-2xl py-1.5 lg:py-2 rounded-xl hover:border-gold transition-all" onclick="setSuit('♣', this)">♣</button>
                                 </div>
-                                <div class="mt-4 grid grid-cols-2 gap-3">
+                                <div class="mt-3 lg:mt-4 grid grid-cols-2 gap-2 lg:gap-3">
                                     <div>
-                                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Обявил играта</label>
-                                        <select id="callerSelect" class="w-full bg-emeraldLight/40 border border-emeraldLight text-white rounded-xl p-3 outline-none focus:border-gold focus:ring-1 ring-gold mt-1 font-semibold appearance-none cursor-pointer" onchange="updateCalc()">
+                                        <label class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Обявил играта</label>
+                                        <select id="callerSelect" class="w-full bg-emeraldLight/40 border border-emeraldLight text-white rounded-xl p-2.5 lg:p-3 text-sm outline-none focus:border-gold focus:ring-1 ring-gold mt-1 font-semibold appearance-none cursor-pointer">
                                             <option value="1">Ние</option>
                                             <option value="2">Вие</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Наддаване</label>
-                                        <select id="multiplierSelect" class="w-full bg-emeraldLight/40 border border-emeraldLight text-white rounded-xl p-3 outline-none focus:border-gold focus:ring-1 ring-gold mt-1 font-semibold appearance-none text-center cursor-pointer">
+                                        <label class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Наддаване</label>
+                                        <select id="multiplierSelect" class="w-full bg-emeraldLight/40 border border-emeraldLight text-white rounded-xl p-2.5 lg:p-3 text-sm outline-none focus:border-gold focus:ring-1 ring-gold mt-1 font-semibold appearance-none text-center cursor-pointer">
                                             <option value="1">Нормално x1</option>
                                             <option value="2" class="text-gold">Контра x2</option>
                                             <option value="4" class="text-danger">Реконтра x4</option>
@@ -179,90 +178,92 @@
                             </div>
 
                             <!-- Точки -->
-                            <div class="bg-forest/20 p-4 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg relative overflow-hidden">
+                            <div class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight/50 lg:border-emeraldLight shadow-lg relative overflow-hidden">
                                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold/30 to-transparent"></div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <h2 class="text-xs uppercase font-bold text-gray-500 tracking-wider">Точки от карти</h2>
-                                    <span id="basePointsLabel" class="text-[10px] font-black bg-gold/10 text-gold px-3 py-1 rounded-full border border-gold/30 uppercase tracking-wider">Общо: 258</span>
+                                <div class="flex justify-between items-center mb-3 lg:mb-4">
+                                    <h2 class="text-[10px] lg:text-xs uppercase font-bold text-gray-400 tracking-wider">Точки от карти</h2>
+                                    <span id="basePointsLabel" class="text-[9px] lg:text-[10px] font-black bg-gold/10 text-gold px-2.5 py-1 rounded-full border border-gold/30 uppercase tracking-wider">Общо: 258</span>
                                 </div>
                                 
-                                <div class="flex items-center justify-between gap-3 bg-anthracite p-3 rounded-2xl border border-emeraldLight/50">
+                                <div class="flex items-center justify-between gap-2 lg:gap-3 bg-anthracite p-2 lg:p-3 rounded-2xl border border-emeraldLight/50">
                                     <div class="flex flex-col items-center w-1/2 relative">
-                                        <label id="lblPoints1" class="text-[10px] uppercase font-bold text-gray-400 mb-1 tracking-wider">Ние</label>
+                                        <label id="lblPoints1" class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 mb-1 tracking-wider">Ние</label>
                                         <div class="flex items-center w-full gap-1">
-                                            <button onclick="adjPts(-10)" class="bg-emeraldLight w-10 h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">-</button>
-                                            <input type="number" id="inputPoints" inputmode="numeric" pattern="[0-9]*" class="font-display flex-grow bg-transparent text-center text-4xl lg:text-5xl font-black text-white outline-none w-full h-12 lg:h-14 focus:text-gold transition-colors" placeholder="0" oninput="updateCalc()" onclick="this.select()">
-                                            <button onclick="adjPts(10)" class="bg-emeraldLight w-10 h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">+</button>
+                                            <button onclick="adjPts(-10)" class="bg-emeraldLight w-8 h-10 sm:w-10 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">-</button>
+                                            <input type="number" id="inputPoints" inputmode="numeric" pattern="[0-9]*" class="font-display flex-grow bg-transparent text-center text-3xl sm:text-4xl lg:text-5xl font-black text-white outline-none w-full h-10 sm:h-12 lg:h-14 focus:text-gold transition-colors" placeholder="0" oninput="updateCalc()" onclick="this.select()">
+                                            <button onclick="adjPts(10)" class="bg-emeraldLight w-8 h-10 sm:w-10 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">+</button>
                                         </div>
                                     </div>
-                                    <div class="text-2xl text-emeraldLight font-black">/</div>
+                                    <div class="text-xl lg:text-2xl text-emeraldLight font-black">/</div>
                                     <div class="flex flex-col items-center w-1/3 opacity-50">
-                                        <label id="lblPoints2" class="text-[10px] uppercase font-bold text-gray-400 mb-1 tracking-wider">Вие</label>
-                                        <div id="autoPoints" class="font-display text-4xl lg:text-5xl font-black text-gray-500 h-12 lg:h-14 flex items-center justify-center">0</div>
+                                        <label id="lblPoints2" class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 mb-1 tracking-wider">Вие</label>
+                                        <div id="autoPoints" class="font-display text-3xl sm:text-4xl lg:text-5xl font-black text-gray-500 h-10 sm:h-12 lg:h-14 flex items-center justify-center">0</div>
                                     </div>
                                 </div>
 
-                                <div class="mt-4 grid grid-cols-2 gap-3">
-                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-emeraldLight/30 border border-emeraldLight/50 p-3 rounded-xl cursor-pointer hover:bg-emeraldLight/60 transition-colors">
+                                <div class="mt-3 lg:mt-4 grid grid-cols-2 gap-2 lg:gap-3">
+                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-emeraldLight/30 border border-emeraldLight/50 p-2.5 lg:p-3 rounded-xl cursor-pointer hover:bg-emeraldLight/60 transition-colors">
                                         <input type="checkbox" id="valat1" class="hidden">
-                                        <div class="w-5 h-5 rounded border-2 border-gray-400 flex items-center justify-center transition-colors">
-                                            <svg class="hidden w-3 h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        <div class="w-4 h-4 lg:w-5 lg:h-5 rounded border-2 border-gray-400 flex items-center justify-center transition-colors">
+                                            <svg class="hidden w-2.5 h-2.5 lg:w-3 lg:h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                         </div>
-                                        <span class="text-sm font-bold text-gray-200">Капо (Ние)</span>
+                                        <span class="text-xs lg:text-sm font-bold text-gray-200">Капо (Ние)</span>
                                     </label>
-                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-emeraldLight/30 border border-emeraldLight/50 p-3 rounded-xl cursor-pointer hover:bg-emeraldLight/60 transition-colors">
+                                    <label class="custom-checkbox flex items-center justify-center space-x-2 bg-emeraldLight/30 border border-emeraldLight/50 p-2.5 lg:p-3 rounded-xl cursor-pointer hover:bg-emeraldLight/60 transition-colors">
                                         <input type="checkbox" id="valat2" class="hidden">
-                                        <div class="w-5 h-5 rounded border-2 border-gray-400 flex items-center justify-center transition-colors">
-                                            <svg class="hidden w-3 h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        <div class="w-4 h-4 lg:w-5 lg:h-5 rounded border-2 border-gray-400 flex items-center justify-center transition-colors">
+                                            <svg class="hidden w-2.5 h-2.5 lg:w-3 lg:h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                         </div>
-                                        <span class="text-sm font-bold text-gray-200">Капо (Вие)</span>
+                                        <span class="text-xs lg:text-sm font-bold text-gray-200">Капо (Вие)</span>
                                     </label>
                                 </div>
                             </div>
 
-                            <button onclick="saveRound()" class="font-sans w-full bg-gold text-anthracite font-black text-lg p-5 rounded-2xl shadow-glow hover:bg-goldHover active:scale-95 transition-all flex justify-center items-center gap-2 relative overflow-hidden group">
+                            <button onclick="saveRound()" class="font-sans w-full bg-gold text-anthracite font-black text-base lg:text-lg p-4 lg:p-5 rounded-2xl shadow-glow hover:bg-goldHover active:scale-95 transition-all flex justify-center items-center gap-2 relative overflow-hidden group">
                                 <span class="relative z-10 uppercase tracking-widest">Запиши Рунда</span>
                                 <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                             </button>
                         </div>
 
                         <!-- ДЯСНА КОЛОНА: Анонси и История -->
-                        <div class="lg:col-span-7 space-y-5 flex flex-col h-full lg:pb-0 pb-10">
-                            <div id="announcementsSection" class="bg-forest/20 p-4 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg flex-none transition-opacity duration-300">
-                                <h2 class="text-xs uppercase font-bold text-gray-500 tracking-wider mb-3">Обявени Анонси</h2>
-                                <div class="flex gap-4">
-                                    <div class="w-1/2 space-y-2" id="ann1"></div>
-                                    <div class="w-1/2 space-y-2" id="ann2"></div>
+                        <div class="lg:col-span-7 space-y-4 lg:space-y-5 flex flex-col h-full lg:pb-0 pb-10">
+                            <!-- Анонси -->
+                            <div id="announcementsSection" class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight/50 lg:border-emeraldLight shadow-lg flex-none transition-opacity duration-300">
+                                <h2 class="text-[10px] lg:text-xs uppercase font-bold text-gray-400 tracking-wider mb-2 lg:mb-3">Обявени Анонси</h2>
+                                <div class="flex gap-2 lg:gap-4">
+                                    <div class="w-1/2 space-y-1.5 lg:space-y-2" id="ann1"></div>
+                                    <div class="w-1/2 space-y-1.5 lg:space-y-2" id="ann2"></div>
                                 </div>
                             </div>
                             
-                            <div id="noTrumpsWarning" class="hidden bg-danger/10 border border-danger/30 p-4 rounded-2xl text-center flex-none">
-                                <span class="text-danger font-black text-xs uppercase tracking-widest">⚠️ На Без Коз няма анонси</span>
+                            <div id="noTrumpsWarning" class="hidden bg-danger/10 border border-danger/30 p-3 lg:p-4 rounded-2xl text-center flex-none">
+                                <span class="text-danger font-black text-[10px] lg:text-xs uppercase tracking-widest">⚠️ На Без Коз няма анонси</span>
                             </div>
 
+                            <!-- История -->
                             <div class="flex-grow flex flex-col min-h-[250px] lg:min-h-0">
-                                <div class="flex justify-between items-center mb-3 px-1 flex-none">
-                                    <h3 class="font-black text-lg text-white">История</h3>
-                                    <button onclick="confirmAction('Искате ли да изтриете последното раздаване?', undoLast)" class="text-xs font-bold text-danger/80 hover:text-danger bg-danger/10 px-3 py-1.5 rounded-full transition-colors cursor-pointer uppercase tracking-wider">Върни ход</button>
+                                <div class="flex justify-between items-center mb-2 lg:mb-3 px-1 flex-none">
+                                    <h3 class="font-black text-base lg:text-lg text-white">История</h3>
+                                    <button onclick="confirmAction('Искате ли да изтриете последното раздаване?', undoLast)" class="text-[10px] lg:text-xs font-bold text-danger/80 hover:text-danger bg-danger/10 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full transition-colors cursor-pointer uppercase tracking-wider">Върни ход</button>
                                 </div>
-                                <div class="bg-anthracite rounded-2xl border border-emeraldLight overflow-hidden shadow-lg flex-grow flex flex-col relative">
+                                <div class="bg-anthracite rounded-2xl border border-emeraldLight/50 lg:border-emeraldLight overflow-hidden shadow-lg flex-grow flex flex-col relative">
                                     <div class="overflow-y-auto flex-grow">
-                                        <table class="w-full text-sm text-left">
-                                            <thead class="text-[10px] uppercase font-bold text-gray-500 bg-emeraldLight/30 sticky top-0 backdrop-blur-md z-10 border-b border-emeraldLight">
+                                        <table class="w-full text-xs lg:text-sm text-left">
+                                            <thead class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 bg-emeraldLight/30 sticky top-0 backdrop-blur-md z-10 border-b border-emeraldLight">
                                                 <tr>
-                                                    <th class="p-4">Договор</th>
-                                                    <th class="p-4 text-center">Ние</th>
-                                                    <th class="p-4 text-center">Вие</th>
+                                                    <th class="p-3 lg:p-4">Договор</th>
+                                                    <th class="p-3 lg:p-4 text-center">Ние</th>
+                                                    <th class="p-3 lg:p-4 text-center">Вие</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="historyBody" class="divide-y divide-emeraldLight/30 font-semibold font-display"></tbody>
                                         </table>
-                                        <div id="emptyHistory" class="absolute inset-0 flex items-center justify-center text-emeraldLight text-sm flex-col gap-2 pointer-events-none">
-                                            <span class="text-4xl opacity-50">📝</span>
-                                            <span class="font-sans font-bold uppercase tracking-wider opacity-70">Няма записани ръце</span>
+                                        <div id="emptyHistory" class="absolute inset-0 flex items-center justify-center text-emeraldLight text-sm flex-col gap-1 lg:gap-2 pointer-events-none">
+                                            <span class="text-3xl lg:text-4xl opacity-50">📝</span>
+                                            <span class="font-sans text-[10px] lg:text-xs font-bold uppercase tracking-wider opacity-70">Няма записани ръце</span>
                                         </div>
                                     </div>
-                                    <button onclick="confirmAction('Сигурни ли сте, че искате да занулите резултата и да започнете нова игра?', resetGame)" class="font-sans w-full bg-emeraldLight/10 hover:bg-emeraldLight/30 text-gray-400 font-bold p-4 text-xs transition-colors flex-none border-t border-emeraldLight uppercase tracking-wider">
+                                    <button onclick="confirmAction('Сигурни ли сте, че искате да занулите резултата и да започнете нова игра?', resetGame)" class="font-sans w-full bg-emeraldLight/10 hover:bg-emeraldLight/30 text-gray-400 font-bold p-3 lg:p-4 text-[10px] lg:text-xs transition-colors flex-none border-t border-emeraldLight uppercase tracking-wider">
                                         Започни Нова Игра
                                     </button>
                                 </div>
@@ -271,59 +272,51 @@
                     </div>
                 </section>
 
-                <!-- ТАБ 2: СКЕНЕР С КАМЕРА -->
-                <section id="tab-scan" class="tab-content h-full max-w-3xl mx-auto space-y-5 lg:pt-2">
-                    <div class="bg-blue-900/20 border border-blue-500/30 p-5 rounded-2xl text-sm text-blue-200 shadow-md">
-                        <strong class="text-blue-400 block mb-2 text-base uppercase tracking-wider">Камера и AI Анализ</strong> 
-                        Насочете камерата към картите и натиснете "Снимай". Системата ще сканира кадъра. 
+                <!-- ТАБ 2: СКЕНЕР С КАМЕРА (Фото-Асистент) -->
+                <section id="tab-scan" class="tab-content h-full max-w-3xl mx-auto space-y-4 lg:space-y-5 lg:pt-2">
+                    <div class="bg-blue-900/20 border border-blue-500/30 p-4 lg:p-5 rounded-2xl text-xs lg:text-sm text-blue-200 shadow-md">
+                        <strong class="text-blue-400 block mb-1 lg:mb-2 text-sm lg:text-base uppercase tracking-wider">Фото Асистент</strong> 
+                        Насочи камерата към картите и "снимай", за да ги замразиш на екрана. След това спокойно ги нацъкай в решетката отдолу.
                     </div>
 
-                    <!-- КАМЕРА КОНТЕЙНЕР -->
-                    <div class="relative w-full aspect-video lg:max-h-[350px] bg-black rounded-2xl overflow-hidden border border-emeraldLight flex items-center justify-center shadow-inner">
-                        <!-- Реалното видео -->
+                    <div class="relative w-full aspect-[4/3] sm:aspect-video lg:max-h-[350px] bg-black rounded-2xl overflow-hidden border border-emeraldLight flex items-center justify-center shadow-inner">
                         <video id="cameraFeed" playsinline class="absolute inset-0 w-full h-full object-cover hidden"></video>
-                        <!-- Платно за направената снимка -->
                         <canvas id="snapshotCanvas" class="absolute inset-0 w-full h-full object-cover hidden"></canvas>
                         
                         <div id="cameraPlaceholder" class="text-center p-4">
-                            <div class="text-5xl mb-3 opacity-20">📷</div>
-                            <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Камерата е изключена</p>
+                            <div class="text-4xl lg:text-5xl mb-2 lg:mb-3 opacity-20">📷</div>
+                            <p class="text-[9px] lg:text-[10px] font-bold text-gray-600 uppercase tracking-widest">Камерата е изключена</p>
                         </div>
-
-                        <!-- Сканиращ лазер -->
-                        <div id="scanLine" class="hidden absolute left-0 w-full h-1 bg-success shadow-[0_0_20px_#4ade80] animate-scan z-10"></div>
                     </div>
                     
-                    <!-- КОНТРОЛИ ЗА КАМЕРАТА -->
-                    <div id="cameraControls" class="flex gap-3">
-                        <button onclick="startCamera()" class="flex-1 bg-emeraldLight hover:bg-emeraldLight/80 border border-success/50 text-success p-4 rounded-xl font-bold active:scale-95 transition-all flex justify-center items-center gap-2 shadow-md uppercase tracking-wider text-xs">
+                    <div id="cameraControls" class="flex gap-2 lg:gap-3">
+                        <button onclick="startCamera()" class="flex-1 bg-emeraldLight hover:bg-emeraldLight/80 border border-success/50 text-success p-3 lg:p-4 rounded-xl font-bold active:scale-95 transition-all flex justify-center items-center gap-2 shadow-md uppercase tracking-wider text-[10px] lg:text-xs">
                             Включи Камера
                         </button>
                     </div>
 
-                    <!-- БУТОН СНИМАЙ (Показва се само като работи камерата) -->
-                    <div id="captureControls" class="flex gap-3 hidden">
-                        <button onclick="takeSnapshotAndAnalyze()" class="flex-1 bg-gold hover:bg-goldHover text-anthracite p-5 rounded-xl font-black active:scale-95 transition-all shadow-glow uppercase tracking-widest text-sm">
-                            📸 Снимай и Анализирай
+                    <div id="captureControls" class="flex gap-2 lg:gap-3 hidden">
+                        <button onclick="takeSnapshot()" class="flex-1 bg-gold hover:bg-goldHover text-anthracite p-4 lg:p-5 rounded-xl font-black active:scale-95 transition-all shadow-glow uppercase tracking-widest text-xs lg:text-sm">
+                            📸 СНИМАЙ КАРТИТЕ
                         </button>
-                        <button onclick="stopCamera()" class="bg-anthracite border border-danger/30 text-danger px-6 rounded-xl font-bold active:scale-95 transition-all">
+                        <button onclick="stopCamera()" class="bg-anthracite border border-danger/30 text-danger px-4 lg:px-6 rounded-xl font-bold active:scale-95 transition-all uppercase text-[10px] lg:text-xs">
                             Спри
                         </button>
                     </div>
 
-                    <!-- РЕЗУЛТАТ ОТ СКАНИРАНЕТО (Ръчна Корекция) -->
-                    <div id="analysisResultBox" class="bg-forest/20 p-5 rounded-2xl border border-emeraldLight shadow-lg mt-4 hidden">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-xs text-gray-400 uppercase tracking-widest">Провери откритите карти</h3>
-                            <span class="text-[10px] font-black bg-gold/10 px-3 py-1.5 rounded-full text-gold border border-gold/30 uppercase tracking-wider" id="scanContractInfo">Договор</span>
+                    <div id="analysisResultBox" class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg mt-3 lg:mt-4 hidden">
+                        <div class="flex justify-between items-center mb-3 lg:mb-4">
+                            <h3 class="font-bold text-[10px] lg:text-xs text-gray-400 uppercase tracking-widest">Въведи картите</h3>
+                            <span class="text-[9px] lg:text-[10px] font-black bg-gold/10 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full text-gold border border-gold/30 uppercase tracking-wider" id="scanContractInfo">Договор</span>
                         </div>
                         
-                        <div class="grid grid-cols-4 gap-2 lg:gap-3" id="cardGrid"></div>
+                        <!-- На мобилен решетката е леко по-сбита -->
+                        <div class="grid grid-cols-4 gap-1.5 lg:gap-3" id="cardGrid"></div>
 
-                        <div class="mt-6 flex justify-between items-center bg-anthracite p-4 rounded-xl border border-emeraldLight/50">
-                            <div class="text-[10px] uppercase font-bold text-gray-500 leading-tight tracking-wider">Открити точки<br><span id="scanTotal" class="font-display text-4xl font-black text-white">0</span></div>
-                            <button onclick="sendToCalculator()" class="font-sans bg-gold text-anthracite px-8 py-4 rounded-xl font-black active:scale-95 hover:bg-goldHover transition-all shadow-glow uppercase tracking-widest">
-                                ВЪВЕДИ В КАЛКУЛАТОРА
+                        <div class="mt-4 lg:mt-6 flex justify-between items-center bg-anthracite p-3 lg:p-4 rounded-xl border border-emeraldLight/50">
+                            <div class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 leading-tight tracking-wider">Открити точки<br><span id="scanTotal" class="font-display text-3xl lg:text-4xl font-black text-white">0</span></div>
+                            <button onclick="sendToCalculator()" class="font-sans bg-gold text-anthracite px-4 lg:px-8 py-3 lg:py-4 rounded-xl font-black active:scale-95 hover:bg-goldHover transition-all shadow-glow uppercase tracking-widest text-[10px] lg:text-xs">
+                                ПРЕХВЪРЛИ
                             </button>
                         </div>
                     </div>
@@ -331,46 +324,45 @@
 
                 <!-- ТАБ 3: ПРАВИЛА (ОФИЦИАЛНИ) -->
                 <section id="tab-rules" class="tab-content h-full max-w-5xl mx-auto pb-10">
-                    <!-- Съдържанието на правилата остава непроменено от предишната версия -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full items-start">
-                        <div class="bg-forest/20 rounded-2xl p-6 lg:p-8 border border-emeraldLight shadow-lg space-y-6">
-                            <h3 class="font-black text-white text-xl uppercase tracking-widest mb-4 flex items-center gap-3"><span class="text-2xl">📖</span> Точкуване</h3>
-                            <div class="space-y-4">
-                                <div class="bg-anthracite p-4 rounded-xl border border-emeraldLight/50">
-                                    <h4 class="font-bold text-gold mb-2 text-xs uppercase tracking-widest border-b border-emeraldLight/50 pb-2">Бази за игра</h4>
-                                    <ul class="text-sm text-gray-300 space-y-2 font-medium">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 h-full items-start">
+                        <div class="bg-forest/20 rounded-2xl p-5 lg:p-8 border border-emeraldLight/50 shadow-lg space-y-4 lg:space-y-6">
+                            <h3 class="font-black text-white text-lg lg:text-xl uppercase tracking-widest mb-2 lg:mb-4 flex items-center gap-2"><span class="text-xl lg:text-2xl">📖</span> Точкуване</h3>
+                            <div class="space-y-3 lg:space-y-4">
+                                <div class="bg-anthracite p-3 lg:p-4 rounded-xl border border-emeraldLight/50">
+                                    <h4 class="font-bold text-gold mb-2 text-[10px] lg:text-xs uppercase tracking-widest border-b border-emeraldLight/50 pb-2">Бази за игра</h4>
+                                    <ul class="text-xs lg:text-sm text-gray-300 space-y-1.5 lg:space-y-2 font-medium">
                                         <li class="flex justify-between"><span>Боя (Коз)</span><strong class="text-white">162 точки</strong></li>
                                         <li class="flex justify-between"><span>Всичко Коз</span><strong class="text-white">258 точки</strong></li>
                                         <li class="flex justify-between"><span>Без Коз</span><strong class="text-white">130 (удвоява се = 260)</strong></li>
                                     </ul>
                                 </div>
-                                <div class="bg-anthracite p-4 rounded-xl border border-emeraldLight/50">
-                                    <h4 class="font-bold text-gold mb-2 text-xs uppercase tracking-widest border-b border-emeraldLight/50 pb-2">Закръгляне</h4>
-                                    <p class="text-sm text-gray-300 font-medium leading-relaxed">
+                                <div class="bg-anthracite p-3 lg:p-4 rounded-xl border border-emeraldLight/50">
+                                    <h4 class="font-bold text-gold mb-2 text-[10px] lg:text-xs uppercase tracking-widest border-b border-emeraldLight/50 pb-2">Закръгляне</h4>
+                                    <p class="text-xs lg:text-sm text-gray-300 font-medium leading-relaxed">
                                         Точките се делят на 10 и се закръглят (пр: 145 = 15).<br>
-                                        <span class="text-gold block mt-2">Изключение на Всичко Коз:</span> Ако двата отбора завършат на 4 (напр. 154:104), отборът с <strong>по-малко точки закръгля нагоре</strong> (11), а другият надолу (15).
+                                        <span class="text-gold block mt-1 lg:mt-2">Изключение на Всичко Коз:</span> Ако двата отбора завършат на 4 (напр. 154:104), отборът с <strong>по-малко точки закръгля нагоре</strong> (11), а другият надолу (15).
                                     </p>
                                 </div>
-                                <div class="bg-anthracite p-4 rounded-xl border border-danger/40">
-                                    <h4 class="font-bold text-danger mb-2 text-xs uppercase tracking-widest border-b border-danger/30 pb-2">Вътре / Висяща (Равенство)</h4>
-                                    <p class="text-sm text-gray-300 font-medium leading-relaxed">
+                                <div class="bg-anthracite p-3 lg:p-4 rounded-xl border border-danger/40">
+                                    <h4 class="font-bold text-danger mb-2 text-[10px] lg:text-xs uppercase tracking-widest border-b border-danger/30 pb-2">Вътре / Висяща (Равенство)</h4>
+                                    <p class="text-xs lg:text-sm text-gray-300 font-medium leading-relaxed">
                                         Ако обявилият изкара <strong>по-малко</strong>, той е вътре и противникът взима всичко.<br>
                                         Ако са <strong>по равно</strong> (напр. 81:81), обявилият не записва нищо — точките му "висят" за следващото раздаване.
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-anthracite rounded-2xl p-6 lg:p-8 border border-emeraldLight shadow-lg">
-                            <h3 class="font-black text-gold text-xl uppercase tracking-widest mb-4 flex items-center gap-3"><span class="text-2xl">📣</span> Анонси</h3>
-                            <p class="text-xs text-gray-400 mb-6 leading-relaxed uppercase tracking-wider font-bold">На Без Коз няма анонси. Поредица бие по дължина, после по сила. Каретата бият само по точкова стойност в коз.</p>
-                            <div class="space-y-3 text-sm font-bold font-sans">
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Белот (K+Q коз)</span><span class="text-gold font-black font-display text-base">20</span></div>
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Терца (3 поредни)</span><span class="text-gold font-black font-display text-base">20</span></div>
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Кварта (4 поредни)</span><span class="text-gold font-black font-display text-base">50</span></div>
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Квинта (5+ поредни)</span><span class="text-gold font-black font-display text-base">100</span></div>
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Каре (10, Q, K, A)</span><span class="text-gold font-black font-display text-base">100</span></div>
-                                <div class="flex justify-between border-b border-emeraldLight/50 pb-3 hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Каре Деветки</span><span class="text-gold font-black font-display text-base">150</span></div>
-                                <div class="flex justify-between hover:bg-emeraldLight/20 p-2 rounded transition-colors"><span class="text-gray-200">Каре Валета</span><span class="text-gold font-black font-display text-base">200</span></div>
+                        <div class="bg-anthracite rounded-2xl p-5 lg:p-8 border border-emeraldLight/50 shadow-lg">
+                            <h3 class="font-black text-gold text-lg lg:text-xl uppercase tracking-widest mb-2 lg:mb-4 flex items-center gap-2"><span class="text-xl lg:text-2xl">📣</span> Анонси</h3>
+                            <p class="text-[10px] lg:text-xs text-gray-400 mb-4 lg:mb-6 leading-relaxed uppercase tracking-wider font-bold">На Без Коз няма анонси. Поредица бие по дължина, после по сила. Каретата бият само по точкова стойност в коз.</p>
+                            <div class="space-y-2 lg:space-y-3 text-xs lg:text-sm font-bold font-sans">
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Белот (K+Q коз)</span><span class="text-gold font-black font-display text-sm lg:text-base">20</span></div>
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Терца (3 поредни)</span><span class="text-gold font-black font-display text-sm lg:text-base">20</span></div>
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Кварта (4 поредни)</span><span class="text-gold font-black font-display text-sm lg:text-base">50</span></div>
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Квинта (5+ поредни)</span><span class="text-gold font-black font-display text-sm lg:text-base">100</span></div>
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Каре (10, Q, K, A)</span><span class="text-gold font-black font-display text-sm lg:text-base">100</span></div>
+                                <div class="flex justify-between border-b border-emeraldLight/50 pb-2 lg:pb-3 p-1.5 lg:p-2"><span class="text-gray-200">Каре Деветки</span><span class="text-gold font-black font-display text-sm lg:text-base">150</span></div>
+                                <div class="flex justify-between p-1.5 lg:p-2"><span class="text-gray-200">Каре Валета</span><span class="text-gold font-black font-display text-sm lg:text-base">200</span></div>
                             </div>
                         </div>
                     </div>
@@ -379,21 +371,20 @@
         </div>
     </div>
 
-    <!-- МОДАЛ -->
+    <!-- МОДАЛ И TOASTS -->
     <div id="modalOverlay" class="fixed inset-0 bg-bgApp/95 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-200">
-        <div class="bg-anthracite border border-emeraldLight p-6 rounded-3xl max-w-sm w-full transform scale-95 transition-transform duration-200 shadow-2xl" id="modalBox">
-            <h3 class="text-xl font-black text-white mb-2 font-display uppercase tracking-wider">Потвърждение</h3>
-            <p id="modalMsg" class="text-sm text-gray-400 mb-8 font-semibold"></p>
-            <div class="flex gap-3 font-sans">
-                <button onclick="closeModal()" class="flex-1 bg-emeraldLight/30 hover:bg-emeraldLight/50 text-white p-3.5 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-wider text-xs">Отказ</button>
-                <button id="modalConfirmBtn" class="flex-1 bg-danger hover:bg-red-500 text-white p-3.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,76,76,0.3)] active:scale-95 transition-all uppercase tracking-wider text-xs">Потвърди</button>
+        <div class="bg-anthracite border border-emeraldLight p-5 lg:p-6 rounded-3xl max-w-[90%] sm:max-w-sm w-full transform scale-95 transition-transform duration-200 shadow-2xl" id="modalBox">
+            <h3 class="text-lg lg:text-xl font-black text-white mb-2 font-display uppercase tracking-wider">Потвърждение</h3>
+            <p id="modalMsg" class="text-xs lg:text-sm text-gray-400 mb-6 lg:mb-8 font-semibold"></p>
+            <div class="flex gap-2 lg:gap-3 font-sans">
+                <button onclick="closeModal()" class="flex-1 bg-emeraldLight/30 hover:bg-emeraldLight/50 text-white p-3 lg:p-3.5 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-wider text-[10px] lg:text-xs">Отказ</button>
+                <button id="modalConfirmBtn" class="flex-1 bg-danger hover:bg-red-500 text-white p-3 lg:p-3.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,76,76,0.3)] active:scale-95 transition-all uppercase tracking-wider text-[10px] lg:text-xs">Потвърди</button>
             </div>
         </div>
     </div>
-    <div id="toastContainer" class="fixed top-6 lg:top-10 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-max max-w-[90%] pointer-events-none font-sans"></div>
+    <div id="toastContainer" class="fixed top-4 lg:top-10 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-max max-w-[95%] pointer-events-none font-sans"></div>
 
     <script>
-        // Държавно състояние
         let state = {
             t1Name: "Ние", t2Name: "Вие", total1: 0, total2: 0, hangingPoints: 0, rounds: [],
             currentContract: 'all', currentSuit: '', targetScore: 151
@@ -436,7 +427,7 @@
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             const color = type === 'error' ? 'bg-danger text-white' : 'bg-gold text-anthracite shadow-glow';
-            toast.className = `toast-enter ${color} px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest shadow-lg flex items-center gap-2`;
+            toast.className = `toast-enter ${color} px-4 lg:px-6 py-2.5 lg:py-3 rounded-full font-black text-[10px] lg:text-xs uppercase tracking-widest shadow-lg flex items-center gap-2`;
             toast.innerHTML = type === 'error' ? `<span>⚠️</span> ${msg}` : `<span>✓</span> ${msg}`;
             container.appendChild(toast);
             setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translate(-50%, -20px)'; setTimeout(() => toast.remove(), 300); }, 2500);
@@ -505,8 +496,7 @@
                 document.getElementById('announcementsSection').classList.remove('opacity-30', 'pointer-events-none');
                 document.getElementById('noTrumpsWarning').classList.add('hidden');
             }
-            updateCalc(); updateOverallScore();
-            recalcScan(); // Refresh scan points if contract changed
+            updateCalc(); updateOverallScore(); recalcScan();
         }
 
         function setSuit(s, btnEl) {
@@ -522,12 +512,12 @@
             container1.innerHTML = ''; container2.innerHTML = '';
             annTypes.forEach(t => {
                 const makeRow = (team) => `
-                    <label class="custom-checkbox flex items-center space-x-2 bg-emeraldLight/20 hover:bg-emeraldLight/40 p-2.5 rounded-xl cursor-pointer transition-colors border border-emeraldLight/30">
+                    <label class="custom-checkbox flex items-center space-x-2 bg-emeraldLight/20 hover:bg-emeraldLight/40 p-2 lg:p-2.5 rounded-xl cursor-pointer transition-colors border border-emeraldLight/30">
                         <input type="checkbox" class="hidden ann-chk t${team}-ann" data-val="${t.val}">
-                        <div class="w-5 h-5 flex-none rounded border border-gray-500 flex items-center justify-center transition-colors">
-                            <svg class="hidden w-3 h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        <div class="w-4 h-4 lg:w-5 lg:h-5 flex-none rounded border border-gray-500 flex items-center justify-center transition-colors">
+                            <svg class="hidden w-2.5 h-2.5 lg:w-3 lg:h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
-                        <span class="text-[10px] lg:text-xs font-bold text-gray-200 leading-tight uppercase tracking-wider">${t.label}</span>
+                        <span class="text-[9px] lg:text-[10px] font-bold text-gray-200 leading-tight uppercase tracking-wider">${t.label}</span>
                     </label>
                 `;
                 container1.innerHTML += makeRow(1); container2.innerHTML += makeRow(2);
@@ -631,8 +621,8 @@
             document.getElementById('progress1').style.width = `${p1Percent}%`; document.getElementById('progress2').style.width = `${p2Percent}%`;
             
             const s1 = document.getElementById('score1'); const s2 = document.getElementById('score2');
-            s1.className = `font-display text-5xl lg:text-6xl font-black mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total1 >= state.targetScore ? 'text-success' : 'text-white'}`;
-            s2.className = `font-display text-5xl lg:text-6xl font-black mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total2 >= state.targetScore ? 'text-success' : 'text-white'}`;
+            s1.className = `font-display text-4xl sm:text-5xl lg:text-6xl font-black mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total1 >= state.targetScore ? 'text-success' : 'text-white'}`;
+            s2.className = `font-display text-4xl sm:text-5xl lg:text-6xl font-black mt-1 tracking-tighter drop-shadow-md transition-colors ${state.total2 >= state.targetScore ? 'text-success' : 'text-white'}`;
 
             const badge = document.getElementById('hangingBadge');
             if(state.hangingPoints > 0) { document.getElementById('hangingPointsDisplay').innerText = state.hangingPoints; badge.classList.remove('hidden'); } 
@@ -646,12 +636,12 @@
             state.rounds.forEach((r) => {
                 const tr = document.createElement('tr'); tr.className = "hover:bg-emeraldLight/20 transition-colors";
                 let badge = '';
-                if(r.inside) badge = `<span class="text-[9px] font-sans font-bold uppercase bg-danger text-white px-1.5 py-0.5 rounded shadow-sm">Вътре (${r.caller==='1'?state.t1Name:state.t2Name})</span>`;
-                if(r.tie) badge = `<span class="text-[9px] font-sans font-bold uppercase bg-gold text-anthracite px-1.5 py-0.5 rounded shadow-sm">Висяща</span>`;
+                if(r.inside) badge = `<span class="text-[8px] lg:text-[9px] font-sans font-bold uppercase bg-danger text-white px-1 py-0.5 rounded shadow-sm">Вътре (${r.caller==='1'?state.t1Name:state.t2Name})</span>`;
+                if(r.tie) badge = `<span class="text-[8px] lg:text-[9px] font-sans font-bold uppercase bg-gold text-anthracite px-1 py-0.5 rounded shadow-sm">Висяща</span>`;
                 tr.innerHTML = `
-                    <td class="p-4 border-b border-emeraldLight/20"><span class="font-black text-gold block text-base">${r.contract}</span>${badge}</td>
-                    <td class="p-4 text-center border-b border-emeraldLight/20 text-xl ${r.caller === '1' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p1}</td>
-                    <td class="p-4 text-center border-b border-emeraldLight/20 text-xl ${r.caller === '2' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p2}</td>`;
+                    <td class="p-3 lg:p-4 border-b border-emeraldLight/20"><span class="font-black text-gold block text-sm lg:text-base">${r.contract}</span>${badge}</td>
+                    <td class="p-3 lg:p-4 text-center border-b border-emeraldLight/20 text-lg lg:text-xl ${r.caller === '1' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p1}</td>
+                    <td class="p-3 lg:p-4 text-center border-b border-emeraldLight/20 text-lg lg:text-xl ${r.caller === '2' ? 'bg-forest/50 text-white' : 'text-gray-500 font-medium'}">${r.p2}</td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -667,7 +657,7 @@
             showToast("Нова игра започната!");
         }
 
-        // --- КАМЕРА И СНИМАНЕ ---
+        // --- КАМЕРА (Фото-асистент) ---
         let stream = null, scanTotal = 0;
         
         async function startCamera() {
@@ -686,7 +676,6 @@
                 document.getElementById('cameraControls').classList.add('hidden');
                 document.getElementById('captureControls').classList.remove('hidden');
                 
-                // Скриваме платното и резултата, ако пускаме пак
                 document.getElementById('snapshotCanvas').classList.add('hidden');
                 document.getElementById('analysisResultBox').classList.add('hidden');
                 
@@ -703,30 +692,27 @@
                 document.getElementById('cameraPlaceholder').classList.remove('hidden');
                 document.getElementById('cameraControls').classList.remove('hidden');
                 document.getElementById('captureControls').classList.add('hidden');
-                document.getElementById('scanLine').classList.add('hidden');
                 document.getElementById('snapshotCanvas').classList.add('hidden');
             }
         }
 
-async function takeSnapshotAndAnalyze() {
+        // НОВАТА ЛОГИКА ЗА СНИМАНЕ (БЕЗ ФАЛШИВ AI)
+        async function takeSnapshot() {
             if (!stream) return;
             const video = document.getElementById('cameraFeed');
             const canvas = document.getElementById('snapshotCanvas');
             const ctx = canvas.getContext('2d');
 
-            // Оразмеряване и рисуване (правим снимката)
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Визуална смяна: крием видеото, показваме замръзналата снимка
             video.classList.add('hidden');
             canvas.classList.remove('hidden');
             
-            // Директно показваме панела за въвеждане
             document.getElementById('analysisResultBox').classList.remove('hidden');
             
-            // Зануляваме решетката (премахваме фалшивия AI)
+            // Зануляване на решетката
             document.querySelectorAll('#cardGrid button').forEach(b => {
                 b.dataset.active = "0";
                 b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
@@ -738,37 +724,12 @@ async function takeSnapshotAndAnalyze() {
             
             showToast("Снимката е запазена! Маркирай картите.", "success");
             
-            // Скрол до резултата
-            document.getElementById('mainContainer').scrollTo({
-                top: document.getElementById('analysisResultBox').offsetTop,
-                behavior: 'smooth'
-            });
-        }
-
-        // За симулацията: избираме 4-5 случайни карти
-        function simulateAIDetection() {
-            // Нулираме старите
-            document.querySelectorAll('#cardGrid button').forEach(b => {
-                b.dataset.active = "0";
-                b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
-                b.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
-                if(['♥','♦'].includes(b.dataset.suit)) b.classList.add('text-red-400');
-                else b.classList.add('text-white');
-            });
-
-            const buttons = Array.from(document.querySelectorAll('#cardGrid button'));
-            
-            // Намираме 4 карти случайно (за демо ефект)
-            for(let i = 0; i < 4; i++) {
-                let randomIdx = Math.floor(Math.random() * buttons.length);
-                let btn = buttons[randomIdx];
-                if(btn.dataset.active === "0") {
-                    btn.dataset.active = "1";
-                    btn.classList.add('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
-                    btn.classList.remove('bg-emeraldLight/30', 'hover:bg-emeraldLight/50', 'text-red-400', 'text-white');
-                }
-            }
-            recalcScan();
+            setTimeout(() => {
+                document.getElementById('mainContainer').scrollTo({
+                    top: document.getElementById('analysisResultBox').offsetTop,
+                    behavior: 'smooth'
+                });
+            }, 100);
         }
 
         const cardsDef = ['7','8','9','10','J','Q','K','A'];
@@ -792,7 +753,7 @@ async function takeSnapshotAndAnalyze() {
             suitsDef.forEach(suit => {
                 cardsDef.forEach(rank => {
                     const btn = document.createElement('button');
-                    btn.className = `font-sans font-bold bg-emeraldLight/30 hover:bg-emeraldLight/50 text-white text-xs lg:text-sm py-3 lg:py-4 rounded-xl border border-transparent transition-all transform active:scale-90 shadow-sm ${['♥','♦'].includes(suit) ? 'text-red-400' : ''}`;
+                    btn.className = `font-sans font-bold bg-emeraldLight/30 hover:bg-emeraldLight/50 text-white text-[10px] lg:text-sm py-2.5 lg:py-4 rounded-xl border border-transparent transition-all transform active:scale-90 shadow-sm ${['♥','♦'].includes(suit) ? 'text-red-400' : ''}`;
                     btn.innerHTML = `${rank}${suit}`;
                     btn.dataset.rank = rank; btn.dataset.suit = suit; btn.dataset.active = "0";
                     btn.onclick = () => {
@@ -826,7 +787,6 @@ async function takeSnapshotAndAnalyze() {
             switchTab('score');
             updateCalc();
             
-            // Нулиране на решетката и скриване на панела
             document.querySelectorAll('#cardGrid button').forEach(b => {
                 b.dataset.active = "0";
                 b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
