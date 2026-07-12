@@ -176,7 +176,8 @@
                         <div id="scoreInputColumn" class="lg:col-span-5 space-y-4 lg:space-y-5 lg:sticky lg:top-0">
                             <!-- Договор -->
                             <div class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight/50 lg:border-emeraldLight shadow-lg">
-                                <div class="grid grid-cols-3 gap-1.5 lg:gap-2 bg-anthracite p-1 lg:p-1.5 rounded-xl border border-emeraldLight/30">
+                                <label class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 ml-1 tracking-wider">Договор</label>
+                                <div class="grid grid-cols-3 gap-1.5 lg:gap-2 mt-1 bg-anthracite p-1 lg:p-1.5 rounded-xl border border-emeraldLight/30">
                                     <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95" data-contract="all" onclick="selectContract('all')">Вс. Коз</button>
                                     <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95" data-contract="none" onclick="selectContract('none')">Без Коз</button>
                                     <button class="contract-btn py-2 lg:py-3 rounded-lg font-bold text-xs lg:text-sm transition-all duration-200 active:scale-95" data-contract="suit" onclick="selectContract('suit')">Боя</button>
@@ -252,8 +253,14 @@
                                     <span class="text-[9px] text-gray-600 font-semibold">по-високата поредица/каре печели</span>
                                 </div>
                                 <div class="flex gap-2 lg:gap-4">
-                                    <div class="w-1/2 space-y-1.5 lg:space-y-2" id="ann1"></div>
-                                    <div class="w-1/2 space-y-1.5 lg:space-y-2" id="ann2"></div>
+                                    <div class="w-1/2">
+                                        <div id="annTeamLabel1" class="text-[9px] font-black text-gold/90 uppercase tracking-wider mb-1.5 truncate">Ние</div>
+                                        <div class="grid grid-cols-2 gap-1.5 content-start" id="ann1"></div>
+                                    </div>
+                                    <div class="w-1/2">
+                                        <div id="annTeamLabel2" class="text-[9px] font-black text-gold/90 uppercase tracking-wider mb-1.5 truncate">Вие</div>
+                                        <div class="grid grid-cols-2 gap-1.5 content-start" id="ann2"></div>
+                                    </div>
                                 </div>
                                 <div id="annConflictBox" class="hidden mt-3 bg-danger/10 border border-danger/40 rounded-xl p-2.5 lg:p-3 pop-in">
                                     <p class="text-[10px] lg:text-xs text-white font-bold mb-2" id="annConflictMsg">Равенство в анонсите — коя е по-висока?</p>
@@ -299,53 +306,52 @@
                 </section>
 
                 <!-- ТАБ 2: AI СКАНИРАНЕ -->
-                <section id="tab-scan" class="tab-content h-full max-w-3xl mx-auto space-y-4 lg:space-y-5 lg:pt-2">
-                    <div class="bg-blue-900/20 border border-blue-500/30 p-4 lg:p-5 rounded-2xl text-xs lg:text-sm text-blue-200 shadow-md">
-                        <strong class="text-blue-400 block mb-1 lg:mb-2 text-sm lg:text-base uppercase tracking-wider">Фото Асистент</strong>
-                        Насочи камерата към картите и "снимай", за да ги замразиш на екрана. После сам маркираш картите в решетката — <strong>това не е автоматично разпознаване</strong> (компютърно зрение), а бърз ръчен инструмент за пресмятане.
+                <section id="tab-scan" class="tab-content h-full max-w-3xl mx-auto space-y-3 lg:space-y-5 lg:pt-2 pb-6">
+                    <div class="bg-blue-900/20 border border-blue-500/30 p-3 lg:p-4 rounded-2xl text-[11px] lg:text-sm text-blue-200 shadow-md flex items-start gap-2.5">
+                        <span class="text-lg flex-none leading-none">💡</span>
+                        <span>Камерата е <strong>незадължителна</strong> — просто за да гледаш картите докато броиш. Истинското пресмятане е решетката отдолу, тя работи винаги, дори без камера.</span>
                     </div>
 
-                    <div class="relative w-full aspect-[4/3] sm:aspect-video lg:max-h-[350px] bg-black rounded-2xl overflow-hidden border border-emeraldLight flex items-center justify-center shadow-inner">
-                        <video id="cameraFeed" playsinline muted class="absolute inset-0 w-full h-full object-cover hidden"></video>
-                        <canvas id="snapshotCanvas" class="absolute inset-0 w-full h-full object-cover hidden"></canvas>
+                    <div class="relative w-full h-48 sm:h-60 lg:h-72 bg-black rounded-2xl overflow-hidden border border-emeraldLight flex items-center justify-center shadow-inner">
+                        <video id="cameraFeed" playsinline muted autoplay class="absolute inset-0 w-full h-full object-contain hidden"></video>
 
                         <div id="cameraPlaceholder" class="text-center p-4">
-                            <div class="text-4xl lg:text-5xl mb-2 lg:mb-3 opacity-20">📷</div>
+                            <div class="text-4xl lg:text-5xl mb-2 opacity-20">📷</div>
                             <p class="text-[9px] lg:text-[10px] font-bold text-gray-600 uppercase tracking-widest">Камерата е изключена</p>
                         </div>
+                        <div id="pausedBadge" class="hidden absolute top-2.5 right-2.5 bg-gold text-anthracite text-[9px] font-black uppercase px-2.5 py-1 rounded-full shadow-glow tracking-wider">⏸ На пауза</div>
                     </div>
 
-                    <div id="cameraControls" class="flex gap-2 lg:gap-3">
-                        <button onclick="startCamera()" class="flex-1 bg-emeraldLight hover:bg-emeraldLight/80 border border-success/50 text-success p-3 lg:p-4 rounded-xl font-bold active:scale-95 transition-all flex justify-center items-center gap-2 shadow-md uppercase tracking-wider text-[10px] lg:text-xs">
-                            Включи Камера
+                    <div class="grid grid-cols-2 gap-2 lg:gap-3">
+                        <button onclick="startCamera()" id="camStartBtn" class="col-span-2 bg-emeraldLight hover:bg-emeraldLight/80 border border-success/50 text-success p-3 lg:p-3.5 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-wider text-[10px] lg:text-xs">
+                            Включи камера
                         </button>
-                        <button onclick="openManualGrid()" class="flex-1 bg-anthracite border border-gold/40 text-gold p-3 lg:p-4 rounded-xl font-bold active:scale-95 transition-all flex justify-center items-center gap-2 shadow-md uppercase tracking-wider text-[10px] lg:text-xs">
-                            Въведи ръчно
+                        <button onclick="toggleFreeze()" id="camFreezeBtn" class="hidden bg-gold hover:bg-goldHover text-anthracite p-3 lg:p-3.5 rounded-xl font-black active:scale-95 transition-all uppercase tracking-wider text-[10px] lg:text-xs shadow-glow">
+                            Замрази кадър
                         </button>
-                    </div>
-
-                    <div id="captureControls" class="flex gap-2 lg:gap-3 hidden">
-                        <button onclick="takeSnapshot()" class="flex-1 bg-gold hover:bg-goldHover text-anthracite p-4 lg:p-5 rounded-xl font-black active:scale-95 transition-all shadow-glow uppercase tracking-widest text-xs lg:text-sm">
-                            📸 СНИМАЙ КАРТИТЕ
-                        </button>
-                        <button onclick="stopCamera()" class="bg-anthracite border border-danger/30 text-danger px-4 lg:px-6 rounded-xl font-bold active:scale-95 transition-all uppercase text-[10px] lg:text-xs">
-                            Спри
+                        <button onclick="stopCameraFully()" id="camStopBtn" class="hidden bg-anthracite border border-danger/30 text-danger p-3 lg:p-3.5 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-wider text-[10px] lg:text-xs">
+                            Спри камера
                         </button>
                     </div>
 
-                    <div id="analysisResultBox" class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg mt-3 lg:mt-4 hidden">
-                        <div class="flex justify-between items-center mb-3 lg:mb-4">
-                            <h3 class="font-bold text-[10px] lg:text-xs text-gray-400 uppercase tracking-widest">Маркирай видените карти</h3>
-                            <span class="text-[9px] lg:text-[10px] font-black bg-gold/10 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full text-gold border border-gold/30 uppercase tracking-wider" id="scanContractInfo">Договор</span>
+                    <div class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-[10px] lg:text-xs text-gray-400 uppercase tracking-widest">Докосни видените карти</h3>
+                            <span class="text-[9px] lg:text-[10px] font-black bg-gold/10 px-2 lg:px-3 py-1 rounded-full text-gold border border-gold/30 uppercase tracking-wider" id="scanContractInfo">Договор</span>
                         </div>
 
                         <div class="grid grid-cols-4 gap-1.5 lg:gap-3" id="cardGrid"></div>
 
-                        <div class="mt-4 lg:mt-6 flex justify-between items-center bg-anthracite p-3 lg:p-4 rounded-xl border border-emeraldLight/50">
+                        <div class="mt-4 flex justify-between items-center gap-2 bg-anthracite p-3 lg:p-4 rounded-xl border border-emeraldLight/50">
                             <div class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 leading-tight tracking-wider">Открити точки<br><span id="scanTotal" class="font-mono text-3xl lg:text-4xl font-bold text-white">0</span></div>
-                            <button onclick="sendToCalculator()" class="font-sans bg-gold text-anthracite px-4 lg:px-8 py-3 lg:py-4 rounded-xl font-black active:scale-95 hover:bg-goldHover transition-all shadow-glow uppercase tracking-widest text-[10px] lg:text-xs">
-                                ПРЕХВЪРЛИ
-                            </button>
+                            <div class="flex gap-2 flex-none">
+                                <button onclick="resetCardGrid()" aria-label="Изчисти маркировките" title="Изчисти" class="bg-emeraldLight/40 hover:bg-emeraldLight/60 text-gray-300 w-11 h-11 lg:w-12 lg:h-12 rounded-xl active:scale-95 transition-all flex items-center justify-center flex-none">
+                                    <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4.5 9a8 8 0 0113.9-4.9M19.5 15a8 8 0 01-13.9 4.9"></path></svg>
+                                </button>
+                                <button onclick="sendToCalculator()" class="font-sans bg-gold text-anthracite px-4 lg:px-8 py-3 lg:py-4 rounded-xl font-black active:scale-95 hover:bg-goldHover transition-all shadow-glow uppercase tracking-widest text-[10px] lg:text-xs whitespace-nowrap">
+                                    ПРЕХВЪРЛИ
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -399,10 +405,10 @@
                             <span class="flex items-center gap-2"><span class="text-lg">🂡</span> Раздаване и наддаване</span>
                             <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
-                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed border-t border-emeraldLight/30 pt-3">
-                            <p>Раздава се обратно на часовниковата стрелка: първо по 3, после по 2 карти на играч (общо 5 за наддаването).</p>
-                            <p>Пръв обявява играчът вдясно от раздаващия — предлага боя, "Без Коз" или "Всичко Коз", или пасува. Силата на обявите нараства: <strong class="text-gray-100">Спатия &lt; Каро &lt; Купа &lt; Пика &lt; Без Коз &lt; Всичко Коз</strong>.</p>
-                            <p>Наддаването приключва при 3 последователни паса. Ако всички пасуват без избран договор, картите се събират и раздава следващият.</p>
+                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed border-t border-emeraldLight/30 pt-3">
+                            <p>Всеки играч получава 5 карти. Играчът вдясно от раздаващия предлага пръв: боя, "Без Коз", "Всичко Коз" — или пасува.</p>
+                            <p>Силата расте така: <strong class="text-gray-100">Спатия → Каро → Купа → Пика → Без Коз → Всичко Коз</strong>.</p>
+                            <p>При 3 паса подред наддаването приключва и се пада на следващия играч да раздава.</p>
                         </div>
                     </details>
 
@@ -411,10 +417,10 @@
                             <span class="flex items-center gap-2"><span class="text-lg">🃏</span> Разиграване</span>
                             <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
-                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed border-t border-emeraldLight/30 pt-3">
-                            <p><strong class="text-gray-100">Боя (един коз):</strong> задължително отговаряне в цвета; ако нямаш — цакаш коз; ако противник е цакал — надцакваш, ако можеш.</p>
-                            <p><strong class="text-gray-100">Всичко Коз:</strong> освен отговаряне в цвета, задължително и качване (по-висока карта), независимо кой води взятката.</p>
-                            <p><strong class="text-gray-100">Без Коз:</strong> единствено задължение е отговарянето в искания цвят.</p>
+                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed border-t border-emeraldLight/30 pt-3">
+                            <p><strong class="text-gray-100">Боя:</strong> следваш цвета; ако нямаш — цакаш коз (и качваш коз, ако противник вече е цакал).</p>
+                            <p><strong class="text-gray-100">Всичко Коз:</strong> следваш цвета и винаги качваш по-висока карта, ако можеш.</p>
+                            <p><strong class="text-gray-100">Без Коз:</strong> просто следваш искания цвят — без коз, без задължително качване.</p>
                         </div>
                     </details>
 
@@ -438,11 +444,11 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <p><strong class="text-gray-100">Общо точки за раздаване (с последно 10):</strong> Боя — 162 · Всичко Коз — 258 · Без Коз — 130, но точките от картите се <strong>удвояват</strong> преди запис (крайно общо 260); закръгля се <em>след</em> удвояването.</p>
-                            <p><strong class="text-gray-100">Изкарана</strong> — обявилият отбор има повече точки (карти + анонси): всеки записва каквото е събрал, разделено на 10 и закръглено.</p>
-                            <p><strong class="text-gray-100">Вкарана</strong> — обявилият има по-малко: противникът взима <em>всичко</em> (двата отбора точки + всички анонси).</p>
-                            <p><strong class="text-gray-100">Висяща</strong> — точна равенство: обявилият не записва нищо, точките му "висят" за следващото решаващо раздаване (натрупват се, ако виси и то).</p>
-                            <p><strong class="text-gold">Изключение на Всичко Коз:</strong> ако двата отбора завършат на цифра 4 (напр. 154/104), отборът с по-малко точки закръгля <strong>нагоре</strong>, другият — надолу.</p>
+                            <p><strong class="text-gray-100">Общо точки:</strong> Боя 162 · Всичко Коз 258 · Без Коз 130 (удвоява се → 260). Крайно винаги делиш на 10 и закръгляш.</p>
+                            <p><strong class="text-gray-100">Изкарана</strong> — обявилият има повече точки → всеки пише каквото е взел.</p>
+                            <p><strong class="text-gray-100">Вкарана</strong> — обявилият има по-малко → другият взима всичко (точки + анонси).</p>
+                            <p><strong class="text-gray-100">Висяща</strong> — точно равенство → обявилият не пише нищо, чака следващото решаващо раздаване.</p>
+                            <p class="text-[11px] text-gray-400">💡 На Всичко Коз, ако двата резултата завършат на 4 — по-малкият закръгля нагоре.</p>
                         </div>
                     </details>
 
@@ -451,11 +457,10 @@
                             <span class="flex items-center gap-2"><span class="text-lg">⚡</span> Контра и Реконтра</span>
                             <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
-                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed border-t border-emeraldLight/30 pt-3">
-                            <p>Обявяват се след последната обява на противника по време на наддаването — залог, че ще победиш при неговия договор.</p>
-                            <p><strong class="text-gray-100">Важно:</strong> контра и реконтра променят логиката — <strong>целият пул от точки в раздаването</strong> (карти на двата отбора + всички анонси + капо) се удвоява (×2) или учетворява (×4), и отива <strong>изцяло</strong> при отбора с повече точки, независимо кой е обявил контрата. Другият отбор записва 0 за раздаването.</p>
-                            <p class="text-gray-400 text-[11px]">Пример: чиста игра на Всичко Коз с контра — 258 × 2 ÷ 10 = 52. Единият отбор пише 52, другият — 0.</p>
-                            <p>Ако раздаването увисне дори при контра/реконтра, удвоеният/учетвореният пул виси за следващото решаващо раздаване.</p>
+                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed border-t border-emeraldLight/30 pt-3">
+                            <p>Залог по време на наддаването, че противникът ще фалира. Контра удвоява, реконтра учетворява.</p>
+                            <p><strong class="text-gray-100">Всичко (карти + анонси + капо) отива изцяло при отбора с повече точки</strong> — удвоено или учетворено. Другият пише 0, без значение кой е викал контра.</p>
+                            <p class="text-[11px] text-gray-400">Пример: Всичко Коз с контра → 258 × 2 ÷ 10 = 52 за победителя, 0 за другия.</p>
                         </div>
                     </details>
 
@@ -464,10 +469,10 @@
                             <span class="flex items-center gap-2"><span class="text-lg">👑</span> Капо (Валат)</span>
                             <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
-                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed border-t border-emeraldLight/30 pt-3">
-                            <p>Ако отбор вземе <strong>всички</strong> взятки в раздаването, получава бонус от <strong class="text-gold">+90 точки</strong> (в допълнение на последно 10, което така или иначе е част от неговите точки).</p>
-                            <p>Капо <strong>не се удвоява</strong> при "Без Коз" (единственото изключение от удвояването там), но <strong>се</strong> удвоява/учетворява при контра/реконтра.</p>
-                            <p><strong class="text-danger">С капо не се излиза играта:</strong> ако капо би прекрачило целта от 151 точки, играта не свършва — изиграва се поне още едно раздаване.</p>
+                        <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed border-t border-emeraldLight/30 pt-3">
+                            <p>Отбор, взел <strong>всички</strong> взятки в раздаването, получава бонус <strong class="text-gold">+90 точки</strong>. Приложението го засича само.</p>
+                            <p>Не се удвоява на "Без Коз", но <strong>се</strong> удвоява/учетворява при контра/реконтра.</p>
+                            <p><strong class="text-danger">С капо не се печели играта</strong> — дори да прекрачи 151, изигравате поне още едно раздаване.</p>
                         </div>
                     </details>
 
@@ -477,9 +482,8 @@
                             <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
                         <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed border-t border-emeraldLight/30 pt-3">
-                            <p>Играта свършва при <strong class="text-gold">151 или повече</strong> точки — <strong>едно и също число за всички договори</strong> (Боя, Всичко Коз и Без Коз се сумират в един общ резултат).</p>
-                            <p>Ако двата отбора прекрачат 151 в едно и също раздаване, печели този с повече точки.</p>
-                            <p>Ако точките излязат равни дори след прекрачването, играта продължава докато някой отбор поведе.</p>
+                            <p>Играта свършва при <strong class="text-gold">151 или повече</strong> точки — едно число, важи за всички видове раздавания заедно.</p>
+                            <p>Ако двата отбора прекрачат 151 в едно и също раздаване, печели този с повече точки. При равенство играта продължава, докато някой поведе.</p>
                         </div>
                     </details>
                 </section>
@@ -510,13 +514,13 @@
 
         // cat: 'belot' (независим), 'seq' (терца/кварта/квинта - йерархия по tier), 'careta' (йерархия по tier)
         const annTypes = [
-            { id: 'belot', label: 'Белот (20)', val: 20, cat: 'belot', tier: 0 },
-            { id: 'tierce', label: 'Терца (20)', val: 20, cat: 'seq', tier: 1 },
-            { id: 'quarte', label: 'Кварта (50)', val: 50, cat: 'seq', tier: 2 },
-            { id: 'quinte', label: 'Квинта (100)', val: 100, cat: 'seq', tier: 3 },
-            { id: 'carre100', label: 'Каре (100)', val: 100, cat: 'careta', tier: 1 },
-            { id: 'carre150', label: 'Каре 9-ки (150)', val: 150, cat: 'careta', tier: 2 },
-            { id: 'carre200', label: 'Каре J-та (200)', val: 200, cat: 'careta', tier: 3 }
+            { id: 'belot', label: 'Белот', val: 20, cat: 'belot', tier: 0 },
+            { id: 'tierce', label: 'Терца', val: 20, cat: 'seq', tier: 1 },
+            { id: 'quarte', label: 'Кварта', val: 50, cat: 'seq', tier: 2 },
+            { id: 'quinte', label: 'Квинта', val: 100, cat: 'seq', tier: 3 },
+            { id: 'carre100', label: 'Каре 10', val: 100, cat: 'careta', tier: 1 },
+            { id: 'carre150', label: 'Каре 9', val: 150, cat: 'careta', tier: 2 },
+            { id: 'carre200', label: 'Каре J', val: 200, cat: 'careta', tier: 3 }
         ];
 
         // Преходен избор при равенство в анонсите (нулира се при всяка промяна на чекбоксите / запис)
@@ -565,15 +569,12 @@
         }
 
         function syncTeamNameDisplays() {
-            document.getElementById('lblPoints1').innerText = document.getElementById('callerBtn1').dataset.active === "1" ? state.t1Name : state.t1Name;
             document.getElementById('callerBtn1').innerText = state.t1Name;
             document.getElementById('callerBtn2').innerText = state.t2Name;
             document.getElementById('historyHeadUs').innerText = state.t1Name;
             document.getElementById('historyHeadThem').innerText = state.t2Name;
-            const caller = document.querySelector('.caller-btn[data-active="1"]');
-            const callerIsOne = caller && caller.dataset.caller === '1';
-            document.getElementById('lblPoints1').innerText = 'Обявил';
-            document.getElementById('lblPoints2').innerText = 'Другият';
+            document.getElementById('annTeamLabel1').innerText = state.t1Name;
+            document.getElementById('annTeamLabel2').innerText = state.t2Name;
         }
 
         /* ======================= TOASTS / MODAL ======================= */
@@ -706,12 +707,12 @@
             container1.innerHTML = ''; container2.innerHTML = '';
             annTypes.forEach(t => {
                 const makeRow = (team) => `
-                    <label class="custom-checkbox flex items-center space-x-2 bg-emeraldLight/20 hover:bg-emeraldLight/40 p-2 lg:p-2.5 rounded-xl cursor-pointer transition-colors border border-emeraldLight/30">
+                    <label class="custom-checkbox flex items-center gap-1.5 bg-emeraldLight/20 hover:bg-emeraldLight/40 py-2 px-1.5 lg:px-2 rounded-lg cursor-pointer transition-colors border border-emeraldLight/30">
                         <input type="checkbox" class="hidden ann-chk t${team}-ann" data-id="${t.id}" data-val="${t.val}" data-cat="${t.cat}" data-tier="${t.tier}" onchange="onAnnouncementChange()">
-                        <div class="w-4 h-4 lg:w-5 lg:h-5 flex-none rounded border border-gray-500 flex items-center justify-center transition-colors">
-                            <svg class="hidden w-2.5 h-2.5 lg:w-3 lg:h-3 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        <div class="w-3.5 h-3.5 lg:w-4 lg:h-4 flex-none rounded border border-gray-500 flex items-center justify-center transition-colors">
+                            <svg class="hidden w-2 h-2 lg:w-2.5 lg:h-2.5 text-anthracite font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
-                        <span class="text-[9px] lg:text-[10px] font-bold text-gray-200 leading-tight uppercase tracking-wider">${t.label}</span>
+                        <span class="text-[9px] lg:text-[10px] font-bold text-gray-200 leading-[1.15] uppercase tracking-wide truncate">${t.label} <span class="text-gold/80 font-normal normal-case">${t.val}</span></span>
                     </label>
                 `;
                 container1.innerHTML += makeRow(1); container2.innerHTML += makeRow(2);
@@ -727,7 +728,7 @@
         function computeAnnouncementResult() {
             const checked1 = {}, checked2 = {};
             document.querySelectorAll('.t1-ann').forEach(c => checked1[c.dataset.id] = c.checked);
-            document.querySelectorAll('.t2-ann').forEach(c => checked2[c.dataded ? c.dataset.id : c.dataset.id] = c.checked);
+            document.querySelectorAll('.t2-ann').forEach(c => checked2[c.dataset.id] = c.checked);
 
             function tierInfo(checked, cat) {
                 let maxTier = 0, sum = 0;
@@ -954,7 +955,6 @@
         /* ======================= GAME END ======================= */
         // Връща true ако капо блокира прекратяването на играта, за да покажем допълнително известие
         function checkGameEnd(wasCapoThisRound) {
-            const over1 = state.total1IsPreview || false; // placeholder, реалната сметка е долу
             const t1 = state.rounds.reduce((a, r) => a + r.p1, 0);
             const t2 = state.rounds.reduce((a, r) => a + r.p2, 0);
             const cross1 = t1 >= state.targetScore, cross2 = t2 >= state.targetScore;
@@ -1050,11 +1050,16 @@
         }
 
         /* ======================= КАМЕРА / AI СКАН ======================= */
-        let stream = null, scanTotal = 0;
+        // Забележка: замразяването на кадъра използва video.pause()/play() вместо canvas снимка.
+        // Canvas копие изисква ръчно съвпадение на резолюция/пропорции с показания <video> и лесно
+        // излиза изкривено/срязано при несъвпадение; пауза на самия видео елемент показва точно
+        // това, което вече се вижда на живо — без разминаване.
+        let stream = null, isFrozen = false;
 
         async function startCamera() {
             try {
-                try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); }
+                let constraints = { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } } };
+                try { stream = await navigator.mediaDevices.getUserMedia(constraints); }
                 catch (e) { stream = await navigator.mediaDevices.getUserMedia({ video: true }); }
                 const video = document.getElementById('cameraFeed');
                 video.srcObject = stream;
@@ -1062,55 +1067,45 @@
 
                 video.classList.remove('hidden');
                 document.getElementById('cameraPlaceholder').classList.add('hidden');
-                document.getElementById('cameraControls').classList.add('hidden');
-                document.getElementById('captureControls').classList.remove('hidden');
-
-                document.getElementById('snapshotCanvas').classList.add('hidden');
-                document.getElementById('analysisResultBox').classList.add('hidden');
+                document.getElementById('camStartBtn').classList.add('hidden');
+                document.getElementById('camFreezeBtn').classList.remove('hidden');
+                document.getElementById('camStopBtn').classList.remove('hidden');
+                document.getElementById('camFreezeBtn').innerText = 'Замрази кадър';
+                document.getElementById('pausedBadge').classList.add('hidden');
+                isFrozen = false;
             } catch (err) {
                 console.error(err);
-                showToast("Няма достъп до камера — може да въведеш ръчно.", "error");
-                openManualGrid();
+                showToast("Няма достъп до камера — просто маркирай картите долу.", "error");
             }
         }
 
-        function stopCamera() {
-            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-            document.getElementById('cameraFeed').classList.add('hidden');
-            document.getElementById('cameraPlaceholder').classList.remove('hidden');
-            document.getElementById('cameraControls').classList.remove('hidden');
-            document.getElementById('captureControls').classList.add('hidden');
-            document.getElementById('snapshotCanvas').classList.add('hidden');
-        }
-
-        // Директен достъп до решетката за ръчно броене — не изисква камера/разрешение
-        function openManualGrid() {
-            document.getElementById('analysisResultBox').classList.remove('hidden');
-            resetCardGrid();
-            setTimeout(() => {
-                document.getElementById('mainContainer').scrollTo({ top: document.getElementById('analysisResultBox').offsetTop, behavior: 'smooth' });
-            }, 50);
-        }
-
-        async function takeSnapshot() {
-            if (!stream) return;
+        function toggleFreeze() {
             const video = document.getElementById('cameraFeed');
-            const canvas = document.getElementById('snapshotCanvas');
-            const ctx = canvas.getContext('2d');
+            if (!stream) return;
+            if (!isFrozen) {
+                video.pause();
+                isFrozen = true;
+                document.getElementById('pausedBadge').classList.remove('hidden');
+                document.getElementById('camFreezeBtn').innerText = 'Пусни камера';
+            } else {
+                video.play();
+                isFrozen = false;
+                document.getElementById('pausedBadge').classList.add('hidden');
+                document.getElementById('camFreezeBtn').innerText = 'Замрази кадър';
+            }
+        }
 
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
+        function stopCameraFully() {
+            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+            const video = document.getElementById('cameraFeed');
+            video.pause(); video.srcObject = null;
             video.classList.add('hidden');
-            canvas.classList.remove('hidden');
-
-            document.getElementById('analysisResultBox').classList.remove('hidden');
-            resetCardGrid();
-            showToast("Снимката е замразена! Маркирай картите.", "success");
-
-            setTimeout(() => {
-                document.getElementById('mainContainer').scrollTo({ top: document.getElementById('analysisResultBox').offsetTop, behavior: 'smooth' });
-            }, 100);
+            document.getElementById('cameraPlaceholder').classList.remove('hidden');
+            document.getElementById('camStartBtn').classList.remove('hidden');
+            document.getElementById('camFreezeBtn').classList.add('hidden');
+            document.getElementById('camStopBtn').classList.add('hidden');
+            document.getElementById('pausedBadge').classList.add('hidden');
+            isFrozen = false;
         }
 
         function resetCardGrid() {
@@ -1178,8 +1173,7 @@
             switchTab('score');
             updateCalc();
             resetCardGrid();
-            document.getElementById('analysisResultBox').classList.add('hidden');
-            stopCamera();
+            stopCameraFully();
             showToast("Стойностите са прехвърлени!");
         }
     </script>
