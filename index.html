@@ -313,14 +313,20 @@
                     </div>
 
                     <div class="relative w-full h-48 sm:h-60 lg:h-72 bg-black rounded-2xl overflow-hidden border border-emeraldLight flex items-center justify-center shadow-inner">
-                        <video id="cameraFeed" playsinline muted autoplay class="absolute inset-0 w-full h-full object-contain hidden"></video>
+                        <video id="cameraFeed" playsinline muted autoplay onclick="sampleCardColor(event)" class="absolute inset-0 w-full h-full object-contain hidden"></video>
 
                         <div id="cameraPlaceholder" class="text-center p-4">
                             <div class="text-4xl lg:text-5xl mb-2 opacity-20">📷</div>
                             <p class="text-[9px] lg:text-[10px] font-bold text-gray-600 uppercase tracking-widest">Камерата е изключена</p>
                         </div>
                         <div id="pausedBadge" class="hidden absolute top-2.5 right-2.5 bg-gold text-anthracite text-[9px] font-black uppercase px-2.5 py-1 rounded-full shadow-glow tracking-wider">⏸ На пауза</div>
+                        <div id="tapHint" class="hidden absolute bottom-2.5 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur text-white text-[9px] lg:text-[10px] font-bold px-3 py-1.5 rounded-full tracking-wide text-center whitespace-nowrap">👆 Докосни карта за цветова подсказка</div>
+                        <div id="colorResultBadge" class="hidden absolute top-2.5 left-2.5 items-center gap-1.5 bg-anthracite/90 backdrop-blur border border-emeraldLight text-white text-[9px] lg:text-[10px] font-bold px-2.5 py-1.5 rounded-full">
+                            <span id="colorResultText">—</span>
+                            <button onclick="clearColorFilter(); event.stopPropagation();" class="ml-1 text-gray-400 hover:text-white leading-none" aria-label="Изчисти филтъра">✕</button>
+                        </div>
                     </div>
+                    <p class="text-[9px] lg:text-[10px] text-gray-500 text-center -mt-1 lg:-mt-2 px-2 leading-relaxed">Разчита само дали мастилото е червено или черно (истински анализ на пикселите) — не чете ранг/боя. Стеснява решетката наполовина, а не я попълва вместо теб.</p>
 
                     <div class="grid grid-cols-2 gap-2 lg:gap-3">
                         <button onclick="startCamera()" id="camStartBtn" class="col-span-2 bg-emeraldLight hover:bg-emeraldLight/80 border border-success/50 text-success p-3 lg:p-3.5 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-wider text-[10px] lg:text-xs">
@@ -1054,7 +1060,14 @@
         // Canvas копие изисква ръчно съвпадение на резолюция/пропорции с показания <video> и лесно
         // излиза изкривено/срязано при несъвпадение; пауза на самия видео елемент показва точно
         // това, което вече се вижда на живо — без разминаване.
-        let stream = null, isFrozen = false;
+        //
+        // Цветова подсказка (реална, не симулирана): при замразен кадър, докосването върху снимката
+        // взима истински пиксели от офскрийн canvas (getImageData) около допира и определя дали
+        // мастилото е червено или черно. Това НЕ разпознава ранг/боя — само стеснява решетката.
+        // Пълно разпознаване на карти изисква трениран модел за точно това 32-картово френско тесте,
+        // какъвто не съществува готов за директно зареждане в браузъра; облачно AI API пък би изисквало
+        // таен ключ, вграден в публичния сайт — несигурно и извън обхвата на статичен GitHub Pages файл.
+        let stream = null, isFrozen = false, sampleCanvas = null;
 
         async function startCamera() {
             try {
@@ -1087,11 +1100,22 @@
                 isFrozen = true;
                 document.getElementById('pausedBadge').classList.remove('hidden');
                 document.getElementById('camFreezeBtn').innerText = 'Пусни камера';
+                document.getElementById('tapHint').classList.remove('hidden');
+
+                // Копираме текущия кадър в офскрийн canvas в НАТИВНА резолюция — оттук четем пиксели при допир.
+                sampleCanvas = document.createElement('canvas');
+                sampleCanvas.width = video.videoWidth || 1280;
+                sampleCanvas.height = video.videoHeight || 960;
+                const ctx = sampleCanvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, sampleCanvas.width, sampleCanvas.height);
             } else {
                 video.play();
                 isFrozen = false;
                 document.getElementById('pausedBadge').classList.add('hidden');
                 document.getElementById('camFreezeBtn').innerText = 'Замрази кадър';
+                document.getElementById('tapHint').classList.add('hidden');
+                clearColorFilter();
+                sampleCanvas = null;
             }
         }
 
@@ -1105,16 +1129,81 @@
             document.getElementById('camFreezeBtn').classList.add('hidden');
             document.getElementById('camStopBtn').classList.add('hidden');
             document.getElementById('pausedBadge').classList.add('hidden');
+            document.getElementById('tapHint').classList.add('hidden');
+            clearColorFilter();
+            sampleCanvas = null;
             isFrozen = false;
+        }
+
+        // Реално четене на пиксели около точката на допир, за да познае червено/черно мастило.
+        function sampleCardColor(event) {
+            if (!isFrozen || !sampleCanvas) return;
+            const video = document.getElementById('cameraFeed');
+            const rect = video.getBoundingClientRect();
+
+            // object-contain центрира кадъра с "letterbox" ленти — пресмятаме реалния мащаб и отместване,
+            // за да превърнем координатите на допира в истински пиксел от нативната резолюция на снимката.
+            const scale = Math.min(rect.width / sampleCanvas.width, rect.height / sampleCanvas.height);
+            const renderedW = sampleCanvas.width * scale, renderedH = sampleCanvas.height * scale;
+            const offsetX = (rect.width - renderedW) / 2, offsetY = (rect.height - renderedH) / 2;
+
+            const clickX = event.clientX - rect.left, clickY = event.clientY - rect.top;
+            const px = (clickX - offsetX) / scale, py = (clickY - offsetY) / scale;
+
+            if (px < 0 || py < 0 || px > sampleCanvas.width || py > sampleCanvas.height) return; // допир в letterbox лентата
+
+            const ctx = sampleCanvas.getContext('2d');
+            const sampleSize = Math.round(sampleCanvas.width * 0.035); // малка зона около допира, пропорционална на резолюцията
+            const sx = Math.max(0, Math.round(px - sampleSize / 2)), sy = Math.max(0, Math.round(py - sampleSize / 2));
+            const sw = Math.min(sampleSize, sampleCanvas.width - sx), sh = Math.min(sampleSize, sampleCanvas.height - sy);
+            if (sw <= 0 || sh <= 0) return;
+
+            let data;
+            try { data = ctx.getImageData(sx, sy, sw, sh).data; } catch (e) { console.error(e); return; }
+
+            let r = 0, g = 0, b = 0, n = 0;
+            for (let i = 0; i < data.length; i += 4) { r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
+            r /= n; g /= n; b /= n;
+            const brightness = (r + g + b) / 3;
+
+            const badge = document.getElementById('colorResultBadge');
+            const text = document.getElementById('colorResultText');
+            badge.classList.remove('hidden'); badge.classList.add('flex');
+
+            if (brightness > 195) {
+                text.innerText = '🤍 Твърде светло — целѝ по-точно символа';
+                clearColorFilter(false);
+            } else if (r > g + 22 && r > b + 22) {
+                text.innerText = '🔴 Прилича на червена (♥ / ♦)';
+                applyColorFilter('red');
+            } else {
+                text.innerText = '⚫ Прилича на черна (♠ / ♣)';
+                applyColorFilter('black');
+            }
+        }
+
+        function applyColorFilter(colorGuess) {
+            document.querySelectorAll('#cardGrid button').forEach(btn => {
+                const isRedSuit = ['♥', '♦'].includes(btn.dataset.suit);
+                const matches = (colorGuess === 'red' && isRedSuit) || (colorGuess === 'black' && !isRedSuit);
+                if (matches || btn.dataset.active === "1") { btn.classList.remove('opacity-25'); }
+                else { btn.classList.add('opacity-25'); }
+            });
+        }
+
+        function clearColorFilter(hideBadge = true) {
+            document.querySelectorAll('#cardGrid button').forEach(btn => btn.classList.remove('opacity-25'));
+            if (hideBadge) { document.getElementById('colorResultBadge').classList.add('hidden'); document.getElementById('colorResultBadge').classList.remove('flex'); }
         }
 
         function resetCardGrid() {
             document.querySelectorAll('#cardGrid button').forEach(b => {
                 b.dataset.active = "0";
-                b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
+                b.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105', 'opacity-25');
                 b.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
                 if (['♥', '♦'].includes(b.dataset.suit)) b.classList.add('text-red-400'); else b.classList.add('text-white');
             });
+            clearColorFilter();
             recalcScan();
         }
 
@@ -1146,7 +1235,7 @@
                         btn.dataset.active = btn.dataset.active === "1" ? "0" : "1";
                         if (btn.dataset.active === "1") {
                             btn.classList.add('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
-                            btn.classList.remove('bg-emeraldLight/30', 'hover:bg-emeraldLight/50', 'text-red-400', 'text-white');
+                            btn.classList.remove('bg-emeraldLight/30', 'hover:bg-emeraldLight/50', 'text-red-400', 'text-white', 'opacity-25');
                         } else {
                             btn.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
                             btn.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
