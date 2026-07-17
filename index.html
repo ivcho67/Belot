@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#050806">
+    <meta name="color-scheme" content="dark">
     <title>Белот Асистент Pro</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,10 +22,12 @@
                         mono: ['"Space Mono"', 'monospace'],
                     },
                     colors: {
-                        bgApp: '#050806',
-                        anthracite: '#111612',
-                        forest: '#162e20',
-                        emeraldLight: '#1f422e',
+                        // rgb(var(...) / <alpha-value>) е нужно (не просто var(...)), за да продължат да работят
+                        // всички съществуващи /opacity варианти в файла (bg-forest/20, border-emeraldLight/50 и т.н.)
+                        bgApp: 'rgb(var(--c-bgApp) / <alpha-value>)',
+                        anthracite: 'rgb(var(--c-anthracite) / <alpha-value>)',
+                        forest: 'rgb(var(--c-forest) / <alpha-value>)',
+                        emeraldLight: 'rgb(var(--c-emeraldLight) / <alpha-value>)',
                         gold: '#e3be52',
                         goldHover: '#f5d67a',
                         danger: '#ff4c4c',
@@ -39,12 +42,31 @@
         }
     </script>
     <style>
+        :root {
+            /* RGB тройки (без "rgb()" опаковка) — форматът, който Tailwind изисква за /opacity варианти */
+            --c-bgApp: 5 8 6;
+            --c-anthracite: 17 22 18;
+            --c-forest: 22 46 32;
+            --c-emeraldLight: 31 66 46;
+            --c-gradIn: #162e20;
+            --c-gradOut: #050806;
+        }
+        /* AMOLED режим: истинско черно (#000) за панелите, за да "изгасят" пикселите на OLED екрани */
+        html.amoled {
+            --c-bgApp: 0 0 0;
+            --c-anthracite: 0 0 0;
+            --c-forest: 13 24 17;
+            --c-emeraldLight: 30 46 35;
+            --c-gradIn: #0c1710;
+            --c-gradOut: #000000;
+        }
         body {
-            background-color: #050806;
-            background-image: radial-gradient(circle at 50% 0%, #162e20 0%, #050806 70%);
+            background-color: rgb(var(--c-bgApp));
+            background-image: radial-gradient(circle at 50% 0%, var(--c-gradIn) 0%, var(--c-gradOut) 70%);
             color: #ffffff;
             -webkit-tap-highlight-color: transparent;
             overscroll-behavior-y: none;
+            transition: background-color 0.3s ease;
         }
         /* Селекция на текст е позволена само в четими/въвеждащи зони, не върху бутони/контроли */
         button, nav, .no-select { -webkit-user-select: none; user-select: none; }
@@ -60,7 +82,7 @@
 
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1f422e; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgb(var(--c-emeraldLight)); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #e3be52; }
 
         input[type="number"]::-webkit-outer-spin-button,
@@ -94,6 +116,20 @@
         details .chev { transition: transform 0.25s ease; }
         details[open] .chev { transform: rotate(180deg); }
         details[open] summary { color: #e3be52; }
+
+        /* Ключ (toggle) за настройки, напр. AMOLED режим */
+        .toggle-switch { width: 44px; height: 26px; border-radius: 999px; background: rgb(var(--c-emeraldLight)); position: relative; transition: background 0.25s ease; flex: none; }
+        .toggle-switch .knob { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 999px; background: #cfd8d2; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), background 0.25s ease; }
+        .toggle-switch[data-on="1"] { background: #e3be52; }
+        .toggle-switch[data-on="1"] .knob { transform: translateX(18px); background: #111612; }
+
+        /* Под-навигация в таб "Правила" (Бързи правила / Как се играе) */
+        .rules-subtab-btn[data-active="1"] { background: #e3be52; color: #111612; }
+        .rules-subtab-content { display: none; }
+        .rules-subtab-content.active { display: block; }
+
+        /* Стъпки в подробното ръководство */
+        .step-num { width: 28px; height: 28px; border-radius: 999px; background: #e3be52; color: #111612; font-weight: 900; flex: none; display: flex; align-items: center; justify-content: center; font-size: 12px; }
     </style>
 </head>
 <body class="h-[100dvh] w-full overflow-hidden flex justify-center items-center lg:p-6 selection:bg-gold selection:text-anthracite">
@@ -101,25 +137,25 @@
     <div id="app-wrapper" class="w-full h-full lg:max-w-6xl lg:max-h-[900px] lg:rounded-3xl bg-anthracite flex flex-col lg:flex-row overflow-hidden lg:shadow-glow-lg border-0 lg:border border-emeraldLight relative">
 
         <!-- НАВИГАЦИЯ -->
-        <nav class="order-2 lg:order-1 flex-none w-full lg:w-28 h-[calc(4.5rem+env(safe-area-inset-bottom))] lg:h-full border-t border-emeraldLight/40 lg:border-t-0 lg:border-r lg:border-emeraldLight bg-anthracite/95 backdrop-blur-xl flex lg:flex-col justify-around items-center pb-[env(safe-area-inset-bottom)] lg:pb-8 lg:pt-8 z-50 relative">
+        <nav role="tablist" aria-label="Основна навигация" class="order-2 lg:order-1 flex-none w-full lg:w-28 h-[calc(4.5rem+env(safe-area-inset-bottom))] lg:h-full border-t border-emeraldLight/40 lg:border-t-0 lg:border-r lg:border-emeraldLight bg-anthracite/95 backdrop-blur-xl flex lg:flex-col justify-around items-center pb-[env(safe-area-inset-bottom)] lg:pb-8 lg:pt-8 z-50 relative">
             <div class="hidden lg:flex flex-col items-center mb-6 opacity-80">
                 <span class="text-3xl">🃏</span>
                 <span class="font-display text-[9px] font-black text-gold tracking-widest mt-1">BELOT</span>
             </div>
 
-            <button onclick="switchTab('score')" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="score" aria-label="Резултат">
+            <button onclick="switchTab('score')" role="tab" aria-selected="true" aria-controls="tab-score" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="score" aria-label="Резултат">
                 <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                 <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Резултат</span>
             </button>
-            <button onclick="switchTab('scan')" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="scan" aria-label="AI Скан">
+            <button onclick="switchTab('scan')" role="tab" aria-selected="false" aria-controls="tab-scan" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="scan" aria-label="AI Скан">
                 <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">AI Скан</span>
             </button>
-            <button onclick="switchTab('announce')" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="announce" aria-label="Анонси">
+            <button onclick="switchTab('announce')" role="tab" aria-selected="false" aria-controls="tab-announce" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="announce" aria-label="Анонси">
                 <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592L5.436 13.683M11 5.882a3 3 0 10-5.657 1.985M11 5.882l6.632-2.947a1 1 0 011.368.928v14.274a1 1 0 01-1.368.928L11 16.118M5.436 13.683A4 4 0 017 6h1.832c.531 0 1.057-.1 1.554-.297"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.436 13.683A4 4 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a4 4 0 01-1.564-.317z"></path></svg>
                 <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Анонси</span>
             </button>
-            <button onclick="switchTab('rules')" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="rules" aria-label="Правила">
+            <button onclick="switchTab('rules')" role="tab" aria-selected="false" aria-controls="tab-rules" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="rules" aria-label="Правила">
                 <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                 <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Правила</span>
             </button>
@@ -130,6 +166,9 @@
         <div class="order-1 lg:order-2 flex-1 flex flex-col relative overflow-hidden bg-transparent z-10">
 
             <header class="flex-none bg-anthracite/85 backdrop-blur-md border-b border-emeraldLight/50 pt-[max(env(safe-area-inset-top),1rem)] pb-3 px-3 lg:px-8 z-40 relative">
+                <button onclick="openSettings()" aria-label="Настройки" class="absolute top-[max(env(safe-area-inset-top),1rem)] right-3 lg:right-8 w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-emeraldLight/30 hover:bg-emeraldLight/50 flex items-center justify-center transition-all active:scale-90 z-50">
+                    <svg class="w-4 h-4 lg:w-5 lg:h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
                 <div class="max-w-4xl mx-auto flex justify-between items-end">
                     <div class="text-center w-[40%]">
                         <input type="text" id="team1Name" value="Ние" maxlength="14" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors rounded" oninput="onNameInput()" onchange="saveState()">
@@ -162,7 +201,7 @@
             <main class="flex-1 overflow-y-auto p-3 lg:p-8 w-full scroll-smooth" id="mainContainer">
 
                 <!-- ТАБ 1: РЕЗУЛТАТ / КАЛКУЛАТОР -->
-                <section id="tab-score" class="tab-content active h-full max-w-5xl mx-auto">
+                <section id="tab-score" role="tabpanel" aria-label="Резултат" class="tab-content active h-full max-w-5xl mx-auto">
 
                     <div id="gameOverBanner" class="hidden mb-4 pop-in bg-gradient-to-br from-gold/20 to-forest/30 border-2 border-gold rounded-2xl p-4 lg:p-6 text-center shadow-glow">
                         <div class="text-3xl mb-1">🏆</div>
@@ -215,21 +254,26 @@
                                     <span id="basePointsLabel" class="text-[9px] lg:text-[10px] font-black bg-gold/10 text-gold px-2.5 py-1 rounded-full border border-gold/30 uppercase tracking-wider">Общо: 258</span>
                                 </div>
 
-                                <div class="flex items-center justify-between gap-2 lg:gap-3 bg-anthracite p-2 lg:p-3 rounded-2xl border border-emeraldLight/50">
-                                    <div class="flex flex-col items-center w-1/2 relative">
+                                <div class="flex items-center justify-between gap-1.5 lg:gap-3 bg-anthracite p-2 lg:p-3 rounded-2xl border border-emeraldLight/50">
+                                    <div class="flex flex-col items-center w-[45%] relative">
                                         <label id="lblPoints1" class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 mb-1 tracking-wider truncate max-w-full">Обявил</label>
                                         <div class="flex items-center w-full gap-1">
-                                            <button onclick="adjPts(-10)" aria-label="Минус 10" class="bg-emeraldLight w-8 h-10 sm:w-10 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">−</button>
-                                            <input type="number" id="inputPoints" inputmode="numeric" pattern="[0-9]*" class="font-mono flex-grow bg-transparent text-center text-3xl sm:text-4xl lg:text-5xl font-bold text-white outline-none w-full h-10 sm:h-12 lg:h-14 focus:text-gold transition-colors rounded-lg" placeholder="0" oninput="updateCalc()" onclick="this.select()">
-                                            <button onclick="adjPts(10)" aria-label="Плюс 10" class="bg-emeraldLight w-8 h-10 sm:w-10 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all">+</button>
+                                            <button onclick="adjPts(-10,'main')" aria-label="Минус 10" class="bg-emeraldLight w-7 h-10 sm:w-9 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all flex-none">−</button>
+                                            <input type="number" id="inputPoints" inputmode="numeric" pattern="[0-9]*" class="font-mono flex-grow bg-transparent text-center text-2xl sm:text-3xl lg:text-4xl font-bold text-white outline-none w-full h-10 sm:h-12 lg:h-14 focus:text-gold transition-colors rounded-lg min-w-0" placeholder="0" oninput="updateCalc('main')" onclick="this.select()">
+                                            <button onclick="adjPts(10,'main')" aria-label="Плюс 10" class="bg-emeraldLight w-7 h-10 sm:w-9 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all flex-none">+</button>
                                         </div>
                                     </div>
-                                    <div class="text-xl lg:text-2xl text-emeraldLight font-black">/</div>
-                                    <div class="flex flex-col items-center w-1/3 opacity-50">
+                                    <div class="text-lg lg:text-xl text-emeraldLight font-black flex-none">/</div>
+                                    <div class="flex flex-col items-center w-[45%] relative">
                                         <label id="lblPoints2" class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 mb-1 tracking-wider truncate max-w-full">Другият</label>
-                                        <div id="autoPoints" class="font-mono text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-500 h-10 sm:h-12 lg:h-14 flex items-center justify-center">0</div>
+                                        <div class="flex items-center w-full gap-1">
+                                            <button onclick="adjPts(-10,'other')" aria-label="Минус 10" class="bg-emeraldLight w-7 h-10 sm:w-9 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all flex-none">−</button>
+                                            <input type="number" id="otherPoints" inputmode="numeric" pattern="[0-9]*" class="font-mono flex-grow bg-transparent text-center text-2xl sm:text-3xl lg:text-4xl font-bold text-white outline-none w-full h-10 sm:h-12 lg:h-14 focus:text-gold transition-colors rounded-lg min-w-0" placeholder="0" oninput="updateCalc('other')" onclick="this.select()">
+                                            <button onclick="adjPts(10,'other')" aria-label="Плюс 10" class="bg-emeraldLight w-7 h-10 sm:w-9 sm:h-12 lg:h-14 rounded-lg text-gray-300 active:scale-90 hover:bg-emeraldLight/80 font-bold transition-all flex-none">+</button>
+                                        </div>
                                     </div>
                                 </div>
+                                <p class="text-[9px] lg:text-[10px] text-gray-500 mt-1.5 text-center">И двете полета се пишат — другото се пресмята само, ако въведеш само едно.</p>
 
                                 <div id="capoIndicator" class="hidden mt-3 text-center pop-in">
                                     <span class="inline-flex items-center gap-1.5 bg-gold/15 border border-gold/40 text-gold text-[10px] lg:text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
@@ -306,7 +350,7 @@
                 </section>
 
                 <!-- ТАБ 2: AI СКАНИРАНЕ -->
-                <section id="tab-scan" class="tab-content h-full max-w-3xl mx-auto space-y-3 lg:space-y-5 lg:pt-2 pb-6">
+                <section id="tab-scan" role="tabpanel" aria-label="AI Скан" class="tab-content h-full max-w-3xl mx-auto space-y-3 lg:space-y-5 lg:pt-2 pb-6">
                     <div class="bg-blue-900/20 border border-blue-500/30 p-3 lg:p-4 rounded-2xl text-[11px] lg:text-sm text-blue-200 shadow-md flex items-start gap-2.5">
                         <span class="text-lg flex-none leading-none">💡</span>
                         <span>Камерата е <strong>незадължителна</strong> — просто за да гледаш картите докато броиш. Истинското пресмятане е решетката отдолу, тя работи винаги, дори без камера.</span>
@@ -363,7 +407,7 @@
                 </section>
 
                 <!-- ТАБ 3: АНОНСИ -->
-                <section id="tab-announce" class="tab-content h-full max-w-3xl mx-auto space-y-4 lg:space-y-5 lg:pt-2 pb-6">
+                <section id="tab-announce" role="tabpanel" aria-label="Анонси" class="tab-content h-full max-w-3xl mx-auto space-y-4 lg:space-y-5 lg:pt-2 pb-6">
                     <div class="bg-danger/10 border-2 border-danger/50 p-4 lg:p-5 rounded-2xl text-center shadow-md">
                         <span class="text-danger font-black text-sm lg:text-base uppercase tracking-widest">⚠️ На "Без Коз" няма анонси</span>
                         <p class="text-[10px] lg:text-xs text-gray-300 mt-1.5 font-medium">Изключение: последно 10 и капо важат винаги, дори на Без Коз.</p>
@@ -404,7 +448,14 @@
                 </section>
 
                 <!-- ТАБ 4: ПРАВИЛА (ACCORDION) -->
-                <section id="tab-rules" class="tab-content h-full max-w-3xl mx-auto pb-10 space-y-3">
+                <section id="tab-rules" role="tabpanel" aria-label="Правила" class="tab-content h-full max-w-3xl mx-auto pb-10 space-y-3">
+
+                    <div class="grid grid-cols-2 gap-1.5 lg:gap-2 bg-anthracite p-1 lg:p-1.5 rounded-xl border border-emeraldLight/30 sticky top-0 z-20 shadow-lg">
+                        <button class="rules-subtab-btn py-2.5 lg:py-3 rounded-lg font-bold text-[11px] lg:text-sm text-white transition-all active:scale-95" data-active="1" onclick="switchRulesSubTab('quick')">⚡ Бързи правила</button>
+                        <button class="rules-subtab-btn py-2.5 lg:py-3 rounded-lg font-bold text-[11px] lg:text-sm text-white transition-all active:scale-95" data-active="0" onclick="switchRulesSubTab('guide')">📖 Как се играе</button>
+                    </div>
+
+                    <div id="rulesQuick" class="rules-subtab-content active space-y-3">
 
                     <details class="bg-forest/20 rounded-2xl border border-emeraldLight/50 overflow-hidden group" open>
                         <summary class="p-4 lg:p-5 flex justify-between items-center font-black text-white text-sm lg:text-base uppercase tracking-wider">
@@ -492,13 +543,203 @@
                             <p>Ако двата отбора прекрачат 151 в едно и също раздаване, печели този с повече точки. При равенство играта продължава, докато някой поведе.</p>
                         </div>
                     </details>
+
+                    </div>
+
+                    <div id="rulesGuide" class="rules-subtab-content space-y-3">
+
+                        <div class="bg-gold/10 border border-gold/30 rounded-2xl p-3.5 lg:p-4 text-[11px] lg:text-sm text-gray-200 leading-relaxed">
+                            Пълно, подробно ръководство за игра на Белот — от подготовката до последната ръка. За бърза справка на масата виж <strong class="text-gold">"⚡ Бързи правила"</strong> горе.
+                        </div>
+
+                        <!-- СТЪПКА 1 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">1</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Подготовка</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
+                                <p>Играят 4 души в 2 отбора по 2 — партньорите сядат един срещу друг, а редуването около масата е между съперници.</p>
+                                <p>Използва се тесте от <strong class="text-gray-100">32 карти</strong> (7, 8, 9, 10, J, Q, K, A във всяка боя — без 2,3,4,5,6).</p>
+                                <p>Определя се първи раздаващ (напр. с теглене на карта — най-висока раздава първа). После раздаването се върти по часовниковата стрелка след всяко раздаване.</p>
+                            </div>
+                        </div>
+
+                        <!-- СТЪПКА 2 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">2</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Раздаване</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
+                                <p>Раздаващият дава по <strong class="text-gray-100">5 карти</strong> на всеки играч (напр. 3+2 или 2+3), по посока обратна на движението на раздаването, за да започне наддаването.</p>
+                                <p>Останалите карти (по 3 на играч) стоят настрана до избора на договор.</p>
+                            </div>
+                        </div>
+
+                        <!-- СТЪПКА 3 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">3</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Наддаване</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
+                                <p>Играчът вдясно от раздаващия започва. На свой ред всеки играч или <strong class="text-gray-100">пасува</strong>, или обявява по-силен договор от последния обявен:</p>
+                                <div class="flex flex-wrap items-center gap-1 my-2 text-[10px] lg:text-xs font-bold">
+                                    <span class="bg-anthracite px-2 py-1 rounded-lg border border-emeraldLight/50">♣ Спатия</span>→<span class="bg-anthracite px-2 py-1 rounded-lg border border-emeraldLight/50">♦ Каро</span>→<span class="bg-anthracite px-2 py-1 rounded-lg border border-emeraldLight/50">♥ Купа</span>→<span class="bg-anthracite px-2 py-1 rounded-lg border border-emeraldLight/50">♠ Пика</span>→<span class="bg-gold/20 text-gold px-2 py-1 rounded-lg border border-gold/40">Без Коз</span>→<span class="bg-gold/20 text-gold px-2 py-1 rounded-lg border border-gold/40">Всичко Коз</span>
+                                </div>
+                                <p>Играч може и просто да повтори "боя" на по-висока позиция в реда по-горе вместо конкретен цвят, ако предпочита само посоката (коз в неопределена боя се доуточнява по конвенция на групата — повечето играят с директно обявяване на цвета).</p>
+                                <p>Наддаването приключва, щом <strong class="text-gray-100">3 играча пасуват подред</strong> след последна обява. Ако всички 4 пасуват без нито един договор, картите се събират и следващият играч раздава наново.</p>
+                                <p>След избран договор, всеки от съперниците на обявилия може да каже <strong class="text-gold">"Контра"</strong> (удвоява резултата от раздаването), а обявилият отбор може да отговори с <strong class="text-gold">"Реконтра"</strong> (учетворява). И двете са незадължителни — залог за увереност в успеха/провала.</p>
+                            </div>
+                        </div>
+
+                        <!-- СТЪПКА 4 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">4</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Довършване на раздаването</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
+                                <p>След избран договор, раздаващият довършва раздаването — всеки играч получава остатъчните карти, докато всички имат по <strong class="text-gray-100">8 карти на ръка</strong>.</p>
+                            </div>
+                        </div>
+
+                        <!-- СТЪПКА 5 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">5</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Обявяване на анонси</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
+                                <p>Играч с поредица (терца/кварта/квинта), каре или "белот" (K+Q коз) го обявява гласно, докато играе <strong class="text-gray-100">първата си карта</strong> от раздаването — все едно кои карти играе.</p>
+                                <p>На "Без Коз" анонси <strong class="text-danger">не се обявяват</strong> изобщо (виж таб "Анонси" за пълните стойности и подредба при спор).</p>
+                            </div>
+                        </div>
+
+                        <!-- СТЪПКА 6 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">6</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Разиграване на ръцете</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed pl-[38px]">
+                                <p>Играе се по посока на раздаването, 8 ръце (взятки) общо. Първият играч (вдясно от раздаващия в първата ръка, после победителят на предната ръка) играе произволна карта; останалите отговарят по ред.</p>
+                                <p class="font-bold text-gray-100">Задължения при отговаряне, по договор:</p>
+                                <ul class="list-disc list-inside space-y-1.5 ml-1">
+                                    <li><strong class="text-gray-100">Боя (един коз):</strong> следваш искания цвят, ако имаш карта от него. Ако нямаш — трябва да цакаш коз. Ако вече има цакан коз преди теб от съотборник, не си длъжен да качваш; ако е цакал съперник, трябва да надцакаш, ако можеш.</li>
+                                    <li><strong class="text-gray-100">Всичко Коз:</strong> следваш цвета, ако имаш. Ако нямаш — задължително качваш с по-висока карта от вече изиграните, ако можеш (коз е всеки цвят тук).</li>
+                                    <li><strong class="text-gray-100">Без Коз:</strong> просто следваш искания цвят, ако имаш; ако нямаш — играеш каквото пожелаеш, без задължение да качваш.</li>
+                                </ul>
+                                <p>Взятката се печели от най-силната карта на искания цвят (или най-силния коз, ако е бил цакан). Победителят прибира 4-те карти и започва следващата взятка.</p>
+                                <p>Последната (8-ма) взятка носи бонус от <strong class="text-gold">10 точки</strong> ("последно 10") за отбора, който я вземе — вече е включено в общия сбор точки по-долу.</p>
+                            </div>
+                        </div>
+
+                        <!-- СТЪПКА 7 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">7</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Преброяване на точките от картите</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed pl-[38px]">
+                                <p>Всеки отбор събира точковата стойност на картите от взетите си взятки:</p>
+                                <div class="bg-anthracite rounded-xl border border-emeraldLight/50 p-3 overflow-x-auto">
+                                    <table class="w-full text-[11px] lg:text-xs min-w-[240px]">
+                                        <thead><tr class="text-gray-500 uppercase text-[9px]"><th class="text-left pb-1.5">Карта</th><th class="pb-1.5">В коз</th><th class="pb-1.5">Не в коз</th></tr></thead>
+                                        <tbody class="font-mono text-gray-200">
+                                            <tr><td class="py-0.5">J</td><td class="text-center text-gold">20</td><td class="text-center">2</td></tr>
+                                            <tr><td class="py-0.5">9</td><td class="text-center text-gold">14</td><td class="text-center">0</td></tr>
+                                            <tr><td class="py-0.5">A</td><td class="text-center">11</td><td class="text-center">11</td></tr>
+                                            <tr><td class="py-0.5">10</td><td class="text-center">10</td><td class="text-center">10</td></tr>
+                                            <tr><td class="py-0.5">K</td><td class="text-center">4</td><td class="text-center">4</td></tr>
+                                            <tr><td class="py-0.5">Q</td><td class="text-center">3</td><td class="text-center">3</td></tr>
+                                            <tr><td class="py-0.5">8 / 7</td><td class="text-center">0</td><td class="text-center">0</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p>Общо за раздаването (с последно 10): <strong class="text-gray-100">Боя = 162</strong> · <strong class="text-gray-100">Всичко Коз = 258</strong> · <strong class="text-gray-100">Без Коз = 130</strong> (но точките после се удвояват → 260).</p>
+                                <p>Към точките от картите се добавят обявените анонси (терца/кварта/квинта/каре/белот) на всеки отбор.</p>
+                            </div>
+                        </div>
+
+                        <!-- СТЪПКА 8 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">8</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Кой печели раздаването</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed pl-[38px]">
+                                <p>Сравняват се общите точки (карти + анонси) на обявилия отбор срещу другия:</p>
+                                <div class="space-y-2">
+                                    <div class="bg-anthracite/60 rounded-xl p-2.5 border-l-4 border-success"><strong class="text-success">Изкарана</strong> — обявилият има повече точки. Всеки отбор си записва каквото реално е събрал.</div>
+                                    <div class="bg-anthracite/60 rounded-xl p-2.5 border-l-4 border-danger"><strong class="text-danger">Вкарана</strong> — обявилият има по-малко. Целият пул (карти на двата отбора + всички анонси) отива при съперника; обявилият записва 0.</div>
+                                    <div class="bg-anthracite/60 rounded-xl p-2.5 border-l-4 border-gray-400"><strong class="text-gray-300">Висяща</strong> — точно равенство. Обявилият пак записва 0, но точките му не изчезват — те "висят" и се прибавят към отбора, който спечели следващото решаващо (неувиснало) раздаване.</div>
+                                </div>
+                                <p class="text-[11px] text-gray-400">💡 На "Всичко Коз", ако двата резултата завършат на цифра 4 — по-малкият закръгля нагоре вместо надолу, за да не се "губи" точка при закръгляне.</p>
+                            </div>
+                        </div>
+
+                        <!-- СТЪПКА 9 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">9</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Капо, Контра и Реконтра</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed pl-[38px]">
+                                <p><strong class="text-gold">Капо (Валат):</strong> ако отбор вземе абсолютно всички 8 взятки, получава бонус от <strong class="text-gold">+90 точки</strong> отгоре. Не се удвоява на "Без Коз", но <strong>се</strong> удвоява/учетворява при контра/реконтра. Играта не може да се спечели директно с капо — ако той би прекрачил 151, играете поне още едно раздаване.</p>
+                                <p><strong class="text-gold">Контра / Реконтра:</strong> ако е било обявено по време на наддаването, целият пул точки от раздаването (карти + анонси + капо) се удвоява (контра) или учетворява (реконтра) и отива <strong>изцяло</strong> при отбора с повече точки — другият пише 0, без значение кой е викал контрата.</p>
+                            </div>
+                        </div>
+
+                        <!-- СТЪПКА 10 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">10</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Записване на резултата</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
+                                <p>Крайната сума за всеки отбор се дели на 10 и се закръгля до цяло число — това число се прибавя към резултата от играта (не към точките от раздаването).</p>
+                                <p>Раздаването приключва, картите се събират, разбъркват се и се раздават наново — раздаващият се сменя с играча вдясно.</p>
+                            </div>
+                        </div>
+
+                        <!-- СТЪПКА 11 -->
+                        <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
+                            <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">11</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Край на играта</h3></div>
+                            <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
+                                <p>Играят се последователни раздавания, докато някой отбор достигне <strong class="text-gold">целевия резултат</strong> (по подразбиране 151 точки — сменяем от ⚙️ Настройки).</p>
+                                <p>Ако двата отбора прекрачат целта в едно и също раздаване, печели този с повече точки. При точно равенство играта продължава до първия отбор, който поведе.</p>
+                                <p class="font-bold text-gold">Честита игра! 🃏</p>
+                            </div>
+                        </div>
+
+                    </div>
                 </section>
             </main>
         </div>
     </div>
 
+    <!-- НАСТРОЙКИ -->
+    <div id="settingsOverlay" onclick="if(event.target===this) closeSettings()" role="dialog" aria-modal="true" aria-label="Настройки" class="fixed inset-0 bg-bgApp/95 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-200">
+        <div class="bg-anthracite border border-emeraldLight p-5 lg:p-6 rounded-3xl max-w-[90%] sm:max-w-sm w-full max-h-[88vh] overflow-y-auto transform scale-95 transition-transform duration-200 shadow-2xl" id="settingsBox">
+            <div class="flex justify-between items-center mb-4 lg:mb-5">
+                <h3 class="text-lg lg:text-xl font-black text-white font-display uppercase tracking-wider">Настройки</h3>
+                <button onclick="closeSettings()" class="w-8 h-8 rounded-full bg-emeraldLight/30 hover:bg-emeraldLight/50 flex items-center justify-center text-gray-300 active:scale-90 transition-all" aria-label="Затвори">✕</button>
+            </div>
+
+            <div class="space-y-3.5 lg:space-y-4 font-sans">
+                <div class="flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
+                    <div>
+                        <div class="text-xs lg:text-sm font-bold text-white">AMOLED режим</div>
+                        <div class="text-[10px] text-gray-500 mt-0.5 leading-snug">Чисто черен фон — пести батерия на OLED/AMOLED екрани</div>
+                    </div>
+                    <button id="amoledToggle" class="toggle-switch" data-on="0" onclick="toggleAmoled()" aria-label="AMOLED режим"><div class="knob"></div></button>
+                </div>
+
+                <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
+                    <div class="text-xs lg:text-sm font-bold text-white mb-1">Цел за край на играта</div>
+                    <div class="text-[10px] text-gray-500 mb-2.5 leading-snug">По правило 151 точки — смени, ако играете на друга цел.</div>
+                    <div class="flex gap-1.5 mb-2">
+                        <button id="presetBtn101" onclick="setTargetPreset(101)" class="target-preset-btn flex-1 bg-anthracite border border-emeraldLight/50 text-gray-300 text-[10px] font-bold py-2 rounded-lg active:scale-95 transition-all">101</button>
+                        <button id="presetBtn151" onclick="setTargetPreset(151)" class="target-preset-btn flex-1 bg-anthracite border border-emeraldLight/50 text-gray-300 text-[10px] font-bold py-2 rounded-lg active:scale-95 transition-all">151</button>
+                        <button id="presetBtn201" onclick="setTargetPreset(201)" class="target-preset-btn flex-1 bg-anthracite border border-emeraldLight/50 text-gray-300 text-[10px] font-bold py-2 rounded-lg active:scale-95 transition-all">201</button>
+                    </div>
+                    <input type="number" id="targetScoreInput" min="21" max="9999" inputmode="numeric" class="w-full bg-anthracite border border-emeraldLight/50 rounded-lg text-center font-mono text-xl font-bold text-gold py-2 outline-none focus:border-gold" oninput="onTargetScoreInput()">
+                </div>
+
+                <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
+                    <div class="text-xs lg:text-sm font-bold text-white mb-1">Начални / коригирани точки</div>
+                    <div class="text-[10px] text-gray-500 mb-2.5 leading-snug">За продължаване на игра от хартия — прибавя се към сбора от изиграните раздавания в приложението.</div>
+                    <div class="flex gap-2 items-start">
+                        <div class="flex-1">
+                            <label class="text-[9px] uppercase font-bold text-gray-500 block mb-1 truncate" id="adjLabel1">Ние</label>
+                            <input type="number" id="adjInput1" inputmode="numeric" class="w-full bg-anthracite border border-emeraldLight/50 rounded-lg text-center font-mono text-lg font-bold text-white py-2 outline-none focus:border-gold" oninput="onAdjustmentInput()">
+                        </div>
+                        <div class="flex-1">
+                            <label class="text-[9px] uppercase font-bold text-gray-500 block mb-1 truncate" id="adjLabel2">Вие</label>
+                            <input type="number" id="adjInput2" inputmode="numeric" class="w-full bg-anthracite border border-emeraldLight/50 rounded-lg text-center font-mono text-lg font-bold text-white py-2 outline-none focus:border-gold" oninput="onAdjustmentInput()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeSettings()" class="mt-4 lg:mt-5 w-full bg-gold text-anthracite font-black p-3 rounded-xl uppercase text-xs tracking-wider active:scale-95 transition-all">Готово</button>
+        </div>
+    </div>
+
     <!-- МОДАЛ И TOASTS -->
-    <div id="modalOverlay" class="fixed inset-0 bg-bgApp/95 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-200">
+    <div id="modalOverlay" onclick="if(event.target===this) closeModal()" role="dialog" aria-modal="true" aria-label="Потвърждение" class="fixed inset-0 bg-bgApp/95 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-200">
         <div class="bg-anthracite border border-emeraldLight p-5 lg:p-6 rounded-3xl max-w-[90%] sm:max-w-sm w-full transform scale-95 transition-transform duration-200 shadow-2xl" id="modalBox">
             <h3 class="text-lg lg:text-xl font-black text-white mb-2 font-display uppercase tracking-wider">Потвърждение</h3>
             <p id="modalMsg" class="text-xs lg:text-sm text-gray-400 mb-6 lg:mb-8 font-semibold"></p>
@@ -515,7 +756,8 @@
         let state = {
             t1Name: "Ние", t2Name: "Вие", total1: 0, total2: 0, hangingPoints: 0, rounds: [],
             currentContract: 'all', currentSuit: '', targetScore: 151,
-            gameOver: false, winner: null
+            gameOver: false, winner: null, amoledMode: false,
+            manualAdjustment: { us: 0, them: 0 }
         };
 
         // cat: 'belot' (независим), 'seq' (терца/кварта/квинта - йерархия по tier), 'careta' (йерархия по tier)
@@ -544,10 +786,20 @@
             }
             if (state.hangingPoints === undefined) state.hangingPoints = 0;
             if (state.gameOver === undefined) state.gameOver = false;
-            if (state.targetScore !== 151) state.targetScore = 151; // миграция от стара грешна логика (251 за Без Коз)
+            if (!state.targetScore || state.targetScore === 251) state.targetScore = 151; // миграция: старата грешна логика слагаше 251 за Без Коз
+            if (state.amoledMode === undefined) state.amoledMode = false;
+            if (!state.manualAdjustment) state.manualAdjustment = { us: 0, them: 0 };
 
             document.getElementById('team1Name').value = state.t1Name;
             document.getElementById('team2Name').value = state.t2Name;
+            document.documentElement.classList.toggle('amoled', state.amoledMode);
+            document.getElementById('amoledToggle').dataset.on = state.amoledMode ? "1" : "0";
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', state.amoledMode ? '#000000' : '#050806');
+            document.getElementById('targetScoreInput').value = state.targetScore;
+            document.getElementById('targetScoreLabel').innerText = `Цел: ${state.targetScore}`;
+            highlightTargetPreset(state.targetScore);
+            document.getElementById('adjInput1').value = state.manualAdjustment.us;
+            document.getElementById('adjInput2').value = state.manualAdjustment.them;
 
             buildAnnouncementsUI();
             buildCardGrid();
@@ -581,6 +833,8 @@
             document.getElementById('historyHeadThem').innerText = state.t2Name;
             document.getElementById('annTeamLabel1').innerText = state.t1Name;
             document.getElementById('annTeamLabel2').innerText = state.t2Name;
+            document.getElementById('adjLabel1').innerText = state.t1Name;
+            document.getElementById('adjLabel2').innerText = state.t2Name;
         }
 
         /* ======================= TOASTS / MODAL ======================= */
@@ -612,6 +866,61 @@
             setTimeout(() => overlay.classList.add('hidden'), 200);
         }
 
+        /* ======================= НАСТРОЙКИ ======================= */
+        function openSettings() {
+            const overlay = document.getElementById('settingsOverlay');
+            const box = document.getElementById('settingsBox');
+            overlay.classList.remove('hidden'); overlay.classList.add('flex');
+            setTimeout(() => { overlay.classList.remove('opacity-0'); box.classList.remove('scale-95'); }, 10);
+        }
+
+        function closeSettings() {
+            const overlay = document.getElementById('settingsOverlay');
+            const box = document.getElementById('settingsBox');
+            overlay.classList.add('opacity-0'); box.classList.add('scale-95');
+            setTimeout(() => { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }, 200);
+        }
+
+        function toggleAmoled() {
+            state.amoledMode = !state.amoledMode;
+            document.documentElement.classList.toggle('amoled', state.amoledMode);
+            document.getElementById('amoledToggle').dataset.on = state.amoledMode ? "1" : "0";
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', state.amoledMode ? '#000000' : '#050806');
+            saveState();
+        }
+
+        function setTargetPreset(val) {
+            document.getElementById('targetScoreInput').value = val;
+            onTargetScoreInput();
+        }
+
+        function highlightTargetPreset(val) {
+            [101, 151, 201].forEach(p => {
+                const btn = document.getElementById('presetBtn' + p);
+                if (p === val) { btn.classList.add('bg-gold', 'text-anthracite', 'border-gold'); btn.classList.remove('bg-anthracite', 'text-gray-300', 'border-emeraldLight/50'); }
+                else { btn.classList.remove('bg-gold', 'text-anthracite', 'border-gold'); btn.classList.add('bg-anthracite', 'text-gray-300', 'border-emeraldLight/50'); }
+            });
+        }
+
+        function onTargetScoreInput() {
+            let val = parseInt(document.getElementById('targetScoreInput').value);
+            if (isNaN(val) || val < 21) return; // изчакваме валидна стойност, без да пренаписваме state с боклук докато потребителят пише
+            state.targetScore = val;
+            document.getElementById('targetScoreLabel').innerText = `Цел: ${val}`;
+            highlightTargetPreset(val);
+            updateOverallScore();
+            saveState();
+        }
+
+        function onAdjustmentInput() {
+            let v1 = parseInt(document.getElementById('adjInput1').value);
+            let v2 = parseInt(document.getElementById('adjInput2').value);
+            state.manualAdjustment.us = isNaN(v1) ? 0 : v1;
+            state.manualAdjustment.them = isNaN(v2) ? 0 : v2;
+            updateOverallScore();
+            saveState();
+        }
+
         /* ======================= TABS ======================= */
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -619,9 +928,20 @@
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 if (btn.dataset.target === tabId) {
                     btn.classList.add('text-gold', 'bg-emeraldLight/10'); btn.classList.remove('text-gray-500');
+                    btn.setAttribute('aria-selected', 'true');
                 } else {
                     btn.classList.remove('text-gold', 'bg-emeraldLight/10'); btn.classList.add('text-gray-500');
+                    btn.setAttribute('aria-selected', 'false');
                 }
+            });
+            document.getElementById('mainContainer').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function switchRulesSubTab(id) {
+            document.querySelectorAll('.rules-subtab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(id === 'guide' ? 'rulesGuide' : 'rulesQuick').classList.add('active');
+            document.querySelectorAll('.rules-subtab-btn').forEach(btn => {
+                btn.dataset.active = (btn.getAttribute('onclick').includes(`'${id}'`)) ? "1" : "0";
             });
             document.getElementById('mainContainer').scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -811,37 +1131,54 @@
         }
 
         /* ======================= POINTS / CAPO ======================= */
-        function adjPts(amount) {
-            let input = document.getElementById('inputPoints'); let val = parseInt(input.value) || 0;
+        function adjPts(amount, field) {
+            const id = field === 'other' ? 'otherPoints' : 'inputPoints';
+            let input = document.getElementById(id); let val = parseInt(input.value) || 0;
             val += amount; if (val < 0) val = 0;
             const max = getBaseForContract(state.currentContract); if (val > max) val = max;
-            input.value = val; updateCalc();
+            input.value = val; updateCalc(field === 'other' ? 'other' : 'main');
         }
 
-        function updateCalc() {
+        // Двете полета (обявил / другият) са напълно редактируеми и се държат в синхрон — където и да
+        // пишеш, другото поле автоматично допълва до общата сума за избрания договор.
+        function updateCalc(source) {
             const base = getBaseForContract(state.currentContract);
-            let inputEl = document.getElementById('inputPoints'); let inputVal = parseInt(inputEl.value);
-            const capoBox = document.getElementById('capoIndicator');
+            const input1 = document.getElementById('inputPoints');
+            const input2 = document.getElementById('otherPoints');
 
-            if (isNaN(inputVal)) {
-                document.getElementById('autoPoints').innerText = base;
-                capoBox.classList.add('hidden');
-                return;
+            let val1, val2;
+            if (source === 'other') {
+                val2 = parseInt(input2.value);
+                if (isNaN(val2)) { input1.value = ''; updateCapoIndicator(NaN, NaN, base); return; }
+                if (val2 > base) { val2 = base; input2.value = base; }
+                if (val2 < 0) { val2 = 0; input2.value = 0; }
+                val1 = base - val2;
+                input1.value = val1;
+            } else {
+                val1 = parseInt(input1.value);
+                if (isNaN(val1)) { input2.value = ''; updateCapoIndicator(NaN, NaN, base); return; }
+                if (val1 > base) { val1 = base; input1.value = base; }
+                if (val1 < 0) { val1 = 0; input1.value = 0; }
+                val2 = base - val1;
+                input2.value = val2;
             }
-            if (inputVal > base) { inputVal = base; inputEl.value = base; }
-            if (inputVal < 0) { inputVal = 0; inputEl.value = 0; }
-            document.getElementById('autoPoints').innerText = base - inputVal;
+            updateCapoIndicator(val1, val2, base);
+        }
 
-            // Капо се засича автоматично: 0 точки (обявилият е "капутиран") или пълния максимум (обявилият взима всичко)
+        // Капо се засича автоматично: 0 точки (обявилият е "капутиран") или пълния максимум (обявилият взима всичко)
+        function updateCapoIndicator(val1, val2, base) {
+            const capoBox = document.getElementById('capoIndicator');
+            if (isNaN(val1) || isNaN(val2)) { capoBox.classList.add('hidden'); return; }
+
             const callerBtn = document.querySelector('.caller-btn[data-active="1"]');
             const callerId = callerBtn ? callerBtn.dataset.caller : '1';
             const callerName = callerId === '1' ? state.t1Name : state.t2Name;
             const otherName = callerId === '1' ? state.t2Name : state.t1Name;
 
-            if (inputVal === base && base > 0) {
+            if (val1 === base && base > 0) {
                 capoBox.classList.remove('hidden');
                 document.getElementById('capoTeamName').innerText = callerName;
-            } else if (inputVal === 0) {
+            } else if (val1 === 0) {
                 capoBox.classList.remove('hidden');
                 document.getElementById('capoTeamName').innerText = otherName;
             } else {
@@ -961,8 +1298,9 @@
         /* ======================= GAME END ======================= */
         // Връща true ако капо блокира прекратяването на играта, за да покажем допълнително известие
         function checkGameEnd(wasCapoThisRound) {
-            const t1 = state.rounds.reduce((a, r) => a + r.p1, 0);
-            const t2 = state.rounds.reduce((a, r) => a + r.p2, 0);
+            const adj = state.manualAdjustment || { us: 0, them: 0 };
+            const t1 = state.rounds.reduce((a, r) => a + r.p1, 0) + (adj.us || 0);
+            const t2 = state.rounds.reduce((a, r) => a + r.p2, 0) + (adj.them || 0);
             const cross1 = t1 >= state.targetScore, cross2 = t2 >= state.targetScore;
 
             if (!cross1 && !cross2) { state.gameOver = false; state.winner = null; return false; }
@@ -1000,8 +1338,9 @@
 
         /* ======================= SCORE / HISTORY ======================= */
         function updateOverallScore() {
-            state.total1 = state.rounds.reduce((a, r) => a + r.p1, 0);
-            state.total2 = state.rounds.reduce((a, r) => a + r.p2, 0);
+            const adj = state.manualAdjustment || { us: 0, them: 0 };
+            state.total1 = state.rounds.reduce((a, r) => a + r.p1, 0) + (adj.us || 0);
+            state.total2 = state.rounds.reduce((a, r) => a + r.p2, 0) + (adj.them || 0);
             document.getElementById('score1').innerText = state.total1;
             document.getElementById('score2').innerText = state.total2;
             const p1Percent = Math.min((state.total1 / state.targetScore) * 100, 100);
@@ -1051,6 +1390,9 @@
 
         function resetGame() {
             state.rounds = []; state.hangingPoints = 0; state.gameOver = false; state.winner = null;
+            state.manualAdjustment = { us: 0, them: 0 };
+            document.getElementById('adjInput1').value = 0;
+            document.getElementById('adjInput2').value = 0;
             updateOverallScore(); renderHistory(); saveState();
             showToast("Нова игра започната!");
         }
