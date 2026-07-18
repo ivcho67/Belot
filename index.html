@@ -318,9 +318,15 @@
 
                             <!-- История -->
                             <div class="flex-grow flex flex-col min-h-[250px] lg:min-h-0">
-                                <div class="flex justify-between items-center mb-2 lg:mb-3 px-1 flex-none">
+                                <div class="flex justify-between items-center mb-2 lg:mb-3 px-1 flex-none gap-2">
                                     <h3 class="font-black text-base lg:text-lg text-white">История</h3>
-                                    <button onclick="confirmAction('Искате ли да изтриете последното раздаване?', undoLast)" class="text-[10px] lg:text-xs font-bold text-danger/80 hover:text-danger bg-danger/10 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full transition-colors cursor-pointer uppercase tracking-wider">Върни ход</button>
+                                    <div class="flex gap-1.5 flex-none">
+                                        <button onclick="shareResults()" aria-label="Сподели резултата" class="text-[10px] lg:text-xs font-bold text-gold/90 hover:text-gold bg-gold/10 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full transition-colors cursor-pointer uppercase tracking-wider flex items-center gap-1">
+                                            <svg class="w-3 h-3 lg:w-3.5 lg:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342a3 3 0 100-2.684M8.684 13.342l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 8.658a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                                            Сподели
+                                        </button>
+                                        <button onclick="requestUndo()" class="text-[10px] lg:text-xs font-bold text-danger/80 hover:text-danger bg-danger/10 px-2 lg:px-3 py-1 lg:py-1.5 rounded-full transition-colors cursor-pointer uppercase tracking-wider">Върни ход</button>
+                                    </div>
                                 </div>
                                 <div class="bg-anthracite rounded-2xl border border-emeraldLight/50 lg:border-emeraldLight overflow-hidden shadow-lg flex-grow flex flex-col relative">
                                     <div class="overflow-y-auto flex-grow">
@@ -463,9 +469,9 @@
                             <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
                         <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed border-t border-emeraldLight/30 pt-3">
-                            <p>Всеки играч получава 5 карти. Играчът вдясно от раздаващия предлага пръв: боя, "Без Коз", "Всичко Коз" — или пасува.</p>
-                            <p>Силата расте така: <strong class="text-gray-100">Спатия → Каро → Купа → Пика → Без Коз → Всичко Коз</strong>.</p>
-                            <p>При 3 паса подред наддаването приключва и се пада на следващия играч да раздава.</p>
+                            <p>Раздава се по 3, после по още 2 карти на играч (общо 5). Играчът вдясно от раздаващия наддава пръв: боя, "Без Коз", "Всичко Коз" — или пас.</p>
+                            <p>Силата расте така: <strong class="text-gray-100">Спатия → Каро → Купа → Пика → Без Коз → Всичко Коз</strong>. При 3 паса подред след избран договор наддаването приключва и раздаващият довършва до 8 карти на играч.</p>
+                            <p>Ако <strong class="text-gray-100">всички</strong> пасуват, без никой да е обявил договор, картите се събират и раздава следващият играч (вдясно от сегашния).</p>
                         </div>
                     </details>
 
@@ -475,8 +481,8 @@
                             <svg class="chev w-5 h-5 text-gold flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </summary>
                         <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed border-t border-emeraldLight/30 pt-3">
-                            <p><strong class="text-gray-100">Боя:</strong> следваш цвета; ако нямаш — цакаш коз (и качваш коз, ако противник вече е цакал).</p>
-                            <p><strong class="text-gray-100">Всичко Коз:</strong> следваш цвета и винаги качваш по-висока карта, ако можеш.</p>
+                            <p><strong class="text-gray-100">Боя:</strong> следваш цвета, ако имаш. Нямаш ли, и взятката е на противника — цакаш коз (и надцакваш, ако той вече е цакал). Ако взятката е на партньора ти, играеш каквото пожелаеш.</p>
+                            <p><strong class="text-gray-100">Всичко Коз:</strong> следваш цвета и си длъжен да качиш по-висока карта, ако можеш — независимо кой води взятката, дори партньорът ти.</p>
                             <p><strong class="text-gray-100">Без Коз:</strong> просто следваш искания цвят — без коз, без задължително качване.</p>
                         </div>
                     </details>
@@ -566,8 +572,8 @@
                         <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
                             <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">2</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Раздаване</h3></div>
                             <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
-                                <p>Раздаващият дава по <strong class="text-gray-100">5 карти</strong> на всеки играч (напр. 3+2 или 2+3), по посока обратна на движението на раздаването, за да започне наддаването.</p>
-                                <p>Останалите карти (по 3 на играч) стоят настрана до избора на договор.</p>
+                                <p>Раздаващият дава по <strong class="text-gray-100">3, после по още 2 карти</strong> на всеки играч (общо 5), в посока обратна на часовниковата стрелка.</p>
+                                <p>Останалите карти стоят настрана до избора на договор.</p>
                             </div>
                         </div>
 
@@ -575,13 +581,12 @@
                         <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
                             <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">3</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Наддаване</h3></div>
                             <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
-                                <p>Играчът вдясно от раздаващия започва. На свой ред всеки играч или <strong class="text-gray-100">пасува</strong>, или обявява по-силен договор от последния обявен:</p>
+                                <p>Играчът вдясно от раздаващия започва. На свой ред всеки играч или <strong class="text-gray-100">пасува</strong>, или обявява по-силен вариант от последния обявен:</p>
                                 <div class="flex flex-wrap items-center gap-1 my-2 text-[10px] lg:text-xs font-bold">
                                     <span class="bg-anthracite px-2 py-1 rounded-lg border border-emeraldLight/50">♣ Спатия</span>→<span class="bg-anthracite px-2 py-1 rounded-lg border border-emeraldLight/50">♦ Каро</span>→<span class="bg-anthracite px-2 py-1 rounded-lg border border-emeraldLight/50">♥ Купа</span>→<span class="bg-anthracite px-2 py-1 rounded-lg border border-emeraldLight/50">♠ Пика</span>→<span class="bg-gold/20 text-gold px-2 py-1 rounded-lg border border-gold/40">Без Коз</span>→<span class="bg-gold/20 text-gold px-2 py-1 rounded-lg border border-gold/40">Всичко Коз</span>
                                 </div>
-                                <p>Играч може и просто да повтори "боя" на по-висока позиция в реда по-горе вместо конкретен цвят, ако предпочита само посоката (коз в неопределена боя се доуточнява по конвенция на групата — повечето играят с директно обявяване на цвета).</p>
-                                <p>Наддаването приключва, щом <strong class="text-gray-100">3 играча пасуват подред</strong> след последна обява. Ако всички 4 пасуват без нито един договор, картите се събират и следващият играч раздава наново.</p>
-                                <p>След избран договор, всеки от съперниците на обявилия може да каже <strong class="text-gold">"Контра"</strong> (удвоява резултата от раздаването), а обявилият отбор може да отговори с <strong class="text-gold">"Реконтра"</strong> (учетворява). И двете са незадължителни — залог за увереност в успеха/провала.</p>
+                                <p>Щом <strong class="text-gray-100">трима играчи подред пасуват</strong> след обявен договор, наддаването приключва — и той е избраният вариант за раздаването. Ако <strong class="text-gray-100">всички четирима</strong> пасуват, без никой да е обявил договор, картите се събират и раздава следващият по ред играч (вдясно от сегашния раздаващ).</p>
+                                <p>Щом последната обява е на противников играч, всеки от отбора му може да каже <strong class="text-gold">"Контра"</strong> — залог, че ще победи при неговия договор (удвоява резултата). Отборът, обявил договора, може да отговори с <strong class="text-gold">"Реконтра"</strong> (учетворява).</p>
                             </div>
                         </div>
 
@@ -589,7 +594,7 @@
                         <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
                             <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">4</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Довършване на раздаването</h3></div>
                             <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
-                                <p>След избран договор, раздаващият довършва раздаването — всеки играч получава остатъчните карти, докато всички имат по <strong class="text-gray-100">8 карти на ръка</strong>.</p>
+                                <p>Раздаващият довършва — раздава по <strong class="text-gray-100">още 3 карти</strong> на всеки играч, докато всички имат по <strong class="text-gray-100">8 карти на ръка</strong>.</p>
                             </div>
                         </div>
 
@@ -597,7 +602,8 @@
                         <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
                             <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">5</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Обявяване на анонси</h3></div>
                             <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
-                                <p>Играч с поредица (терца/кварта/квинта), каре или "белот" (K+Q коз) го обявява гласно, докато играе <strong class="text-gray-100">първата си карта</strong> от раздаването — все едно кои карти играе.</p>
+                                <p>Играч с поредица (терца/кварта/квинта), каре или "белот" (K+Q коз) го обявява гласно, докато играе <strong class="text-gray-100">първата си карта</strong> от раздаването — все едно дали тя участва в комбинацията.</p>
+                                <p>За "белот" конкретно, обявяването става при първата от двете карти (K или Q), стига да е: първа изиграна карта на взятката, ИЛИ отговаряш с нея на искания цвят, ИЛИ цакаш/надцакваш/подцакваш с нея при коз.</p>
                                 <p>На "Без Коз" анонси <strong class="text-danger">не се обявяват</strong> изобщо (виж таб "Анонси" за пълните стойности и подредба при спор).</p>
                             </div>
                         </div>
@@ -606,11 +612,11 @@
                         <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
                             <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">6</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Разиграване на ръцете</h3></div>
                             <div class="text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed pl-[38px]">
-                                <p>Играе се по посока на раздаването, 8 ръце (взятки) общо. Първият играч (вдясно от раздаващия в първата ръка, после победителят на предната ръка) играе произволна карта; останалите отговарят по ред.</p>
+                                <p>Играе се 8 ръце (взятки) общо. Играчът вдясно от раздаващия играе първата карта на първата взятка; после винаги започва победителят на предната взятка. Останалите отговарят по ред (по посока обратна на часовниковата стрелка).</p>
                                 <p class="font-bold text-gray-100">Задължения при отговаряне, по договор:</p>
                                 <ul class="list-disc list-inside space-y-1.5 ml-1">
-                                    <li><strong class="text-gray-100">Боя (един коз):</strong> следваш искания цвят, ако имаш карта от него. Ако нямаш — трябва да цакаш коз. Ако вече има цакан коз преди теб от съотборник, не си длъжен да качваш; ако е цакал съперник, трябва да надцакаш, ако можеш.</li>
-                                    <li><strong class="text-gray-100">Всичко Коз:</strong> следваш цвета, ако имаш. Ако нямаш — задължително качваш с по-висока карта от вече изиграните, ако можеш (коз е всеки цвят тук).</li>
+                                    <li><strong class="text-gray-100">Боя (един коз):</strong> следваш искания цвят, ако имаш карта от него. Ако нямаш И взятката в момента е на противника — трябва да цакаш коз (и да надцакаш, ако той вече е цакал; без по-висок коз, играеш каквото искаш). Ако взятката е на партньора ти, не си длъжен да цакаш.</li>
+                                    <li><strong class="text-gray-100">Всичко Коз:</strong> следваш цвета, ако имаш. Ако нямаш — задължително качваш с по-висока карта от вече изиграните, ако можеш (коз е всеки цвят тук, а качването важи независимо кой води взятката до момента).</li>
                                     <li><strong class="text-gray-100">Без Коз:</strong> просто следваш искания цвят, ако имаш; ако нямаш — играеш каквото пожелаеш, без задължение да качваш.</li>
                                 </ul>
                                 <p>Взятката се печели от най-силната карта на искания цвят (или най-силния коз, ако е бил цакан). Победителят прибира 4-те карти и започва следващата взятка.</p>
@@ -660,7 +666,7 @@
                         <div class="bg-forest/20 rounded-2xl border border-emeraldLight/50 p-4 lg:p-5">
                             <div class="flex items-center gap-2.5 mb-2.5"><div class="step-num">9</div><h3 class="font-black text-white text-sm lg:text-base uppercase tracking-wide">Капо, Контра и Реконтра</h3></div>
                             <div class="text-xs lg:text-sm text-gray-300 space-y-2.5 leading-relaxed pl-[38px]">
-                                <p><strong class="text-gold">Капо (Валат):</strong> ако отбор вземе абсолютно всички 8 взятки, получава бонус от <strong class="text-gold">+90 точки</strong> отгоре. Не се удвоява на "Без Коз", но <strong>се</strong> удвоява/учетворява при контра/реконтра. Играта не може да се спечели директно с капо — ако той би прекрачил 151, играете поне още едно раздаване.</p>
+                                <p><strong class="text-gold">Капо (Валат):</strong> ако отбор вземе абсолютно всички 8 взятки, получава бонус от <strong class="text-gold">+90 точки</strong> отгоре. Не се удвоява на "Без Коз", но <strong>се</strong> удвоява/учетворява при контра/реконтра. Играта не може да се спечели директно с капо — ако той би прекрачил целта, се изиграва поне още едно раздаване (не се брои раздаване без обявен договор, нито друго капо — ако и то е капо, играете пак още едно).</p>
                                 <p><strong class="text-gold">Контра / Реконтра:</strong> ако е било обявено по време на наддаването, целият пул точки от раздаването (карти + анонси + капо) се удвоява (контра) или учетворява (реконтра) и отива <strong>изцяло</strong> при отбора с повече точки — другият пише 0, без значение кой е викал контрата.</p>
                             </div>
                         </div>
@@ -699,6 +705,7 @@
             </div>
 
             <div class="space-y-3.5 lg:space-y-4 font-sans">
+                <p class="text-[10px] font-black text-gold uppercase tracking-widest -mb-1">Изглед</p>
                 <div class="flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
                     <div>
                         <div class="text-xs lg:text-sm font-bold text-white">AMOLED режим</div>
@@ -707,6 +714,7 @@
                     <button id="amoledToggle" class="toggle-switch" data-on="0" onclick="toggleAmoled()" aria-label="AMOLED режим"><div class="knob"></div></button>
                 </div>
 
+                <p class="text-[10px] font-black text-gold uppercase tracking-widest !mt-5 -mb-1">Игра</p>
                 <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
                     <div class="text-xs lg:text-sm font-bold text-white mb-1">Цел за край на играта</div>
                     <div class="text-[10px] text-gray-500 mb-2.5 leading-snug">По правило 151 точки — смени, ако играете на друга цел.</div>
@@ -731,6 +739,54 @@
                             <input type="number" id="adjInput2" inputmode="numeric" class="w-full bg-anthracite border border-emeraldLight/50 rounded-lg text-center font-mono text-lg font-bold text-white py-2 outline-none focus:border-gold" oninput="onAdjustmentInput()">
                         </div>
                     </div>
+                </div>
+
+                <div class="flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
+                    <div>
+                        <div class="text-xs lg:text-sm font-bold text-white">Таб "AI Скан"</div>
+                        <div class="text-[10px] text-gray-500 mt-0.5 leading-snug">Скрий го, ако не го използваш — навигацията остава по-чиста</div>
+                    </div>
+                    <button id="scanTabToggle" class="toggle-switch" data-on="1" onclick="toggleScanTabVisibility()" aria-label="Таб AI Скан"><div class="knob"></div></button>
+                </div>
+
+                <div class="flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
+                    <div>
+                        <div class="text-xs lg:text-sm font-bold text-white">Бързо връщане на ход</div>
+                        <div class="text-[10px] text-gray-500 mt-0.5 leading-snug">Без питане за потвърждение при "Върни ход"</div>
+                    </div>
+                    <button id="quickUndoToggle" class="toggle-switch" data-on="0" onclick="toggleQuickUndo()" aria-label="Бързо връщане на ход"><div class="knob"></div></button>
+                </div>
+
+                <p class="text-[10px] font-black text-gold uppercase tracking-widest !mt-5 -mb-1">Устройство</p>
+                <div id="wakeLockRow" class="hidden flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
+                    <div>
+                        <div class="text-xs lg:text-sm font-bold text-white">Не изключвай екрана</div>
+                        <div class="text-[10px] text-gray-500 mt-0.5 leading-snug">Държи телефона буден, докато играете</div>
+                    </div>
+                    <button id="wakeLockToggle" class="toggle-switch" data-on="0" onclick="toggleWakeLock()" aria-label="Не изключвай екрана"><div class="knob"></div></button>
+                </div>
+
+                <div id="hapticRow" class="hidden flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
+                    <div>
+                        <div class="text-xs lg:text-sm font-bold text-white">Вибрация</div>
+                        <div class="text-[10px] text-gray-500 mt-0.5 leading-snug">Леко потрепване при запис, капо и победа</div>
+                    </div>
+                    <button id="hapticToggle" class="toggle-switch" data-on="0" onclick="toggleHaptic()" aria-label="Вибрация"><div class="knob"></div></button>
+                </div>
+
+                <div class="flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
+                    <div>
+                        <div class="text-xs lg:text-sm font-bold text-white">Звукови ефекти</div>
+                        <div class="text-[10px] text-gray-500 mt-0.5 leading-snug">Тих сигнал при запис, капо и победа</div>
+                    </div>
+                    <button id="soundToggle" class="toggle-switch" data-on="0" onclick="toggleSound()" aria-label="Звукови ефекти"><div class="knob"></div></button>
+                </div>
+
+                <p class="text-[10px] font-black text-gold uppercase tracking-widest !mt-5 -mb-1">Данни</p>
+                <div class="bg-danger/10 p-3 rounded-xl border border-danger/30">
+                    <div class="text-xs lg:text-sm font-bold text-white mb-1">Опасна зона</div>
+                    <div class="text-[10px] text-gray-500 mb-2.5 leading-snug">Изтрива всичко — имена, резултат, история, настройки. Без връщане назад.</div>
+                    <button onclick="closeSettings(); confirmAction('Наистина ли да изтрием ВСИЧКИ данни на приложението? Това не може да се отмени.', fullReset)" class="w-full bg-danger/20 hover:bg-danger/30 border border-danger/50 text-danger text-[11px] font-bold py-2.5 rounded-lg active:scale-95 transition-all uppercase tracking-wider">Изчисти всички данни</button>
                 </div>
             </div>
 
@@ -757,7 +813,9 @@
             t1Name: "Ние", t2Name: "Вие", total1: 0, total2: 0, hangingPoints: 0, rounds: [],
             currentContract: 'all', currentSuit: '', targetScore: 151,
             gameOver: false, winner: null, amoledMode: false,
-            manualAdjustment: { us: 0, them: 0 }
+            manualAdjustment: { us: 0, them: 0 },
+            wakeLockEnabled: false, hapticEnabled: false, soundEnabled: false,
+            scanTabVisible: true, quickUndo: false
         };
 
         // cat: 'belot' (независим), 'seq' (терца/кварта/квинта - йерархия по tier), 'careta' (йерархия по tier)
@@ -789,6 +847,15 @@
             if (!state.targetScore || state.targetScore === 251) state.targetScore = 151; // миграция: старата грешна логика слагаше 251 за Без Коз
             if (state.amoledMode === undefined) state.amoledMode = false;
             if (!state.manualAdjustment) state.manualAdjustment = { us: 0, them: 0 };
+            if (state.wakeLockEnabled === undefined) state.wakeLockEnabled = false;
+            if (state.hapticEnabled === undefined) state.hapticEnabled = false;
+            if (state.soundEnabled === undefined) state.soundEnabled = false;
+            if (state.scanTabVisible === undefined) state.scanTabVisible = true;
+            if (state.quickUndo === undefined) state.quickUndo = false;
+
+            document.getElementById('scanTabToggle').dataset.on = state.scanTabVisible ? "1" : "0";
+            applyScanTabVisibility();
+            document.getElementById('quickUndoToggle').dataset.on = state.quickUndo ? "1" : "0";
 
             document.getElementById('team1Name').value = state.t1Name;
             document.getElementById('team2Name').value = state.t2Name;
@@ -801,6 +868,19 @@
             document.getElementById('adjInput1').value = state.manualAdjustment.us;
             document.getElementById('adjInput2').value = state.manualAdjustment.them;
 
+            // Функциите за заключен буден екран и вибрация не съществуват във всеки браузър
+            // (напр. вибрация липсва в Safari/iOS) — показваме превключвателя само където реално работи.
+            if ('wakeLock' in navigator) {
+                document.getElementById('wakeLockRow').classList.remove('hidden');
+                document.getElementById('wakeLockToggle').dataset.on = state.wakeLockEnabled ? "1" : "0";
+                if (state.wakeLockEnabled) requestWakeLock();
+            }
+            if ('vibrate' in navigator) {
+                document.getElementById('hapticRow').classList.remove('hidden');
+                document.getElementById('hapticToggle').dataset.on = state.hapticEnabled ? "1" : "0";
+            }
+            document.getElementById('soundToggle').dataset.on = state.soundEnabled ? "1" : "0";
+
             buildAnnouncementsUI();
             buildCardGrid();
             selectContract(state.currentContract, true);
@@ -811,6 +891,12 @@
             renderHistory();
             checkGameOverUI();
         };
+
+        // Заключването на екрана автоматично се освобождава щом табът изгуби фокус (напр. смяна на приложение) —
+        // при връщане го подновяваме, ако потребителят го иска включен.
+        document.addEventListener('visibilitychange', () => {
+            if (state.wakeLockEnabled && document.visibilityState === 'visible') requestWakeLock();
+        });
 
         function saveState() {
             state.t1Name = document.getElementById('team1Name').value.trim() || "Ние";
@@ -919,6 +1005,105 @@
             state.manualAdjustment.them = isNaN(v2) ? 0 : v2;
             updateOverallScore();
             saveState();
+        }
+
+        /* ======================= ВИДИМОСТ НА ТАБ "AI СКАН" ======================= */
+        function applyScanTabVisibility() {
+            const scanBtn = document.querySelector('.nav-btn[data-target="scan"]');
+            if (state.scanTabVisible) {
+                scanBtn.classList.remove('hidden');
+                document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('w-1/3'); b.classList.add('w-1/4'); });
+            } else {
+                if (document.getElementById('tab-scan').classList.contains('active')) switchTab('score');
+                if (stream) stopCameraFully(); // не оставяй камерата да работи скрита
+                scanBtn.classList.add('hidden');
+                document.querySelectorAll('.nav-btn:not([data-target="scan"])').forEach(b => { b.classList.remove('w-1/4'); b.classList.add('w-1/3'); });
+            }
+        }
+        function toggleScanTabVisibility() {
+            state.scanTabVisible = !state.scanTabVisible;
+            document.getElementById('scanTabToggle').dataset.on = state.scanTabVisible ? "1" : "0";
+            applyScanTabVisibility();
+            saveState();
+        }
+
+        /* ======================= БЪРЗО ВРЪЩАНЕ НА ХОД ======================= */
+        function toggleQuickUndo() {
+            state.quickUndo = !state.quickUndo;
+            document.getElementById('quickUndoToggle').dataset.on = state.quickUndo ? "1" : "0";
+            saveState();
+        }
+        function requestUndo() {
+            if (state.quickUndo) undoLast();
+            else confirmAction('Искате ли да изтриете последното раздаване?', undoLast);
+        }
+
+        /* ======================= ЕКРАН БУДЕН ======================= */
+        let wakeLockRef = null;
+        async function requestWakeLock() {
+            if (!('wakeLock' in navigator)) return;
+            try {
+                wakeLockRef = await navigator.wakeLock.request('screen');
+            } catch (err) { console.error('Wake Lock грешка:', err); }
+        }
+        function releaseWakeLock() {
+            if (wakeLockRef) { wakeLockRef.release().catch(() => {}); wakeLockRef = null; }
+        }
+        function toggleWakeLock() {
+            state.wakeLockEnabled = !state.wakeLockEnabled;
+            document.getElementById('wakeLockToggle').dataset.on = state.wakeLockEnabled ? "1" : "0";
+            if (state.wakeLockEnabled) requestWakeLock(); else releaseWakeLock();
+            saveState();
+        }
+
+        /* ======================= ВИБРАЦИЯ ======================= */
+        function toggleHaptic() {
+            state.hapticEnabled = !state.hapticEnabled;
+            document.getElementById('hapticToggle').dataset.on = state.hapticEnabled ? "1" : "0";
+            if (state.hapticEnabled) hapticFeedback(15);
+            saveState();
+        }
+        function hapticFeedback(pattern) {
+            if (state.hapticEnabled && 'vibrate' in navigator) { try { navigator.vibrate(pattern); } catch (e) {} }
+        }
+
+        /* ======================= ЗВУК (генериран на живо, без аудио файлове) ======================= */
+        let audioCtxRef = null;
+        function getAudioCtx() {
+            if (!audioCtxRef) {
+                try { audioCtxRef = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+            }
+            return audioCtxRef;
+        }
+        function playTone(freq, duration, delay = 0, volume = 0.16) {
+            if (!state.soundEnabled) return;
+            const ctx = getAudioCtx();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') ctx.resume();
+            const start = ctx.currentTime + delay;
+            const osc = ctx.createOscillator(); const gain = ctx.createGain();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(freq, start);
+            gain.gain.setValueAtTime(0.0001, start);
+            gain.gain.exponentialRampToValueAtTime(volume, start + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(start); osc.stop(start + duration + 0.02);
+        }
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            document.getElementById('soundToggle').dataset.on = state.soundEnabled ? "1" : "0";
+            if (state.soundEnabled) playTone(660, 0.12);
+            saveState();
+        }
+        function playSaveSound() { playTone(587, 0.13); }
+        function playCapoSound() { playTone(523, 0.12, 0); playTone(659, 0.12, 0.1); playTone(784, 0.22, 0.2); }
+        function playWinSound() { playTone(523, 0.14, 0); playTone(659, 0.14, 0.13); playTone(784, 0.14, 0.26); playTone(1047, 0.35, 0.39); }
+
+        /* ======================= ПЪЛНО НУЛИРАНЕ ======================= */
+        function fullReset() {
+            releaseWakeLock();
+            localStorage.removeItem('beloteStatePro');
+            location.reload();
         }
 
         /* ======================= TABS ======================= */
@@ -1274,13 +1459,23 @@
 
             const wasCapoBlocking = checkGameEnd(isCapo);
 
-            showToast(isCapo ? "Капо записано! +90" : "Записано!");
             document.getElementById('inputPoints').value = '';
             document.querySelectorAll('.ann-chk').forEach(c => c.checked = false);
             seqTieChoice = null; careTieChoice = null;
             document.getElementById('annConflictBox').classList.add('hidden');
             setContra(1);
             updateCalc(); updateOverallScore(); renderHistory(); saveState();
+
+            if (state.gameOver) {
+                showToast(`${state.winner === '1' ? state.t1Name : state.t2Name} печели играта! 🏆`);
+                playWinSound(); hapticFeedback([40, 60, 40, 60, 90]);
+            } else if (isCapo) {
+                showToast("Капо записано! +90");
+                playCapoSound(); hapticFeedback([25, 50, 25]);
+            } else {
+                showToast("Записано!");
+                playSaveSound(); hapticFeedback(15);
+            }
 
             if (wasCapoBlocking) {
                 setTimeout(() => showToast("Капо! Играта продължава — с капо не се излиза.", "error"), 400);
@@ -1386,6 +1581,48 @@
             state.gameOver = false; state.winner = null;
             updateOverallScore(); renderHistory(); saveState();
             showToast("Последното раздаване е изтрито!");
+        }
+
+        /* ======================= СПОДЕЛЯНЕ НА РЕЗУЛТАТА ======================= */
+        function buildResultsText() {
+            const lines = [];
+            lines.push(`🃏 Белот: ${state.t1Name} ${state.total1} – ${state.total2} ${state.t2Name}`);
+            if (state.gameOver && state.winner) {
+                lines.push(`🏆 Победител: ${state.winner === '1' ? state.t1Name : state.t2Name} (цел: ${state.targetScore})`);
+            } else {
+                lines.push(`Цел: ${state.targetScore} точки`);
+            }
+            if (state.rounds.length) {
+                lines.push('');
+                lines.push('Раздавания:');
+                state.rounds.forEach(r => {
+                    let tag = '';
+                    if (r.outcome === 'failure') tag = ' (вкарана)';
+                    else if (r.outcome === 'tie') tag = ' (висяща)';
+                    if (r.isCapo) tag += ' 🏆капо';
+                    lines.push(`${r.n}. ${r.contract}: ${r.p1}-${r.p2}${tag}`);
+                });
+            }
+            lines.push('');
+            lines.push('Направено с Белот Асистент Pro');
+            return lines.join('\n');
+        }
+
+        async function shareResults() {
+            if (state.rounds.length === 0 && !(state.manualAdjustment.us || state.manualAdjustment.them)) {
+                return showToast("Няма какво да се сподели още.", "error");
+            }
+            const text = buildResultsText();
+            if (navigator.share) {
+                try { await navigator.share({ title: 'Резултат от Белот', text: text }); return; }
+                catch (e) { if (e.name === 'AbortError') return; /* друга грешка -> опитай клипборд по-долу */ }
+            }
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast("Резултатът е копиран!");
+            } catch (e) {
+                showToast("Неуспешно споделяне.", "error");
+            }
         }
 
         function resetGame() {
