@@ -431,6 +431,11 @@
                             <span class="text-[9px] lg:text-[10px] font-black bg-gold/10 px-2 lg:px-3 py-1 rounded-full text-gold border border-gold/30 uppercase tracking-wider" id="scanContractInfo">Договор</span>
                         </div>
 
+                        <div id="rankGuessRow" class="hidden mb-3 bg-anthracite/60 rounded-xl p-2.5 items-center gap-2 flex-wrap">
+                            <span class="text-[9px] lg:text-[10px] text-gray-400 font-bold">🔍 Прилича на:</span>
+                            <div id="rankGuessChips" class="flex gap-1.5 flex-wrap"></div>
+                        </div>
+
                         <div class="grid grid-cols-4 gap-1.5 lg:gap-3" id="cardGrid"></div>
 
                         <div class="mt-4 flex justify-between items-center gap-2 bg-anthracite p-3 lg:p-4 rounded-xl border border-emeraldLight/50">
@@ -780,6 +785,14 @@
                     <input type="text" id="workerSecretInput" placeholder="Споделена тайна (по избор)" class="w-full bg-anthracite border border-emeraldLight/50 rounded-lg text-left font-mono text-[11px] lg:text-xs text-white py-2.5 px-3 outline-none focus:border-gold" oninput="onWorkerConfigInput()">
                 </div>
 
+                <div class="flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
+                    <div>
+                        <div class="text-xs lg:text-sm font-bold text-white">Безплатно предположение за ранг</div>
+                        <div class="text-[10px] text-gray-500 mt-0.5 leading-snug">Без сървър, без ключ — OCR директно в браузъра (~2MB при първо ползване). По-неточно от Worker-а, но напълно безплатно.</div>
+                    </div>
+                    <button id="ocrToggle" class="toggle-switch" data-on="0" onclick="toggleOcr()" aria-label="Безплатно предположение за ранг"><div class="knob"></div></button>
+                </div>
+
                 <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
                     <div class="text-xs lg:text-sm font-bold text-white mb-1">Цел за край на играта</div>
                     <div class="text-[10px] text-gray-500 mb-2.5 leading-snug">По правило 151 точки — смени, ако играете на друга цел.</div>
@@ -880,7 +893,7 @@
             manualAdjustment: { us: 0, them: 0 },
             wakeLockEnabled: false, hapticEnabled: false, soundEnabled: false,
             scanTabVisible: true, quickUndo: false,
-            workerUrl: '', workerSecret: ''
+            workerUrl: '', workerSecret: '', ocrEnabled: false
         };
 
         // cat: 'belot' (независим), 'seq' (терца/кварта/квинта - йерархия по tier), 'careta' (йерархия по tier)
@@ -920,6 +933,9 @@
             if (state.quickUndo === undefined) state.quickUndo = false;
             if (state.workerUrl === undefined) state.workerUrl = '';
             if (state.workerSecret === undefined) state.workerSecret = '';
+            if (state.ocrEnabled === undefined) state.ocrEnabled = false;
+
+            document.getElementById('ocrToggle').dataset.on = state.ocrEnabled ? "1" : "0";
 
             document.getElementById('workerUrlInput').value = state.workerUrl;
             document.getElementById('workerSecretInput').value = state.workerSecret;
@@ -1125,6 +1141,12 @@
             const ready = !!(typeof isFrozen !== 'undefined' && isFrozen);
             btn.classList.toggle('opacity-50', !ready);
             document.getElementById('aiRecognizeLabel').innerText = ready ? 'Разпознай с AI' : 'Замрази кадъра, за да разпознаеш';
+        }
+
+        function toggleOcr() {
+            state.ocrEnabled = !state.ocrEnabled;
+            document.getElementById('ocrToggle').dataset.on = state.ocrEnabled ? "1" : "0";
+            saveState();
         }
 
         /* ======================= ВИДИМОСТ НА ТАБ "AI СКАН" ======================= */
@@ -1869,16 +1891,22 @@
             const text = document.getElementById('colorResultText');
             badge.classList.remove('hidden'); badge.classList.add('flex');
 
+            let colorGuess = null;
             if (brightness > 195) {
                 text.innerText = '🤍 Твърде светло — целѝ по-точно символа';
                 clearColorFilter(false);
             } else if (r > g + 22 && r > b + 22) {
                 text.innerText = '🔴 Прилича на червена (♥ / ♦)';
+                colorGuess = 'red';
                 applyColorFilter('red');
             } else {
                 text.innerText = '⚫ Прилича на черна (♠ / ♣)';
+                colorGuess = 'black';
                 applyColorFilter('black');
             }
+
+            hideRankGuess();
+            if (colorGuess && state.ocrEnabled) attemptRankGuess(px, py, colorGuess);
         }
 
         function applyColorFilter(colorGuess) {
@@ -1893,7 +1921,125 @@
         function clearColorFilter(hideBadge = true) {
             document.querySelectorAll('#cardGrid button').forEach(btn => btn.classList.remove('opacity-25'));
             if (hideBadge) { document.getElementById('colorResultBadge').classList.add('hidden'); document.getElementById('colorResultBadge').classList.remove('flex'); }
+            hideRankGuess();
         }
+
+        function hideRankGuess() {
+            document.getElementById('rankGuessRow').classList.add('hidden');
+            document.getElementById('rankGuessRow').classList.remove('flex');
+            document.getElementById('rankGuessChips').innerHTML = '';
+        }
+
+        /* ======================= БЕЗПЛАТНО OCR ПРЕДПОЛОЖЕНИЕ ЗА РАНГ ======================= */
+        // Никакъв сървър, никакъв ключ — Tesseract.js разчита текст изцяло в браузъра (WebAssembly).
+        // Ъгловите индекси на картите са дребна, стилизирана мишена за общ OCR модел, затова това е
+        // само предположение с ниска увереност, комбинирано с вече надеждното разчитане на цвета.
+        let tesseractLoadPromise = null;
+        function loadTesseractScript() {
+            if (window.Tesseract) return Promise.resolve();
+            if (tesseractLoadPromise) return tesseractLoadPromise;
+            tesseractLoadPromise = new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+                s.onload = () => resolve();
+                s.onerror = () => { tesseractLoadPromise = null; reject(new Error('OCR библиотеката не се зареди.')); };
+                document.head.appendChild(s);
+            });
+            return tesseractLoadPromise;
+        }
+
+        let ocrWorkerPromise = null;
+        async function getOcrWorker() {
+            await loadTesseractScript();
+            if (!ocrWorkerPromise) {
+                ocrWorkerPromise = Tesseract.createWorker('eng').then(async (w) => {
+                    await w.setParameters({ tessedit_char_whitelist: '01789JQKA', tessedit_pageseg_mode: '7' });
+                    return w;
+                });
+            }
+            return ocrWorkerPromise;
+        }
+
+        // Изрязва зона около допира, уголемява я и я превръща в чист черно-бял контраст —
+        // истинско разчитане, не гадаене; но малкия ъглов индекс си остава трудна мишена.
+        function cropAndPreprocess(sourceCanvas, cx, cy) {
+            const cropSize = Math.round(sourceCanvas.width * 0.09);
+            const sx = Math.max(0, Math.round(cx - cropSize / 2));
+            const sy = Math.max(0, Math.round(cy - cropSize / 2));
+            const sw = Math.min(cropSize, sourceCanvas.width - sx);
+            const sh = Math.min(cropSize, sourceCanvas.height - sy);
+            if (sw <= 0 || sh <= 0) return null;
+
+            const scaleFactor = 4;
+            const out = document.createElement('canvas');
+            out.width = sw * scaleFactor; out.height = sh * scaleFactor;
+            const ctx = out.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(sourceCanvas, sx, sy, sw, sh, 0, 0, out.width, out.height);
+
+            const imgData = ctx.getImageData(0, 0, out.width, out.height);
+            const d = imgData.data;
+            for (let i = 0; i < d.length; i += 4) {
+                const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+                const val = gray < 130 ? 0 : 255;
+                d[i] = d[i + 1] = d[i + 2] = val;
+            }
+            ctx.putImageData(imgData, 0, 0);
+            return out;
+        }
+
+        // От суровия OCR текст извлича валиден ранг на Белот карта (7,8,9,10,J,Q,K,A), или null.
+        function parseRankFromOcrText(rawText) {
+            let t = (rawText || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+            t = t.replace(/O/g, '0').replace(/I/g, '1').replace(/L/g, '1');
+            if (t.includes('10') || t.includes('1O') || (t.includes('1') && t.includes('0'))) return '10';
+            for (const r of ['7', '8', '9', 'J', 'Q', 'K', 'A']) { if (t.includes(r)) return r; }
+            return null;
+        }
+
+        async function attemptRankGuess(px, py, colorGuess) {
+            if (!sampleCanvas) return;
+            const cropped = cropAndPreprocess(sampleCanvas, px, py);
+            if (!cropped) return;
+
+            const text = document.getElementById('colorResultText');
+            const baseMsg = text.innerText;
+            text.innerText = baseMsg + ' · гадая ранга…';
+
+            try {
+                const worker = await getOcrWorker();
+                const { data } = await worker.recognize(cropped);
+                const rank = parseRankFromOcrText(data.text);
+                const confidence = data.confidence || 0;
+
+                text.innerText = baseMsg;
+                if (rank && confidence >= 35) showRankGuess(rank, colorGuess);
+            } catch (err) {
+                console.error('OCR грешка:', err);
+                text.innerText = baseMsg;
+            }
+        }
+
+        function showRankGuess(rank, colorGuess) {
+            const suits = colorGuess === 'red' ? ['♥', '♦'] : ['♠', '♣'];
+            const row = document.getElementById('rankGuessRow');
+            const chips = document.getElementById('rankGuessChips');
+            chips.innerHTML = '';
+            suits.forEach(suit => {
+                const chip = document.createElement('button');
+                chip.className = 'font-mono font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-glow bg-gold text-anthracite';
+                chip.innerHTML = `${rank}${suit}`;
+                chip.onclick = () => {
+                    const cardBtn = document.querySelector(`#cardGrid button[data-rank="${rank}"][data-suit="${suit}"]`);
+                    if (cardBtn) { setCardActive(cardBtn, true); recalcScan(); hapticFeedback(15); }
+                    hideRankGuess();
+                };
+                chips.appendChild(chip);
+            });
+            row.classList.remove('hidden'); row.classList.add('flex');
+        }
+
+
 
         function resetCardGrid() {
             document.querySelectorAll('#cardGrid button').forEach(b => setCardActive(b, false));
