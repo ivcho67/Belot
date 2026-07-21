@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="bg">
+<html lang="bg" translate="no">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#050806">
     <meta name="color-scheme" content="dark">
@@ -195,7 +196,7 @@
                 </button>
                 <div class="max-w-4xl mx-auto flex justify-between items-end">
                     <div class="text-center w-[40%]">
-                        <input type="text" id="team1Name" value="Ние" maxlength="14" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors rounded" oninput="onNameInput()" onchange="saveState()">
+                        <input type="text" id="team1Name" value="Ние" maxlength="14" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" translate="no" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors rounded" oninput="onNameInput()" onchange="saveState()">
                         <button onclick="openEditScore('1')" aria-label="Редактирай резултата" class="w-full group active:scale-95 transition-transform">
                             <div class="font-mono text-4xl sm:text-5xl lg:text-6xl font-bold mt-1 tracking-tighter text-white drop-shadow-md transition-colors" id="score1">0</div>
                             <svg class="w-3 h-3 lg:w-3.5 lg:h-3.5 mx-auto mt-0.5 text-gray-600 group-hover:text-gold group-active:text-gold transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
@@ -203,7 +204,7 @@
                     </div>
                     <div class="text-xl sm:text-2xl lg:text-3xl font-display font-black text-emeraldLight w-[10%] text-center pb-1 lg:pb-2 opacity-50">VS</div>
                     <div class="text-center w-[40%]">
-                        <input type="text" id="team2Name" value="Вие" maxlength="14" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors rounded" oninput="onNameInput()" onchange="saveState()">
+                        <input type="text" id="team2Name" value="Вие" maxlength="14" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" translate="no" class="font-sans bg-transparent text-gray-400 font-bold text-xs lg:text-sm w-full text-center focus:outline-none focus:text-gold transition-colors rounded" oninput="onNameInput()" onchange="saveState()">
                         <button onclick="openEditScore('2')" aria-label="Редактирай резултата" class="w-full group active:scale-95 transition-transform">
                             <div class="font-mono text-4xl sm:text-5xl lg:text-6xl font-bold mt-1 tracking-tighter text-white drop-shadow-md transition-colors" id="score2">0</div>
                             <svg class="w-3 h-3 lg:w-3.5 lg:h-3.5 mx-auto mt-0.5 text-gray-600 group-hover:text-gold group-active:text-gold transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
@@ -400,7 +401,7 @@
                             <p class="text-[9px] lg:text-[10px] font-bold text-gray-600 uppercase tracking-widest">Камерата е изключена</p>
                         </div>
                         <div id="pausedBadge" class="hidden absolute top-2.5 right-2.5 bg-gold text-anthracite text-[9px] font-black uppercase px-2.5 py-1 rounded-full shadow-glow tracking-wider">⏸ На пауза</div>
-                        <div id="tapHint" class="hidden absolute bottom-2.5 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur text-white text-[9px] lg:text-[10px] font-bold px-3 py-1.5 rounded-full tracking-wide text-center whitespace-nowrap">👆 Докосни карта за цветова подсказка</div>
+                        <div id="tapHint" class="hidden absolute bottom-2.5 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur text-white text-[9px] lg:text-[10px] font-bold px-3 py-1.5 rounded-full tracking-wide text-center whitespace-nowrap">👆 Докосни точно ъгловия символ на картата</div>
                         <div id="colorResultBadge" class="hidden absolute top-2.5 left-2.5 items-center gap-1.5 bg-anthracite/90 backdrop-blur border border-emeraldLight text-white text-[9px] lg:text-[10px] font-bold px-2.5 py-1.5 rounded-full">
                             <span id="colorResultText">—</span>
                             <button onclick="clearColorFilter(); event.stopPropagation();" class="ml-1 text-gray-400 hover:text-white leading-none" aria-label="Изчисти филтъра">✕</button>
@@ -1874,7 +1875,8 @@
             if (px < 0 || py < 0 || px > sampleCanvas.width || py > sampleCanvas.height) return; // допир в letterbox лентата
 
             const ctx = sampleCanvas.getContext('2d');
-            const sampleSize = Math.round(sampleCanvas.width * 0.035); // малка зона около допира, пропорционална на резолюцията
+            // По-широка зона на търсене от преди, за да прощава леко неточен допир...
+            const sampleSize = Math.round(sampleCanvas.width * 0.06);
             const sx = Math.max(0, Math.round(px - sampleSize / 2)), sy = Math.max(0, Math.round(py - sampleSize / 2));
             const sw = Math.min(sampleSize, sampleCanvas.width - sx), sh = Math.min(sampleSize, sampleCanvas.height - sy);
             if (sw <= 0 || sh <= 0) return;
@@ -1882,9 +1884,18 @@
             let data;
             try { data = ctx.getImageData(sx, sy, sw, sh).data; } catch (e) { console.error(e); return; }
 
-            let r = 0, g = 0, b = 0, n = 0;
-            for (let i = 0; i < data.length; i += 4) { r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
-            r /= n; g /= n; b /= n;
+            // ...но вместо просто да осредним всичко (включително фона, ако допирът е леко встрани),
+            // взимаме само най-тъмните/наситени 25% пиксели в зоната — тези реално са мастилото.
+            const pixels = [];
+            for (let i = 0; i < data.length; i += 4) {
+                const pr = data[i], pg = data[i + 1], pb = data[i + 2];
+                pixels.push({ r: pr, g: pg, b: pb, dark: 255 - Math.min(pr, pg, pb) });
+            }
+            pixels.sort((a, b) => b.dark - a.dark);
+            const topCount = Math.max(1, Math.round(pixels.length * 0.25));
+            let r = 0, g = 0, b = 0;
+            for (let i = 0; i < topCount; i++) { r += pixels[i].r; g += pixels[i].g; b += pixels[i].b; }
+            r /= topCount; g /= topCount; b /= topCount;
             const brightness = (r + g + b) / 3;
 
             const badge = document.getElementById('colorResultBadge');
