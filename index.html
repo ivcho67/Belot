@@ -168,19 +168,15 @@
                 <span class="font-display text-[9px] font-black text-gold tracking-widest mt-1">BELOT</span>
             </div>
 
-            <button onclick="switchTab('score')" role="tab" aria-selected="true" aria-controls="tab-score" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="score" aria-label="Резултат">
+            <button onclick="switchTab('score')" role="tab" aria-selected="true" aria-controls="tab-score" class="nav-btn w-1/3 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="score" aria-label="Резултат">
                 <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                 <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Резултат</span>
             </button>
-            <button onclick="switchTab('scan')" role="tab" aria-selected="false" aria-controls="tab-scan" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="scan" aria-label="AI Скан">
-                <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">AI Скан</span>
-            </button>
-            <button onclick="switchTab('announce')" role="tab" aria-selected="false" aria-controls="tab-announce" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="announce" aria-label="Анонси">
+            <button onclick="switchTab('announce')" role="tab" aria-selected="false" aria-controls="tab-announce" class="nav-btn w-1/3 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="announce" aria-label="Анонси">
                 <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592L5.436 13.683M11 5.882a3 3 0 10-5.657 1.985M11 5.882l6.632-2.947a1 1 0 011.368.928v14.274a1 1 0 01-1.368.928L11 16.118M5.436 13.683A4 4 0 017 6h1.832c.531 0 1.057-.1 1.554-.297"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.436 13.683A4 4 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a4 4 0 01-1.564-.317z"></path></svg>
                 <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Анонси</span>
             </button>
-            <button onclick="switchTab('rules')" role="tab" aria-selected="false" aria-controls="tab-rules" class="nav-btn w-1/4 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="rules" aria-label="Правила">
+            <button onclick="switchTab('rules')" role="tab" aria-selected="false" aria-controls="tab-rules" class="nav-btn w-1/3 lg:w-full lg:py-5 flex flex-col items-center justify-center transition-all transform active:scale-90 hover:bg-emeraldLight/30 lg:rounded-2xl" data-target="rules" aria-label="Правила">
                 <svg class="w-6 h-6 lg:w-7 lg:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                 <span class="font-sans text-[9px] lg:text-[10px] font-bold uppercase tracking-wider">Правила</span>
             </button>
@@ -386,91 +382,25 @@
                     </div>
                 </section>
 
-                <!-- ТАБ 2: AI СКАНИРАНЕ -->
-                <section id="tab-scan" role="tabpanel" aria-label="AI Скан" class="tab-content h-full max-w-3xl mx-auto space-y-3 lg:space-y-5 lg:pt-2 pb-6">
-                    <div class="bg-blue-900/20 border border-blue-500/30 p-3 lg:p-4 rounded-2xl text-[11px] lg:text-sm text-blue-200 shadow-md flex items-start gap-2.5">
-                        <span class="text-lg flex-none leading-none">💡</span>
-                        <span>Камерата е <strong>незадължителна</strong> — просто за да гледаш картите докато броиш. Истинското пресмятане е решетката отдолу, тя работи винаги, дори без камера.</span>
-                    </div>
-
-                    <div class="relative w-full h-48 sm:h-60 lg:h-72 bg-black rounded-2xl overflow-hidden border border-emeraldLight flex items-center justify-center shadow-inner">
-                        <video id="cameraFeed" playsinline muted autoplay onclick="sampleCardColor(event)" class="absolute inset-0 w-full h-full object-contain hidden"></video>
-
-                        <div id="cameraPlaceholder" class="text-center p-4">
-                            <div class="text-4xl lg:text-5xl mb-2 opacity-20">📷</div>
-                            <p class="text-[9px] lg:text-[10px] font-bold text-gray-600 uppercase tracking-widest">Камерата е изключена</p>
-                        </div>
-                        <div id="pausedBadge" class="hidden absolute top-2.5 right-2.5 bg-gold text-anthracite text-[9px] font-black uppercase px-2.5 py-1 rounded-full shadow-glow tracking-wider">⏸ На пауза</div>
-                        <div id="tapHint" class="hidden absolute bottom-2.5 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur text-white text-[9px] lg:text-[10px] font-bold px-3 py-1.5 rounded-full tracking-wide text-center whitespace-nowrap">👆 Докосни точно ъгловия символ на картата</div>
-                        <div id="colorResultBadge" class="hidden absolute top-2.5 left-2.5 items-center gap-1.5 bg-anthracite/90 backdrop-blur border border-emeraldLight text-white text-[9px] lg:text-[10px] font-bold px-2.5 py-1.5 rounded-full">
-                            <span id="colorResultText">—</span>
-                            <button onclick="clearColorFilter(); event.stopPropagation();" class="ml-1 text-gray-400 hover:text-white leading-none" aria-label="Изчисти филтъра">✕</button>
-                        </div>
-                    </div>
-                    <p class="text-[9px] lg:text-[10px] text-gray-500 text-center -mt-1 lg:-mt-2 px-2 leading-relaxed">Разчита само дали мастилото е червено или черно (истински анализ на пикселите) — не чете ранг/боя. Стеснява решетката наполовина, а не я попълва вместо теб.</p>
-
-                    <div class="grid grid-cols-2 gap-2 lg:gap-3">
-                        <button onclick="startCamera()" id="camStartBtn" class="col-span-2 bg-emeraldLight hover:bg-emeraldLight/80 border border-success/50 text-success p-3 lg:p-3.5 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-wider text-[10px] lg:text-xs">
-                            Включи камера
-                        </button>
-                        <button onclick="toggleFreeze()" id="camFreezeBtn" class="hidden bg-gold hover:bg-goldHover text-anthracite p-3 lg:p-3.5 rounded-xl font-black active:scale-95 transition-all uppercase tracking-wider text-[10px] lg:text-xs shadow-glow">
-                            Замрази кадър
-                        </button>
-                        <button onclick="stopCameraFully()" id="camStopBtn" class="hidden bg-anthracite border border-danger/30 text-danger p-3 lg:p-3.5 rounded-xl font-bold active:scale-95 transition-all uppercase tracking-wider text-[10px] lg:text-xs">
-                            Спри камера
-                        </button>
-                    </div>
-
-                    <button onclick="recognizeWithAI()" id="aiRecognizeBtn" class="hidden w-full bg-gradient-to-r from-gold to-goldHover text-anthracite p-3.5 lg:p-4 rounded-xl font-black active:scale-95 transition-all shadow-glow uppercase tracking-widest text-[11px] lg:text-sm flex items-center justify-center gap-2">
-                        <svg id="aiRecognizeIcon" class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-                        <span id="aiRecognizeLabel">Разпознай с AI</span>
-                    </button>
-
-                    <div class="bg-forest/20 p-3 lg:p-5 rounded-2xl border border-emeraldLight shadow-lg">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-bold text-[10px] lg:text-xs text-gray-400 uppercase tracking-widest">Докосни видените карти</h3>
-                            <span class="text-[9px] lg:text-[10px] font-black bg-gold/10 px-2 lg:px-3 py-1 rounded-full text-gold border border-gold/30 uppercase tracking-wider" id="scanContractInfo">Договор</span>
-                        </div>
-
-                        <div id="rankGuessRow" class="hidden mb-3 bg-anthracite/60 rounded-xl p-2.5 items-center gap-2 flex-wrap">
-                            <span class="text-[9px] lg:text-[10px] text-gray-400 font-bold">🔍 Прилича на:</span>
-                            <div id="rankGuessChips" class="flex gap-1.5 flex-wrap"></div>
-                        </div>
-
-                        <div class="grid grid-cols-4 gap-1.5 lg:gap-3" id="cardGrid"></div>
-
-                        <div class="mt-4 flex justify-between items-center gap-2 bg-anthracite p-3 lg:p-4 rounded-xl border border-emeraldLight/50">
-                            <div class="text-[9px] lg:text-[10px] uppercase font-bold text-gray-500 leading-tight tracking-wider">Открити точки<br><span id="scanTotal" class="font-mono text-3xl lg:text-4xl font-bold text-white">0</span></div>
-                            <div class="flex gap-2 flex-none">
-                                <button onclick="resetCardGrid()" aria-label="Изчисти маркировките" title="Изчисти" class="bg-emeraldLight/40 hover:bg-emeraldLight/60 text-gray-300 w-11 h-11 lg:w-12 lg:h-12 rounded-xl active:scale-95 transition-all flex items-center justify-center flex-none">
-                                    <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4.5 9a8 8 0 0113.9-4.9M19.5 15a8 8 0 01-13.9 4.9"></path></svg>
-                                </button>
-                                <button onclick="sendToCalculator()" class="font-sans bg-gold text-anthracite px-4 lg:px-8 py-3 lg:py-4 rounded-xl font-black active:scale-95 hover:bg-goldHover transition-all shadow-glow uppercase tracking-widest text-[10px] lg:text-xs whitespace-nowrap">
-                                    ПРЕХВЪРЛИ
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- ТАБ 3: АНОНСИ -->
+                <!-- ТАБ 2: АНОНСИ -->
                 <section id="tab-announce" role="tabpanel" aria-label="Анонси" class="tab-content h-full max-w-3xl mx-auto space-y-4 lg:space-y-5 lg:pt-2 pb-6">
                     <div class="bg-danger/10 border-2 border-danger/50 p-4 lg:p-5 rounded-2xl text-center shadow-md">
                         <span class="text-danger font-black text-sm lg:text-base uppercase tracking-widest">⚠️ На "Без Коз" няма анонси</span>
-                        <p class="text-[10px] lg:text-xs text-gray-300 mt-1.5 font-medium">Изключение: последно 10 и капо важат винаги, дори на Без Коз.</p>
+                        <p class="text-[10px] lg:text-xs text-gray-300 mt-1.5 font-medium">Играчите нямат право да обявяват притежаваните комбинации. Изключение: последно 10 и капо важат винаги.</p>
                     </div>
 
                     <div class="bg-forest/20 rounded-2xl p-4 lg:p-6 border border-emeraldLight/50 shadow-lg">
                         <h3 class="font-black text-white text-base lg:text-lg uppercase tracking-widest mb-3 lg:mb-4 flex items-center gap-2"><span class="text-xl">📣</span> Стойности</h3>
                         <div class="space-y-2 lg:space-y-2.5 text-xs lg:text-sm font-bold font-sans">
-                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Белот <span class="text-gray-500 font-normal">(K+Q коз)</span></span><span class="text-gold font-mono text-sm lg:text-base">20</span></div>
-                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Терца <span class="text-gray-500 font-normal">(3 поредни)</span></span><span class="text-gold font-mono text-sm lg:text-base">20</span></div>
+                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Белот <span class="text-gray-500 font-normal">(Q+K от коз)</span></span><span class="text-gold font-mono text-sm lg:text-base">20</span></div>
+                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Терца <span class="text-gray-500 font-normal">(3 поредни от една боя)</span></span><span class="text-gold font-mono text-sm lg:text-base">20</span></div>
                             <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Кварта <span class="text-gray-500 font-normal">(4 поредни)</span></span><span class="text-gold font-mono text-sm lg:text-base">50</span></div>
                             <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Квинта <span class="text-gray-500 font-normal">(5 поредни)</span></span><span class="text-gold font-mono text-sm lg:text-base">100</span></div>
-                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Каре <span class="text-gray-500 font-normal">(10/Q/K/A)</span></span><span class="text-gold font-mono text-sm lg:text-base">100</span></div>
-                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Каре Деветки</span><span class="text-gold font-mono text-sm lg:text-base">150</span></div>
-                            <div class="flex justify-between items-center p-1.5 lg:p-2"><span class="text-gray-200">Каре Валета</span><span class="text-gold font-mono text-sm lg:text-base">200</span></div>
+                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Каре <span class="text-gray-500 font-normal">(4× еднакви 10/Q/K/A)</span></span><span class="text-gold font-mono text-sm lg:text-base">100</span></div>
+                            <div class="flex justify-between items-center border-b border-emeraldLight/50 pb-2 lg:pb-2.5 p-1.5 lg:p-2"><span class="text-gray-200">Каре Деветки <span class="text-gray-500 font-normal">(4× 9)</span></span><span class="text-gold font-mono text-sm lg:text-base">150</span></div>
+                            <div class="flex justify-between items-center p-1.5 lg:p-2"><span class="text-gray-200">Каре Валета <span class="text-gray-500 font-normal">(4× J)</span></span><span class="text-gold font-mono text-sm lg:text-base">200</span></div>
                         </div>
+                        <p class="text-[10px] lg:text-xs text-gray-500 mt-3 pt-3 border-t border-emeraldLight/30">Ред на картите при анонсите: 7 – 8 – 9 – 10 – J – Q – K – A (винаги така, без връзка с коз).</p>
                     </div>
 
                     <div class="bg-anthracite rounded-2xl p-4 lg:p-6 border border-emeraldLight/50 shadow-lg space-y-3 lg:space-y-4">
@@ -481,20 +411,24 @@
                         </div>
                         <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/30">
                             <h4 class="font-bold text-gold text-[10px] lg:text-xs uppercase tracking-widest mb-1.5">Терца / Кварта / Квинта</h4>
-                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">Записва се само на отбора с <strong>най-дългата поредица</strong>. При равна дължина печели тази, която започва от по-висока карта (ред: 7-8-9-10-J-Q-K-A). При пълно равенство (различна боя, но същата дължина и стартова карта) — <strong>всички премии за поредици отпадат</strong>.</p>
+                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">Записва се само на отбора с <strong>най-дългата поредица</strong>. При равна дължина печели тази, която започва от по-висока карта. Ако най-високите поредици на двата отбора излязат напълно равни — <strong>всички премии за поредици отпадат</strong>.</p>
                         </div>
                         <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/30">
                             <h4 class="font-bold text-gold text-[10px] lg:text-xs uppercase tracking-widest mb-1.5">Каре</h4>
-                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">Записва се само каре с <strong>най-висока точкова стойност</strong> (Валета 200 &gt; Деветки 150 &gt; останалите 100). Каре не отменя поредица — те са отделни категории и могат да важат едновременно за различни отбори.</p>
+                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">Записва се само каре с <strong>най-висока точкова стойност</strong> (Валета 200 &gt; Деветки 150 &gt; останалите 100). Каре не отменя поредица — това са отделни категории, важат едновременно и за двата отбора, ако имат.</p>
+                        </div>
+                        <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/30">
+                            <h4 class="font-bold text-gold text-[10px] lg:text-xs uppercase tracking-widest mb-1.5">Карта, участваща в две комбинации</h4>
+                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">Ако една и съща карта е част едновременно от каре и поредица, играчът сам избира кое от двете да обяви.</p>
                         </div>
                         <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/30">
                             <h4 class="font-bold text-gold text-[10px] lg:text-xs uppercase tracking-widest mb-1.5">Белот</h4>
-                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">Винаги е <strong>независим</strong> от горната йерархия — важи, ако е обявен правилно, дори двата отбора да имат белот (възможно на Всичко Коз, в различна боя).</p>
+                            <p class="text-xs lg:text-sm text-gray-300 leading-relaxed">Винаги е <strong>независим</strong> от горната йерархия — важи и за двата отбора едновременно, ако имат (възможно на Всичко Коз, всеки в различна боя). Обявява се при първата от двете карти (Q или K), ако е спазено едно от: първа карта на взятката, отговор на искания цвят, или цакане/надцакване/подцакване при коз.</p>
                         </div>
                     </div>
                 </section>
 
-                <!-- ТАБ 4: ПРАВИЛА (ACCORDION) -->
+                <!-- ТАБ 3: ПРАВИЛА (ACCORDION) -->
                 <section id="tab-rules" role="tabpanel" aria-label="Правила" class="tab-content h-full max-w-3xl mx-auto pb-10 space-y-3">
 
                     <div class="grid grid-cols-2 gap-1.5 lg:gap-2 bg-anthracite p-1 lg:p-1.5 rounded-xl border border-emeraldLight/30 sticky top-0 z-20 shadow-lg">
@@ -511,7 +445,7 @@
                         </summary>
                         <div class="px-4 lg:px-5 pb-4 lg:pb-5 text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed border-t border-emeraldLight/30 pt-3">
                             <p>Раздава се по 3, после по още 2 карти на играч (общо 5). Играчът вдясно от раздаващия наддава пръв: боя, "Без Коз", "Всичко Коз" — или пас.</p>
-                            <p>Силата расте така: <strong class="text-gray-100">Спатия → Каро → Купа → Пика → Без Коз → Всичко Коз</strong>. При 3 паса подред след избран договор наддаването приключва и раздаващият довършва до 8 карти на играч.</p>
+                            <p>Силата расте така: <strong class="text-gray-100">♣ Спатия → ♦ Каро → ♥ Купа → ♠ Пика → Без Коз → Всичко Коз</strong>. При 3 паса подред след избран договор наддаването приключва и раздаващият довършва до 8 карти на играч.</p>
                             <p>Ако <strong class="text-gray-100">всички</strong> пасуват, без никой да е обявил договор, картите се събират и раздава следващият играч (вдясно от сегашния).</p>
                         </div>
                     </details>
@@ -547,6 +481,7 @@
                                         <tr><td>8 / 7</td><td class="text-center">0</td><td class="text-center">0</td></tr>
                                     </tbody>
                                 </table>
+                                <p class="text-[9px] text-gray-500 mt-2 pt-2 border-t border-emeraldLight/30">Редът на картите отгоре надолу е и редът по сила — J е най-силна в коз, A е най-силна извън коз.</p>
                             </div>
                             <p><strong class="text-gray-100">Общо точки:</strong> Боя 162 · Всичко Коз 258 · Без Коз 130 (удвоява се → 260). Крайно винаги делиш на 10 и закръгляш.</p>
                             <p><strong class="text-gray-100">Изкарана</strong> — обявилият има повече точки → всеки пише каквото е взел.</p>
@@ -605,7 +540,7 @@
                             <div class="text-xs lg:text-sm text-gray-300 space-y-2 leading-relaxed pl-[38px]">
                                 <p>Играят 4 души в 2 отбора по 2 — партньорите сядат един срещу друг, а редуването около масата е между съперници.</p>
                                 <p>Използва се тесте от <strong class="text-gray-100">32 карти</strong> (7, 8, 9, 10, J, Q, K, A във всяка боя — без 2,3,4,5,6).</p>
-                                <p>Определя се първи раздаващ (напр. с теглене на карта — най-висока раздава първа). После раздаването се върти по часовниковата стрелка след всяко раздаване.</p>
+                                <p>Определя се първи раздаващ. След всяко раздаване ролята на раздаващ преминава към играча <strong class="text-gray-100">вдясно</strong> от досегашния.</p>
                             </div>
                         </div>
 
@@ -780,21 +715,6 @@
 
                 <p class="text-[10px] font-black text-gold uppercase tracking-widest !mt-5 -mb-1">Игра</p>
                 <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
-                    <div class="text-xs lg:text-sm font-bold text-white mb-1">AI разпознаване на карти</div>
-                    <div class="text-[10px] text-gray-500 mb-2.5 leading-snug">Адрес на твоя Cloudflare Worker, който праща снимката към Claude и връща разпознатите карти. Виж инструкциите за качване отделно.</div>
-                    <input type="text" id="workerUrlInput" placeholder="https://твоя-worker.workers.dev" inputmode="url" class="w-full bg-anthracite border border-emeraldLight/50 rounded-lg text-left font-mono text-[11px] lg:text-xs text-white py-2.5 px-3 outline-none focus:border-gold mb-2" oninput="onWorkerConfigInput()">
-                    <input type="text" id="workerSecretInput" placeholder="Споделена тайна (по избор)" class="w-full bg-anthracite border border-emeraldLight/50 rounded-lg text-left font-mono text-[11px] lg:text-xs text-white py-2.5 px-3 outline-none focus:border-gold" oninput="onWorkerConfigInput()">
-                </div>
-
-                <div class="flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
-                    <div>
-                        <div class="text-xs lg:text-sm font-bold text-white">Безплатно предположение за ранг</div>
-                        <div class="text-[10px] text-gray-500 mt-0.5 leading-snug">Без сървър, без ключ — OCR директно в браузъра (~2MB при първо ползване). По-неточно от Worker-а, но напълно безплатно.</div>
-                    </div>
-                    <button id="ocrToggle" class="toggle-switch" data-on="0" onclick="toggleOcr()" aria-label="Безплатно предположение за ранг"><div class="knob"></div></button>
-                </div>
-
-                <div class="bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
                     <div class="text-xs lg:text-sm font-bold text-white mb-1">Цел за край на играта</div>
                     <div class="text-[10px] text-gray-500 mb-2.5 leading-snug">По правило 151 точки — смени, ако играете на друга цел.</div>
                     <div class="flex gap-1.5 mb-2">
@@ -803,15 +723,7 @@
                         <button id="presetBtn201" onclick="setTargetPreset(201)" class="target-preset-btn flex-1 bg-anthracite border border-emeraldLight/50 text-gray-300 text-[10px] font-bold py-2 rounded-lg active:scale-95 transition-all">201</button>
                     </div>
                     <input type="number" id="targetScoreInput" min="21" max="9999" inputmode="numeric" class="w-full bg-anthracite border border-emeraldLight/50 rounded-lg text-center font-mono text-xl font-bold text-gold py-2 outline-none focus:border-gold" oninput="onTargetScoreInput()">
-                    <p class="text-[10px] text-gray-500 mt-2.5 leading-snug">💡 Резултатът на всеки отбор (горе на главния екран) сега се редактира директно с тап върху числото — удобно за продължаване на игра от хартия.</p>
-                </div>
-
-                <div class="flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
-                    <div>
-                        <div class="text-xs lg:text-sm font-bold text-white">Таб "AI Скан"</div>
-                        <div class="text-[10px] text-gray-500 mt-0.5 leading-snug">Скрий го, ако не го използваш — навигацията остава по-чиста</div>
-                    </div>
-                    <button id="scanTabToggle" class="toggle-switch" data-on="1" onclick="toggleScanTabVisibility()" aria-label="Таб AI Скан"><div class="knob"></div></button>
+                    <p class="text-[10px] text-gray-500 mt-2.5 leading-snug">💡 Резултатът на всеки отбор (горе на главния екран) се редактира директно с тап върху числото — удобно за продължаване на игра от хартия.</p>
                 </div>
 
                 <div class="flex items-center justify-between gap-3 bg-forest/20 p-3 rounded-xl border border-emeraldLight/40">
@@ -893,8 +805,7 @@
             gameOver: false, winner: null, theme: 'forest',
             manualAdjustment: { us: 0, them: 0 },
             wakeLockEnabled: false, hapticEnabled: false, soundEnabled: false,
-            scanTabVisible: true, quickUndo: false,
-            workerUrl: '', workerSecret: '', ocrEnabled: false
+            quickUndo: false
         };
 
         // cat: 'belot' (независим), 'seq' (терца/кварта/квинта - йерархия по tier), 'careta' (йерархия по tier)
@@ -930,20 +841,10 @@
             if (state.wakeLockEnabled === undefined) state.wakeLockEnabled = false;
             if (state.hapticEnabled === undefined) state.hapticEnabled = false;
             if (state.soundEnabled === undefined) state.soundEnabled = false;
-            if (state.scanTabVisible === undefined) state.scanTabVisible = true;
             if (state.quickUndo === undefined) state.quickUndo = false;
-            if (state.workerUrl === undefined) state.workerUrl = '';
-            if (state.workerSecret === undefined) state.workerSecret = '';
-            if (state.ocrEnabled === undefined) state.ocrEnabled = false;
+            // изчистваме остатъци от махнатия AI скенер, ако идват от по-стар запазен запис
+            delete state.scanTabVisible; delete state.workerUrl; delete state.workerSecret; delete state.ocrEnabled;
 
-            document.getElementById('ocrToggle').dataset.on = state.ocrEnabled ? "1" : "0";
-
-            document.getElementById('workerUrlInput').value = state.workerUrl;
-            document.getElementById('workerSecretInput').value = state.workerSecret;
-            updateAiScanButtonVisibility();
-
-            document.getElementById('scanTabToggle').dataset.on = state.scanTabVisible ? "1" : "0";
-            applyScanTabVisibility();
             document.getElementById('quickUndoToggle').dataset.on = state.quickUndo ? "1" : "0";
 
             document.getElementById('team1Name').value = state.t1Name;
@@ -967,7 +868,6 @@
             document.getElementById('soundToggle').dataset.on = state.soundEnabled ? "1" : "0";
 
             buildAnnouncementsUI();
-            buildCardGrid();
             selectContract(state.currentContract, true);
             if (state.currentContract === 'suit' && state.currentSuit) highlightSuitButton(state.currentSuit);
             setCaller(document.getElementById('inputPoints') ? (state.lastCaller || '1') : '1');
@@ -1129,47 +1029,6 @@
             showToast('Резултатът е обновен!');
         }
 
-        function onWorkerConfigInput() {
-            state.workerUrl = document.getElementById('workerUrlInput').value.trim();
-            state.workerSecret = document.getElementById('workerSecretInput').value.trim();
-            updateAiScanButtonVisibility();
-            saveState();
-        }
-        function updateAiScanButtonVisibility() {
-            const btn = document.getElementById('aiRecognizeBtn');
-            if (!btn) return;
-            btn.classList.toggle('hidden', !state.workerUrl);
-            const ready = !!(typeof isFrozen !== 'undefined' && isFrozen);
-            btn.classList.toggle('opacity-50', !ready);
-            document.getElementById('aiRecognizeLabel').innerText = ready ? 'Разпознай с AI' : 'Замрази кадъра, за да разпознаеш';
-        }
-
-        function toggleOcr() {
-            state.ocrEnabled = !state.ocrEnabled;
-            document.getElementById('ocrToggle').dataset.on = state.ocrEnabled ? "1" : "0";
-            saveState();
-        }
-
-        /* ======================= ВИДИМОСТ НА ТАБ "AI СКАН" ======================= */
-        function applyScanTabVisibility() {
-            const scanBtn = document.querySelector('.nav-btn[data-target="scan"]');
-            if (state.scanTabVisible) {
-                scanBtn.classList.remove('hidden');
-                document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('w-1/3'); b.classList.add('w-1/4'); });
-            } else {
-                if (document.getElementById('tab-scan').classList.contains('active')) switchTab('score');
-                if (stream) stopCameraFully(); // не оставяй камерата да работи скрита
-                scanBtn.classList.add('hidden');
-                document.querySelectorAll('.nav-btn:not([data-target="scan"])').forEach(b => { b.classList.remove('w-1/4'); b.classList.add('w-1/3'); });
-            }
-        }
-        function toggleScanTabVisibility() {
-            state.scanTabVisible = !state.scanTabVisible;
-            document.getElementById('scanTabToggle').dataset.on = state.scanTabVisible ? "1" : "0";
-            applyScanTabVisibility();
-            saveState();
-        }
-
         /* ======================= БЪРЗО ВРЪЩАНЕ НА ХОД ======================= */
         function toggleQuickUndo() {
             state.quickUndo = !state.quickUndo;
@@ -1297,9 +1156,6 @@
             document.getElementById('basePointsLabel').innerText = `ОБЩО: ${base}`;
             document.getElementById('inputPoints').max = base;
 
-            let contractStr = cType === 'none' ? "Без Коз" : (cType === 'all' ? "Всичко Коз" : (state.currentSuit ? `Боя: ${state.currentSuit}` : "Боя"));
-            document.getElementById('scanContractInfo').innerText = contractStr;
-
             if (cType === 'none') {
                 document.getElementById('announcementsSection').classList.add('hidden');
                 document.getElementById('noTrumpsWarning').classList.remove('hidden');
@@ -1309,8 +1165,8 @@
                 document.getElementById('announcementsSection').classList.remove('hidden');
                 document.getElementById('noTrumpsWarning').classList.add('hidden');
             }
-            if (!skipRecalc) { updateCalc(); recalcScan(); saveState(); }
-            else { updateCalc(); recalcScan(); }
+            if (!skipRecalc) { updateCalc(); saveState(); }
+            else { updateCalc(); }
         }
 
         function highlightSuitButton(suit) {
@@ -1330,8 +1186,6 @@
         function setSuit(s) {
             state.currentSuit = s;
             highlightSuitButton(s);
-            document.getElementById('scanContractInfo').innerText = `Боя: ${s}`;
-            recalcScan();
             saveState();
         }
 
@@ -1775,411 +1629,6 @@
             showToast("Нова игра започната!");
         }
 
-        /* ======================= КАМЕРА / AI СКАН ======================= */
-        // Забележка: замразяването на кадъра използва video.pause()/play() вместо canvas снимка.
-        // Canvas копие изисква ръчно съвпадение на резолюция/пропорции с показания <video> и лесно
-        // излиза изкривено/срязано при несъвпадение; пауза на самия видео елемент показва точно
-        // това, което вече се вижда на живо — без разминаване.
-        //
-        // Цветова подсказка (реална, не симулирана): при замразен кадър, докосването върху снимката
-        // взима истински пиксели от офскрийн canvas (getImageData) около допира и определя дали
-        // мастилото е червено или черно. Това НЕ разпознава ранг/боя — само стеснява решетката.
-        // Пълно разпознаване на карти изисква трениран модел за точно това 32-картово френско тесте,
-        // какъвто не съществува готов за директно зареждане в браузъра; облачно AI API пък би изисквало
-        // таен ключ, вграден в публичния сайт — несигурно и извън обхвата на статичен GitHub Pages файл.
-        let stream = null, isFrozen = false, sampleCanvas = null;
-
-        async function startCamera() {
-            try {
-                let constraints = { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } } };
-                try { stream = await navigator.mediaDevices.getUserMedia(constraints); }
-                catch (e) { stream = await navigator.mediaDevices.getUserMedia({ video: true }); }
-                const video = document.getElementById('cameraFeed');
-                video.srcObject = stream;
-                await video.play();
-
-                video.classList.remove('hidden');
-                document.getElementById('cameraPlaceholder').classList.add('hidden');
-                document.getElementById('camStartBtn').classList.add('hidden');
-                document.getElementById('camFreezeBtn').classList.remove('hidden');
-                document.getElementById('camStopBtn').classList.remove('hidden');
-                document.getElementById('camFreezeBtn').innerText = 'Замрази кадър';
-                document.getElementById('pausedBadge').classList.add('hidden');
-                isFrozen = false;
-            } catch (err) {
-                console.error(err);
-                showToast("Няма достъп до камера — просто маркирай картите долу.", "error");
-            }
-        }
-
-        function toggleFreeze() {
-            const video = document.getElementById('cameraFeed');
-            if (!stream) return;
-            if (!isFrozen) {
-                video.pause();
-                isFrozen = true;
-                document.getElementById('pausedBadge').classList.remove('hidden');
-                document.getElementById('camFreezeBtn').innerText = 'Пусни камера';
-                document.getElementById('tapHint').classList.remove('hidden');
-
-                // Копираме текущия кадър в офскрийн canvas в НАТИВНА резолюция — оттук четем пиксели при допир.
-                sampleCanvas = document.createElement('canvas');
-                sampleCanvas.width = video.videoWidth || 1280;
-                sampleCanvas.height = video.videoHeight || 960;
-                const ctx = sampleCanvas.getContext('2d');
-                ctx.drawImage(video, 0, 0, sampleCanvas.width, sampleCanvas.height);
-            } else {
-                video.play();
-                isFrozen = false;
-                document.getElementById('pausedBadge').classList.add('hidden');
-                document.getElementById('camFreezeBtn').innerText = 'Замрази кадър';
-                document.getElementById('tapHint').classList.add('hidden');
-                clearColorFilter();
-                sampleCanvas = null;
-            }
-            updateAiScanButtonVisibility();
-        }
-
-        function stopCameraFully() {
-            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-            const video = document.getElementById('cameraFeed');
-            video.pause(); video.srcObject = null;
-            video.classList.add('hidden');
-            document.getElementById('cameraPlaceholder').classList.remove('hidden');
-            document.getElementById('camStartBtn').classList.remove('hidden');
-            document.getElementById('camFreezeBtn').classList.add('hidden');
-            document.getElementById('camStopBtn').classList.add('hidden');
-            document.getElementById('pausedBadge').classList.add('hidden');
-            document.getElementById('tapHint').classList.add('hidden');
-            clearColorFilter();
-            sampleCanvas = null;
-            isFrozen = false;
-            updateAiScanButtonVisibility();
-        }
-
-        // Реално четене на пиксели около точката на допир, за да познае червено/черно мастило.
-        function sampleCardColor(event) {
-            if (!isFrozen || !sampleCanvas) return;
-            const video = document.getElementById('cameraFeed');
-            const rect = video.getBoundingClientRect();
-
-            // object-contain центрира кадъра с "letterbox" ленти — пресмятаме реалния мащаб и отместване,
-            // за да превърнем координатите на допира в истински пиксел от нативната резолюция на снимката.
-            const scale = Math.min(rect.width / sampleCanvas.width, rect.height / sampleCanvas.height);
-            const renderedW = sampleCanvas.width * scale, renderedH = sampleCanvas.height * scale;
-            const offsetX = (rect.width - renderedW) / 2, offsetY = (rect.height - renderedH) / 2;
-
-            const clickX = event.clientX - rect.left, clickY = event.clientY - rect.top;
-            const px = (clickX - offsetX) / scale, py = (clickY - offsetY) / scale;
-
-            if (px < 0 || py < 0 || px > sampleCanvas.width || py > sampleCanvas.height) return; // допир в letterbox лентата
-
-            const ctx = sampleCanvas.getContext('2d');
-            // По-широка зона на търсене от преди, за да прощава леко неточен допир...
-            const sampleSize = Math.round(sampleCanvas.width * 0.06);
-            const sx = Math.max(0, Math.round(px - sampleSize / 2)), sy = Math.max(0, Math.round(py - sampleSize / 2));
-            const sw = Math.min(sampleSize, sampleCanvas.width - sx), sh = Math.min(sampleSize, sampleCanvas.height - sy);
-            if (sw <= 0 || sh <= 0) return;
-
-            let data;
-            try { data = ctx.getImageData(sx, sy, sw, sh).data; } catch (e) { console.error(e); return; }
-
-            // ...но вместо просто да осредним всичко (включително фона, ако допирът е леко встрани),
-            // взимаме само най-тъмните/наситени 25% пиксели в зоната — тези реално са мастилото.
-            const pixels = [];
-            for (let i = 0; i < data.length; i += 4) {
-                const pr = data[i], pg = data[i + 1], pb = data[i + 2];
-                pixels.push({ r: pr, g: pg, b: pb, dark: 255 - Math.min(pr, pg, pb) });
-            }
-            pixels.sort((a, b) => b.dark - a.dark);
-            const topCount = Math.max(1, Math.round(pixels.length * 0.25));
-            let r = 0, g = 0, b = 0;
-            for (let i = 0; i < topCount; i++) { r += pixels[i].r; g += pixels[i].g; b += pixels[i].b; }
-            r /= topCount; g /= topCount; b /= topCount;
-            const brightness = (r + g + b) / 3;
-
-            const badge = document.getElementById('colorResultBadge');
-            const text = document.getElementById('colorResultText');
-            badge.classList.remove('hidden'); badge.classList.add('flex');
-
-            let colorGuess = null;
-            if (brightness > 195) {
-                text.innerText = '🤍 Твърде светло — целѝ по-точно символа';
-                clearColorFilter(false);
-            } else if (r > g + 22 && r > b + 22) {
-                text.innerText = '🔴 Прилича на червена (♥ / ♦)';
-                colorGuess = 'red';
-                applyColorFilter('red');
-            } else {
-                text.innerText = '⚫ Прилича на черна (♠ / ♣)';
-                colorGuess = 'black';
-                applyColorFilter('black');
-            }
-
-            hideRankGuess();
-            if (colorGuess && state.ocrEnabled) attemptRankGuess(px, py, colorGuess);
-        }
-
-        function applyColorFilter(colorGuess) {
-            document.querySelectorAll('#cardGrid button').forEach(btn => {
-                const isRedSuit = ['♥', '♦'].includes(btn.dataset.suit);
-                const matches = (colorGuess === 'red' && isRedSuit) || (colorGuess === 'black' && !isRedSuit);
-                if (matches || btn.dataset.active === "1") { btn.classList.remove('opacity-25'); }
-                else { btn.classList.add('opacity-25'); }
-            });
-        }
-
-        function clearColorFilter(hideBadge = true) {
-            document.querySelectorAll('#cardGrid button').forEach(btn => btn.classList.remove('opacity-25'));
-            if (hideBadge) { document.getElementById('colorResultBadge').classList.add('hidden'); document.getElementById('colorResultBadge').classList.remove('flex'); }
-            hideRankGuess();
-        }
-
-        function hideRankGuess() {
-            document.getElementById('rankGuessRow').classList.add('hidden');
-            document.getElementById('rankGuessRow').classList.remove('flex');
-            document.getElementById('rankGuessChips').innerHTML = '';
-        }
-
-        /* ======================= БЕЗПЛАТНО OCR ПРЕДПОЛОЖЕНИЕ ЗА РАНГ ======================= */
-        // Никакъв сървър, никакъв ключ — Tesseract.js разчита текст изцяло в браузъра (WebAssembly).
-        // Ъгловите индекси на картите са дребна, стилизирана мишена за общ OCR модел, затова това е
-        // само предположение с ниска увереност, комбинирано с вече надеждното разчитане на цвета.
-        let tesseractLoadPromise = null;
-        function loadTesseractScript() {
-            if (window.Tesseract) return Promise.resolve();
-            if (tesseractLoadPromise) return tesseractLoadPromise;
-            tesseractLoadPromise = new Promise((resolve, reject) => {
-                const s = document.createElement('script');
-                s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-                s.onload = () => resolve();
-                s.onerror = () => { tesseractLoadPromise = null; reject(new Error('OCR библиотеката не се зареди.')); };
-                document.head.appendChild(s);
-            });
-            return tesseractLoadPromise;
-        }
-
-        let ocrWorkerPromise = null;
-        async function getOcrWorker() {
-            await loadTesseractScript();
-            if (!ocrWorkerPromise) {
-                ocrWorkerPromise = Tesseract.createWorker('eng').then(async (w) => {
-                    await w.setParameters({ tessedit_char_whitelist: '01789JQKA', tessedit_pageseg_mode: '7' });
-                    return w;
-                });
-            }
-            return ocrWorkerPromise;
-        }
-
-        // Изрязва зона около допира, уголемява я и я превръща в чист черно-бял контраст —
-        // истинско разчитане, не гадаене; но малкия ъглов индекс си остава трудна мишена.
-        function cropAndPreprocess(sourceCanvas, cx, cy) {
-            const cropSize = Math.round(sourceCanvas.width * 0.09);
-            const sx = Math.max(0, Math.round(cx - cropSize / 2));
-            const sy = Math.max(0, Math.round(cy - cropSize / 2));
-            const sw = Math.min(cropSize, sourceCanvas.width - sx);
-            const sh = Math.min(cropSize, sourceCanvas.height - sy);
-            if (sw <= 0 || sh <= 0) return null;
-
-            const scaleFactor = 4;
-            const out = document.createElement('canvas');
-            out.width = sw * scaleFactor; out.height = sh * scaleFactor;
-            const ctx = out.getContext('2d');
-            ctx.imageSmoothingEnabled = true;
-            ctx.drawImage(sourceCanvas, sx, sy, sw, sh, 0, 0, out.width, out.height);
-
-            const imgData = ctx.getImageData(0, 0, out.width, out.height);
-            const d = imgData.data;
-            for (let i = 0; i < d.length; i += 4) {
-                const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-                const val = gray < 130 ? 0 : 255;
-                d[i] = d[i + 1] = d[i + 2] = val;
-            }
-            ctx.putImageData(imgData, 0, 0);
-            return out;
-        }
-
-        // От суровия OCR текст извлича валиден ранг на Белот карта (7,8,9,10,J,Q,K,A), или null.
-        function parseRankFromOcrText(rawText) {
-            let t = (rawText || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
-            t = t.replace(/O/g, '0').replace(/I/g, '1').replace(/L/g, '1');
-            if (t.includes('10') || t.includes('1O') || (t.includes('1') && t.includes('0'))) return '10';
-            for (const r of ['7', '8', '9', 'J', 'Q', 'K', 'A']) { if (t.includes(r)) return r; }
-            return null;
-        }
-
-        async function attemptRankGuess(px, py, colorGuess) {
-            if (!sampleCanvas) return;
-            const cropped = cropAndPreprocess(sampleCanvas, px, py);
-            if (!cropped) return;
-
-            const text = document.getElementById('colorResultText');
-            const baseMsg = text.innerText;
-            text.innerText = baseMsg + ' · гадая ранга…';
-
-            try {
-                const worker = await getOcrWorker();
-                const { data } = await worker.recognize(cropped);
-                const rank = parseRankFromOcrText(data.text);
-                const confidence = data.confidence || 0;
-
-                text.innerText = baseMsg;
-                if (rank && confidence >= 35) showRankGuess(rank, colorGuess);
-            } catch (err) {
-                console.error('OCR грешка:', err);
-                text.innerText = baseMsg;
-            }
-        }
-
-        function showRankGuess(rank, colorGuess) {
-            const suits = colorGuess === 'red' ? ['♥', '♦'] : ['♠', '♣'];
-            const row = document.getElementById('rankGuessRow');
-            const chips = document.getElementById('rankGuessChips');
-            chips.innerHTML = '';
-            suits.forEach(suit => {
-                const chip = document.createElement('button');
-                chip.className = 'font-mono font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-glow bg-gold text-anthracite';
-                chip.innerHTML = `${rank}${suit}`;
-                chip.onclick = () => {
-                    const cardBtn = document.querySelector(`#cardGrid button[data-rank="${rank}"][data-suit="${suit}"]`);
-                    if (cardBtn) { setCardActive(cardBtn, true); recalcScan(); hapticFeedback(15); }
-                    hideRankGuess();
-                };
-                chips.appendChild(chip);
-            });
-            row.classList.remove('hidden'); row.classList.add('flex');
-        }
-
-
-
-        function resetCardGrid() {
-            document.querySelectorAll('#cardGrid button').forEach(b => setCardActive(b, false));
-            clearColorFilter();
-            recalcScan();
-        }
-
-        const cardsDef = ['7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-        const suitsDef = ['♠', '♥', '♦', '♣'];
-
-        function getCardValue(rank, suit) {
-            const isNoTrump = state.currentContract === 'none';
-            const isAllTrump = state.currentContract === 'all';
-            const isThisTrumpSuit = state.currentContract === 'suit' && suit === state.currentSuit;
-
-            if (isAllTrump || isThisTrumpSuit) {
-                return { 'J': 20, '9': 14, 'A': 11, '10': 10, 'K': 4, 'Q': 3 }[rank] || 0;
-            } else {
-                return { 'A': 11, '10': 10, 'K': 4, 'Q': 3, 'J': 2 }[rank] || 0;
-            }
-        }
-
-        // Споделена логика за (де)маркиране на карта — ползва се както при ръчно
-        // тапване, така и при автоматично попълване от AI разпознаването.
-        function setCardActive(btn, active) {
-            btn.dataset.active = active ? "1" : "0";
-            const suit = btn.dataset.suit;
-            if (active) {
-                btn.classList.add('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
-                btn.classList.remove('bg-emeraldLight/30', 'hover:bg-emeraldLight/50', 'text-red-400', 'text-white', 'opacity-25');
-            } else {
-                btn.classList.remove('bg-gold', 'text-anthracite', 'shadow-glow', 'scale-105');
-                btn.classList.add('bg-emeraldLight/30', 'hover:bg-emeraldLight/50');
-                if (['♥', '♦'].includes(suit)) btn.classList.add('text-red-400'); else btn.classList.add('text-white');
-            }
-        }
-
-        function buildCardGrid() {
-            const grid = document.getElementById('cardGrid');
-            grid.innerHTML = '';
-            suitsDef.forEach(suit => {
-                cardsDef.forEach(rank => {
-                    const btn = document.createElement('button');
-                    btn.className = `font-sans font-bold bg-emeraldLight/30 hover:bg-emeraldLight/50 text-white text-[10px] lg:text-sm py-2.5 lg:py-4 rounded-xl border border-transparent transition-all transform active:scale-90 shadow-sm ${['♥', '♦'].includes(suit) ? 'text-red-400' : ''}`;
-                    btn.innerHTML = `${rank}${suit}`;
-                    btn.dataset.rank = rank; btn.dataset.suit = suit; btn.dataset.active = "0";
-                    btn.onclick = () => {
-                        setCardActive(btn, btn.dataset.active !== "1");
-                        recalcScan();
-                    };
-                    grid.appendChild(btn);
-                });
-            });
-        }
-
-        function recalcScan() {
-            scanTotal = 0;
-            document.querySelectorAll('#cardGrid button[data-active="1"]').forEach(btn => {
-                scanTotal += getCardValue(btn.dataset.rank, btn.dataset.suit);
-            });
-            const el = document.getElementById('scanTotal');
-            if (el) el.innerText = scanTotal;
-        }
-
-        /* ======================= AI РАЗПОЗНАВАНЕ (през собствения Worker на потребителя) ======================= */
-        const SUIT_NAME_TO_SYMBOL = { spades: '♠', hearts: '♥', diamonds: '♦', clubs: '♣' };
-
-        async function recognizeWithAI() {
-            if (!state.workerUrl) { showToast('Настрой AI разпознаване в Настройки.', 'error'); return; }
-            if (!isFrozen || !sampleCanvas) { showToast('Първо замрази кадъра с картите.', 'error'); return; }
-
-            const btn = document.getElementById('aiRecognizeBtn');
-            const icon = document.getElementById('aiRecognizeIcon');
-            const label = document.getElementById('aiRecognizeLabel');
-            btn.disabled = true; btn.classList.add('opacity-60', 'pointer-events-none');
-            icon.classList.add('animate-spin');
-            label.innerText = 'Разпознавам…';
-
-            try {
-                // Смаляваме преди изпращане — по-бързо качване и по-малко токени, пак достатъчно ясно за карти.
-                const maxDim = 1100;
-                const scale = Math.min(1, maxDim / Math.max(sampleCanvas.width, sampleCanvas.height));
-                const exportCanvas = document.createElement('canvas');
-                exportCanvas.width = Math.round(sampleCanvas.width * scale);
-                exportCanvas.height = Math.round(sampleCanvas.height * scale);
-                exportCanvas.getContext('2d').drawImage(sampleCanvas, 0, 0, exportCanvas.width, exportCanvas.height);
-                const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.85);
-
-                const headers = { 'Content-Type': 'application/json' };
-                if (state.workerSecret) headers['X-Shared-Secret'] = state.workerSecret;
-
-                const res = await fetch(state.workerUrl, { method: 'POST', headers, body: JSON.stringify({ image: dataUrl }) });
-                const data = await res.json().catch(() => ({}));
-
-                if (!res.ok) {
-                    showToast(data.error || `AI разпознаването се провали (${res.status}).`, 'error');
-                    return;
-                }
-
-                let matched = 0;
-                (data.cards || []).forEach(c => {
-                    const suitSym = SUIT_NAME_TO_SYMBOL[String(c.suit || '').toLowerCase()];
-                    const rank = String(c.rank || '').toUpperCase();
-                    if (!suitSym || !rank) return;
-                    const cardBtn = document.querySelector(`#cardGrid button[data-rank="${rank}"][data-suit="${suitSym}"]`);
-                    if (cardBtn && cardBtn.dataset.active !== "1") { setCardActive(cardBtn, true); matched++; }
-                });
-                recalcScan();
-
-                if (matched > 0) { showToast(`Разпознати ${matched} ${matched === 1 ? 'карта' : 'карти'}! Провери и коригирай при нужда.`); hapticFeedback(15); }
-                else showToast('Не бяха разпознати карти — маркирай ръчно.', 'error');
-            } catch (err) {
-                console.error(err);
-                showToast('Няма връзка с AI сервиза.', 'error');
-            } finally {
-                btn.disabled = false; btn.classList.remove('opacity-60', 'pointer-events-none');
-                icon.classList.remove('animate-spin');
-                updateAiScanButtonVisibility();
-            }
-        }
-
-        function sendToCalculator() {
-            document.getElementById('inputPoints').value = scanTotal;
-            switchTab('score');
-            updateCalc();
-            resetCardGrid();
-            stopCameraFully();
-            showToast("Стойностите са прехвърлени!");
-        }
     </script>
 </body>
 </html>
